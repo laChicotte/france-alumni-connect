@@ -1,11 +1,23 @@
+"use client"
+
 import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { articles } from "@/lib/fake-data"
+import type { Article } from "@/lib/fake-data"
 import { Calendar, User, ArrowRight } from "lucide-react"
+import { useState } from "react"
 
 export default function ActualitesPage() {
-  const categories = ["Tous", "Parcours inspirants", "Entrepreneuriat", "Intégration", "Événements"]
+  type BaseCategory = Article["category"]
+  type ArticleCategory = BaseCategory | "Tous"
+  const baseCategories: BaseCategory[] = Array.from(new Set(articles.map((a) => a.category)))
+  const categories: ArticleCategory[] = ["Tous", ...baseCategories]
+  const [selectedCategory, setSelectedCategory] = useState<ArticleCategory>("Tous")
+  const filteredArticles =
+    selectedCategory === "Tous"
+      ? articles
+      : articles.filter((article) => article.category === selectedCategory)
 
   return (
     <div className="min-h-screen">
@@ -31,10 +43,11 @@ export default function ActualitesPage() {
             {categories.map((category) => (
               <Button
                 key={category}
-                variant={category === "Tous" ? "default" : "outline"}
+                variant={category === selectedCategory ? "default" : "outline"}
                 className={
-                  category === "Tous" ? "bg-[#0055A4] hover:bg-[#0055A4]/90" : "hover:bg-[#0055A4] hover:text-white"
+                  category === selectedCategory ? "bg-[#0055A4] hover:bg-[#0055A4]/90" : "hover:bg-[#0055A4] hover:text-white"
                 }
+                onClick={() => setSelectedCategory(category)}
               >
                 {category}
               </Button>
@@ -47,7 +60,7 @@ export default function ActualitesPage() {
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {articles.map((article) => (
+            {filteredArticles.map((article) => (
               <Card key={article.id} className="overflow-hidden hover:shadow-lg transition-shadow group">
                 <div className="relative overflow-hidden">
                   <img

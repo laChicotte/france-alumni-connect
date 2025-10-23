@@ -112,6 +112,16 @@ export const articles: Article[] = [
     image: "/student-campus-france-university.jpg",
     content: "Intégrer HEC Paris était un rêve que je n'osais pas imaginer...",
   },
+  {
+    id: "7",
+    title: "Salon des Stages 2025 : Coaching et Recrutement",
+    excerpt: "Deux jours pour connecter étudiants et entreprises à Conakry avec nos Alumni.",
+    category: "Événements",
+    author: "Équipe France Alumni",
+    date: "18 Mars 2024",
+    image: "/social-innovation-community-africa.jpg",
+    content: "Un rendez-vous inédit qui rassemble Alumni, étudiants et entreprises pour créer des opportunités concrètes...",
+  },
 ]
 
 export const alumniMembers: AlumniMember[] = [
@@ -371,51 +381,4 @@ export const jobPostings: JobPosting[] = [
     salary: "Indemnité de stage",
     remote: false,
   },
-]
-
-export const events: Event[] = [
-  {
-    id: "1",
-    title: "Forum Alumni 2024",
-    date: "20 Avril 2024",
-    time: "09:00 - 17:00",
-    location: "Palais des Nations, Conakry",
-    type: "Conférence",
-    description: "Le grand rassemblement annuel des alumni France-Guinée avec conférences, networking et opportunités professionnelles.",
-    image: "/conference-event-networking-africa.jpg",
-    attendees: 150
-  },
-  {
-    id: "2",
-    title: "Workshop Entrepreneuriat Tech",
-    date: "15 Mai 2024",
-    time: "14:00 - 18:00",
-    location: "Institut Français, Conakry",
-    type: "Workshop",
-    description: "Formation pratique sur le lancement de startups technologiques en Guinée.",
-    image: "/startup-office-technology-africa.jpg",
-    attendees: 30
-  },
-  {
-    id: "3",
-    title: "Soirée Networking",
-    date: "8 Juin 2024",
-    time: "18:30 - 22:00",
-    location: "Hôtel Riviera, Conakry",
-    type: "Networking",
-    description: "Rencontre informelle entre alumni pour échanger sur les opportunités professionnelles.",
-    image: "/social-innovation-community-africa.jpg",
-    attendees: 80
-  },
-  {
-    id: "4",
-    title: "Formation Leadership",
-    date: "22 Juin 2024",
-    time: "09:00 - 16:00",
-    location: "Campus France, Conakry",
-    type: "Formation",
-    description: "Développement des compétences en leadership et gestion d'équipe.",
-    image: "/professional-woman-office-guinea.jpg",
-    attendees: 25
-  }
 ]

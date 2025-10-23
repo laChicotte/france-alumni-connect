@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { Menu, X, User, LogOut, Settings, Bell } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -25,6 +25,7 @@ export function Navigation() {
     role: ""
   })
   const router = useRouter()
+  const pathname = usePathname()
 
   useEffect(() => {
     // Vérifier l'état de connexion au chargement
@@ -67,15 +68,23 @@ export function Navigation() {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="px-4 py-2 text-sm font-medium text-foreground hover:text-[#0055A4] hover:bg-muted rounded-md transition-colors"
-              >
-                {item.label}
-              </Link>
-            ))}
+            {navItems.map((item) => {
+              const isActive = pathname.startsWith(item.href)
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={
+                    `px-4 py-2 text-sm font-medium rounded-md transition-colors ` +
+                    (isActive
+                      ? `text-[#0055A4] bg-[#0055A4]/10 border border-[#0055A4]/20`
+                      : `text-foreground hover:text-[#0055A4] hover:bg-muted`)
+                  }
+                >
+                  {item.label}
+                </Link>
+              )
+            })}
             
             {/* User Profile */}
             <div className="ml-4">
@@ -159,16 +168,24 @@ export function Navigation() {
         {/* Mobile Navigation */}
         {isOpen && (
           <div className="md:hidden py-4 space-y-2">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="block px-4 py-2 text-sm font-medium text-foreground hover:text-[#0055A4] hover:bg-muted rounded-md transition-colors"
-                onClick={() => setIsOpen(false)}
-              >
-                {item.label}
-              </Link>
-            ))}
+            {navItems.map((item) => {
+              const isActive = pathname.startsWith(item.href)
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={
+                    `block px-4 py-2 text-sm font-medium rounded-md transition-colors ` +
+                    (isActive
+                      ? `text-[#0055A4] bg-[#0055A4]/10 border border-[#0055A4]/20`
+                      : `text-foreground hover:text-[#0055A4] hover:bg-muted`)
+                  }
+                  onClick={() => setIsOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              )
+            })}
             
             {/* Mobile User Profile */}
             <div className="px-4 py-2 border-t border-border mt-4">

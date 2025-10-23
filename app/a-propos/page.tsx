@@ -260,7 +260,7 @@ export default function AboutPage() {
                 Devenir membre
               </a>
               <a
-                href="/contact"
+                href="mailto:france.alumni@institutfrancais-guinee.fr"
                 className="inline-flex items-center justify-center px-6 py-3 bg-white/10 text-white font-semibold rounded-lg hover:bg-white/20 transition-colors border border-white"
               >
                 Nous contacter

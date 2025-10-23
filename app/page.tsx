@@ -2,12 +2,12 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ArrowRight, Users, Briefcase, GraduationCap, Globe, MapPin, Mail, Calendar, Clock, MapPin as MapPinIcon } from "lucide-react"
-import { articles, alumniMembers, events } from "@/lib/fake-data"
+import { articles, alumniMembers } from "@/lib/fake-data"
 
 export default function HomePage() {
   const featuredArticles = articles.slice(0, 2)
   const featuredAlumni = alumniMembers.slice(-3)
-  const upcomingEvents = events.slice(0, 2)
+  const upcomingEvents = articles.filter((a) => a.category === "Événements").slice(0, 2)
 
   return (
     <div className="min-h-screen">
@@ -88,27 +88,22 @@ export default function HomePage() {
               <div className="flex justify-between items-end mb-8">
                 <div>
                   <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-4">Evénements</h2>
-                  <p className="text-lg text-muted-foreground">Rejoignez nos événements</p>
+                  <p className="text-lg text-muted-foreground">Rejoignez nos événements à venir</p>
                 </div>
-                <Link href="/evenements">
-                  <Button variant="outline" size="sm">
-                    Voir tout
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Button>
-                </Link>
+                {/* Bouton "Voir tout" supprimé pour harmonisation (pas de page événements dédiée) */}
               </div>
 
               <div className="space-y-3">
                 {upcomingEvents.map((event) => (
                   <Card key={event.id} className="hover:shadow-lg transition-shadow">
-                    <CardContent className="p-3">
+                    <CardContent className="px-3 py-[9px]">
                       <div className="flex items-start gap-3">
                         <div className="w-10 h-10 bg-[#0055A4]/10 rounded-lg flex items-center justify-center flex-shrink-0">
                           <Calendar className="h-5 w-5 text-[#0055A4]" />
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="inline-block px-2 py-1 bg-[#FCD116]/20 text-[#0055A4] text-xs font-semibold rounded-full mb-2">
-                            {event.type}
+                            Événement
                           </div>
                           <h3 className="font-serif text-base font-bold mb-1 line-clamp-2">{event.title}</h3>
                           <div className="space-y-1 text-xs text-muted-foreground">
@@ -118,17 +113,15 @@ export default function HomePage() {
                             </div>
                             <div className="flex items-center gap-2">
                               <Clock className="h-3 w-3" />
-                              <span>{event.time}</span>
+                              <span>—</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <MapPinIcon className="h-3 w-3" />
-                              <span className="line-clamp-1">{event.location}</span>
+                              <span className="line-clamp-1">—</span>
                             </div>
                           </div>
-                          <div className="mt-2 flex items-center justify-between">
-                            <span className="text-xs text-muted-foreground">
-                              {event.attendees} participants
-                            </span>
+                          <div className="mt-1 flex items-center justify-between">
+                            <span className="text-xs text-muted-foreground">&nbsp;</span>
                             <Button size="sm" variant="outline" className="text-xs h-6 px-2">
                               S'inscrire
                             </Button>

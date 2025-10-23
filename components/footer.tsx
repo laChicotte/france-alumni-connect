@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Facebook, Twitter, Linkedin, Mail } from "lucide-react"
+import { Facebook, Linkedin, Mail } from "lucide-react"
 
 export function Footer() {
   return (
@@ -47,7 +47,11 @@ export function Footer() {
             <ul className="space-y-2 text-sm text-white/80">
               <li>Institut Français de Guinée</li>
               <li>Conakry, Guinée</li>
-              <li>contact@francealumniconnect.fr</li>
+              <li>
+                <a href="mailto:france.alumni@institutfrancais-guinee.fr" className="hover:text-[#FCD116] transition-colors">
+                  france.alumni@institutfrancais-guinee.fr
+                </a>
+              </li>
               <li>+224 XXX XX XX XX</li>
             </ul>
           </div>
@@ -56,16 +60,29 @@ export function Footer() {
           <div>
             <h4 className="font-semibold mb-4">Suivez-nous</h4>
             <div className="flex gap-4">
-              <a href="#" className="hover:text-[#FCD116] transition-colors">
+              <a 
+                href="https://www.facebook.com/share/1EaGeQh1f8/?mibextid=wwXIfr" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hover:text-[#FCD116] transition-colors"
+                aria-label="Suivez-nous sur Facebook"
+              >
                 <Facebook className="h-5 w-5" />
               </a>
-              <a href="#" className="hover:text-[#FCD116] transition-colors">
-                <Twitter className="h-5 w-5" />
-              </a>
-              <a href="#" className="hover:text-[#FCD116] transition-colors">
+              <a 
+                href="https://www.linkedin.com/company/francealumnign/" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hover:text-[#FCD116] transition-colors"
+                aria-label="Suivez-nous sur LinkedIn"
+              >
                 <Linkedin className="h-5 w-5" />
               </a>
-              <a href="#" className="hover:text-[#FCD116] transition-colors">
+              <a 
+                href="mailto:france.alumni@institutfrancais-guinee.fr" 
+                className="hover:text-[#FCD116] transition-colors"
+                aria-label="Envoyez-nous un email"
+              >
                 <Mail className="h-5 w-5" />
               </a>
             </div>
