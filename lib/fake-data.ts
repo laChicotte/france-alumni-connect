@@ -38,6 +38,18 @@ export interface JobPosting {
   remote: boolean
 }
 
+export interface Event {
+  id: string
+  title: string
+  date: string
+  time: string
+  location: string
+  type: "Conférence" | "Networking" | "Formation" | "Workshop"
+  description: string
+  image: string
+  attendees: number
+}
+
 export const articles: Article[] = [
   {
     id: "1",
@@ -239,10 +251,11 @@ export const teamMembers = [
 ]
 
 export const partners = [
-  { name: "Ambassade de France en Guinée", logo: "/placeholder.svg?height=80&width=200" },
-  { name: "Campus France", logo: "/placeholder.svg?height=80&width=200" },
-  { name: "Institut Français de Guinée", logo: "/placeholder.svg?height=80&width=200" },
-  { name: "Ministère de l'Enseignement Supérieur", logo: "/placeholder.svg?height=80&width=200" },
+  { name: "Ambassade de France en Guinée et en Sierra Leone", logo: "/partenaires/ambassade.png" },
+  { name: "Institut français de Guinée", logo: "/partenaires/ifg.png" },
+  { name: "Campus France", logo: "/partenaires/campusfrance.png" },
+  { name: "Association des Jeunes Guinéens de France", logo: "/partenaires/ajgf.jpg" },
+  { name: "Salon de l'Emploi et de l'Entrepreneuriat des Guinéens de France", logo: "/partenaires/seegf.png" },
 ]
 
 export const jobPostings: JobPosting[] = [
@@ -358,4 +371,51 @@ export const jobPostings: JobPosting[] = [
     salary: "Indemnité de stage",
     remote: false,
   },
+]
+
+export const events: Event[] = [
+  {
+    id: "1",
+    title: "Forum Alumni 2024",
+    date: "20 Avril 2024",
+    time: "09:00 - 17:00",
+    location: "Palais des Nations, Conakry",
+    type: "Conférence",
+    description: "Le grand rassemblement annuel des alumni France-Guinée avec conférences, networking et opportunités professionnelles.",
+    image: "/conference-event-networking-africa.jpg",
+    attendees: 150
+  },
+  {
+    id: "2",
+    title: "Workshop Entrepreneuriat Tech",
+    date: "15 Mai 2024",
+    time: "14:00 - 18:00",
+    location: "Institut Français, Conakry",
+    type: "Workshop",
+    description: "Formation pratique sur le lancement de startups technologiques en Guinée.",
+    image: "/startup-office-technology-africa.jpg",
+    attendees: 30
+  },
+  {
+    id: "3",
+    title: "Soirée Networking",
+    date: "8 Juin 2024",
+    time: "18:30 - 22:00",
+    location: "Hôtel Riviera, Conakry",
+    type: "Networking",
+    description: "Rencontre informelle entre alumni pour échanger sur les opportunités professionnelles.",
+    image: "/social-innovation-community-africa.jpg",
+    attendees: 80
+  },
+  {
+    id: "4",
+    title: "Formation Leadership",
+    date: "22 Juin 2024",
+    time: "09:00 - 16:00",
+    location: "Campus France, Conakry",
+    type: "Formation",
+    description: "Développement des compétences en leadership et gestion d'équipe.",
+    image: "/professional-woman-office-guinea.jpg",
+    attendees: 25
+  }
 ]

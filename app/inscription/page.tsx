@@ -71,6 +71,20 @@ export default function InscriptionPage() {
               <Input id="company" placeholder="Ex: Banque Atlantique Guinée" />
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="diploma">Dernier diplôme français obtenu *</Label>
+              <Input 
+                id="diploma" 
+                type="file" 
+                accept=".pdf,.jpg,.jpeg,.png" 
+                required 
+                className="file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#0055A4] file:text-white hover:file:bg-[#0055A4]/90"
+              />
+              <p className="text-xs text-muted-foreground">
+                Formats acceptés : PDF, JPG, PNG (max 5MB)
+              </p>
+            </div>
+
             <div className="flex items-start space-x-2">
               <Checkbox id="terms" required />
               <label htmlFor="terms" className="text-sm text-muted-foreground leading-relaxed">
@@ -82,6 +96,13 @@ export default function InscriptionPage() {
                 <Link href="/confidentialite" className="text-[#0055A4] hover:underline">
                   politique de confidentialité
                 </Link>
+              </label>
+            </div>
+
+            <div className="flex items-start space-x-2">
+              <Checkbox id="verifDiploma" required />
+              <label htmlFor="verifDiploma" className="text-sm text-muted-foreground leading-relaxed">
+                J'autorise verifDiploma à vérifier et authentifier mon diplôme français pour valider mon inscription au réseau France Alumni Guinée *
               </label>
             </div>
 

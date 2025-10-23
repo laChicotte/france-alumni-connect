@@ -1,19 +1,55 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react"
-import { Menu, X } from "lucide-react"
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
+import { Menu, X, User, LogOut, Settings, Bell } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [user, setUser] = useState({
+    name: "",
+    email: "",
+    avatar: "",
+    role: ""
+  })
+  const router = useRouter()
+
+  useEffect(() => {
+    // Vérifier l'état de connexion au chargement
+    const authStatus = localStorage.getItem('isAuthenticated')
+    const userData = localStorage.getItem('user')
+    
+    if (authStatus === 'true' && userData) {
+      setIsAuthenticated(true)
+      setUser(JSON.parse(userData))
+    }
+  }, [])
+
+  const handleLogout = () => {
+    localStorage.removeItem('isAuthenticated')
+    localStorage.removeItem('user')
+    setIsAuthenticated(false)
+    setUser({ name: "", email: "", avatar: "", role: "" })
+    router.push('/')
+  }
 
   const navItems = [
-    { href: "/", label: "Accueil" },
+    // { href: "/", label: "Accueil" },
     { href: "/a-propos", label: "À propos" },
     { href: "/actualites", label: "Actualités" },
     { href: "/emploi", label: "Emploi" },
-    { href: "/authentification", label: "Authentification" },
     { href: "/annuaire", label: "Annuaire" },
   ]
 
@@ -40,6 +76,78 @@ export function Navigation() {
                 {item.label}
               </Link>
             ))}
+            
+            {/* User Profile */}
+            <div className="ml-4">
+              {isAuthenticated ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={user.avatar} alt={user.name} />
+                        <AvatarFallback className="bg-[#0055A4] text-white text-xs">
+                          {user.name.split(' ').map(n => n[0]).join('')}
+                        </AvatarFallback>
+                      </Avatar>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                    <DropdownMenuLabel className="font-normal">
+                      <div className="flex flex-col space-y-1">
+                        <div className="flex items-center gap-2">
+                          <p className="text-sm font-medium leading-none">{user.name}</p>
+                          {user.role && (
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#0055A4]/10 text-[#0055A4]">
+                              {user.role}
+                            </span>
+                          )}
+                        </div>
+                        <p className="text-xs leading-none text-muted-foreground">
+                          {user.email}
+                        </p>
+                      </div>
+                    </DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem asChild>
+                      <Link href="/profil" className="cursor-pointer">
+                        <User className="mr-2 h-4 w-4" />
+                        <span>Mon profil</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/parametres" className="cursor-pointer">
+                        <Settings className="mr-2 h-4 w-4" />
+                        <span>Paramètres</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href="/notifications" className="cursor-pointer">
+                        <Bell className="mr-2 h-4 w-4" />
+                        <span>Notifications</span>
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout} className="cursor-pointer">
+                      <LogOut className="mr-2 h-4 w-4" />
+                      <span>Se déconnecter</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <div className="flex items-center gap-2">
+                  <Link href="/connexion">
+                    <Button variant="outline" size="sm">
+                      Se connecter
+                    </Button>
+                  </Link>
+                  <Link href="/inscription">
+                    <Button size="sm" className="bg-[#0055A4] hover:bg-[#0055A4]/90">
+                      S'inscrire
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
 
           {/* Mobile menu button */}
@@ -61,6 +169,75 @@ export function Navigation() {
                 {item.label}
               </Link>
             ))}
+            
+            {/* Mobile User Profile */}
+            <div className="px-4 py-2 border-t border-border mt-4">
+              {isAuthenticated ? (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-3 px-2 py-2">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={user.avatar} alt={user.name} />
+                      <AvatarFallback className="bg-[#0055A4] text-white text-xs">
+                        {user.name.split(' ').map(n => n[0]).join('')}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <p className="text-sm font-medium">{user.name}</p>
+                      <p className="text-xs text-muted-foreground">{user.email}</p>
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <Link
+                      href="/profil"
+                      className="flex items-center gap-2 px-2 py-2 text-sm text-foreground hover:text-[#0055A4] hover:bg-muted rounded-md transition-colors"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <User className="h-4 w-4" />
+                      Mon profil
+                    </Link>
+                    <Link
+                      href="/parametres"
+                      className="flex items-center gap-2 px-2 py-2 text-sm text-foreground hover:text-[#0055A4] hover:bg-muted rounded-md transition-colors"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <Settings className="h-4 w-4" />
+                      Paramètres
+                    </Link>
+                    <Link
+                      href="/notifications"
+                      className="flex items-center gap-2 px-2 py-2 text-sm text-foreground hover:text-[#0055A4] hover:bg-muted rounded-md transition-colors"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <Bell className="h-4 w-4" />
+                      Notifications
+                    </Link>
+                    <button
+                      onClick={() => {
+                        handleLogout()
+                        setIsOpen(false)
+                      }}
+                      className="flex items-center gap-2 px-2 py-2 text-sm text-foreground hover:text-[#0055A4] hover:bg-muted rounded-md transition-colors w-full text-left"
+                    >
+                      <LogOut className="h-4 w-4" />
+                      Se déconnecter
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <Link href="/connexion" className="block" onClick={() => setIsOpen(false)}>
+                    <Button variant="outline" size="sm" className="w-full">
+                      Se connecter
+                    </Button>
+                  </Link>
+                  <Link href="/inscription" className="block" onClick={() => setIsOpen(false)}>
+                    <Button size="sm" className="w-full bg-[#0055A4] hover:bg-[#0055A4]/90">
+                      S'inscrire
+                    </Button>
+                  </Link>
+                </div>
+              )}
+            </div>
           </div>
         )}
       </div>

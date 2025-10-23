@@ -1,4 +1,5 @@
 import { Card, CardContent } from "@/components/ui/card"
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
 import { teamMembers, partners } from "@/lib/fake-data"
 import { Target, Users, Heart, Globe, Award, Lightbulb } from "lucide-react"
 
@@ -169,7 +170,7 @@ export default function AboutPage() {
       </section>
 
       {/* Team */}
-      <section className="py-20">
+      {/* <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
             <h2 className="font-serif text-3xl font-bold mb-4">Notre Équipe</h2>
@@ -197,7 +198,7 @@ export default function AboutPage() {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Partners */}
       <section className="py-20 bg-muted">
@@ -212,19 +213,33 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-5xl mx-auto">
-            {partners.map((partner, index) => (
-              <Card key={index} className="flex items-center justify-center p-6 hover:shadow-lg transition-shadow">
-                <div className="text-center">
-                  <img
-                    src={partner.logo || "/placeholder.svg"}
-                    alt={partner.name}
-                    className="w-full h-16 object-contain mb-2"
-                  />
-                  <p className="text-xs text-muted-foreground font-medium">{partner.name}</p>
-                </div>
-              </Card>
-            ))}
+          <div className="max-w-6xl mx-auto">
+            <Carousel
+              opts={{
+                align: "start",
+                loop: true,
+              }}
+              className="w-full"
+            >
+              <CarouselContent className="-ml-2 md:-ml-4">
+                {partners.map((partner, index) => (
+                  <CarouselItem key={index} className="pl-2 md:pl-4 md:basis-1/2 lg:basis-1/3">
+                    <Card className="flex items-center justify-center p-6 hover:shadow-lg transition-shadow h-full">
+                      <div className="text-center">
+                        <img
+                          src={partner.logo || "/placeholder.svg"}
+                          alt={partner.name}
+                          className="w-full h-16 object-contain mb-2"
+                        />
+                        <p className="text-xs text-muted-foreground font-medium">{partner.name}</p>
+                      </div>
+                    </Card>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious className="hidden md:flex" />
+              <CarouselNext className="hidden md:flex" />
+            </Carousel>
           </div>
         </div>
       </section>
