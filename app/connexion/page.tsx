@@ -85,8 +85,12 @@ export default function ConnexionPage() {
       }))
       localStorage.setItem('isAuthenticated', 'true')
       
-      // Rediriger vers la page d'accueil
+      // Rediriger vers la page d'accueil et forcer le rechargement
       router.push('/')
+      // Forcer le rechargement pour mettre à jour l'état de navigation
+      setTimeout(() => {
+        window.location.reload()
+      }, 100)
     } else {
       alert('Identifiants incorrects')
     }

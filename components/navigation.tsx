@@ -93,9 +93,9 @@ export function Navigation() {
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src={user.avatar} alt={user.name} />
-                        <AvatarFallback className="bg-[#0055A4] text-white text-xs">
-                          {user.name.split(' ').map(n => n[0]).join('')}
+                        <AvatarImage src={user.avatar && user.avatar !== '/placeholder.svg' ? user.avatar : undefined} alt={user.name} />
+                        <AvatarFallback className="bg-gradient-to-br from-gray-600 to-gray-800 text-white text-xs font-bold">
+                          {user.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'FA'}
                         </AvatarFallback>
                       </Avatar>
                     </Button>
@@ -193,9 +193,9 @@ export function Navigation() {
                 <div className="space-y-2">
                   <div className="flex items-center gap-3 px-2 py-2">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={user.avatar} alt={user.name} />
-                      <AvatarFallback className="bg-[#0055A4] text-white text-xs">
-                        {user.name.split(' ').map(n => n[0]).join('')}
+                      <AvatarImage src={user.avatar && user.avatar !== '/placeholder.svg' ? user.avatar : undefined} alt={user.name} />
+                      <AvatarFallback className="bg-gradient-to-br from-gray-600 to-gray-800 text-white text-xs font-bold">
+                        {user.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'FA'}
                       </AvatarFallback>
                     </Avatar>
                     <div>
