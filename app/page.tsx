@@ -73,8 +73,8 @@ export default function HomePage() {
                       <p className="text-muted-foreground text-sm mb-4 line-clamp-3">{article.excerpt}</p>
                       <div className="flex items-center justify-between text-sm text-muted-foreground">
                         <span>{article.date}</span>
-                        <Link href={`/actualites/${article.id}`} className="text-[#0055A4] font-semibold hover:underline">
-                          Lire plus →
+                        <Link href="/actualites" className="text-[#0055A4] font-semibold hover:underline">
+                          Voir toutes les actualités →
                         </Link>
                       </div>
                     </CardContent>
@@ -166,7 +166,7 @@ export default function HomePage() {
                       />
                     </div>
                     <h3 className="font-serif text-lg font-bold mb-1 group-hover:text-[#0055A4] transition-colors">
-                      <Link href={`/annuaire/${member.id}`}>{member.name}</Link>
+                      {member.name}
                     </h3>
                     <p className="text-sm text-[#0055A4] font-semibold mb-2">{member.currentPosition}</p>
                     <p className="text-sm text-muted-foreground mb-3">{member.company}</p>
@@ -190,9 +190,9 @@ export default function HomePage() {
                   </div>
 
                   <div className="flex gap-2">
-                    <Link href={`/annuaire/${member.id}`} className="flex-1">
+                    <Link href="/annuaire" className="flex-1">
                       <Button variant="outline" size="sm" className="w-full bg-transparent hover:bg-[#0055A4] hover:text-white">
-                        Voir le profil
+                        Voir l'annuaire
                       </Button>
                     </Link>
                     <Button

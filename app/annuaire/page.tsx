@@ -1,8 +1,12 @@
+"use client"
+
 import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { alumniMembers } from "@/lib/fake-data"
 import { Search, Filter, GraduationCap, Briefcase, MapPin, Mail } from "lucide-react"
+import { useState } from "react"
 
 export default function AnnuairePage() {
   const sectors = ["Tous", "Technologie", "Finance", "Santé", "Éducation", "Droit", "Architecture"]
@@ -103,7 +107,7 @@ export default function AnnuairePage() {
                       />
                     </div>
                     <h3 className="font-serif text-xl font-bold mb-1 group-hover:text-[#0055A4] transition-colors">
-                      <Link href={`/annuaire/${member.id}`}>{member.name}</Link>
+                      {member.name}
                     </h3>
                     <p className="text-sm text-[#0055A4] font-semibold mb-2">{member.currentPosition}</p>
                     <p className="text-sm text-muted-foreground mb-3">{member.company}</p>
@@ -127,11 +131,57 @@ export default function AnnuairePage() {
                   </div>
 
                   <div className="flex gap-2">
-                    <Link href={`/annuaire/${member.id}`} className="flex-1">
-                      <Button variant="outline" className="w-full bg-transparent hover:bg-[#0055A4] hover:text-white">
-                        Voir le profil
-                      </Button>
-                    </Link>
+                    <Dialog>
+                      <DialogTrigger asChild>
+                        <Button variant="outline" className="flex-1 bg-transparent hover:bg-[#0055A4] hover:text-white">
+                          Voir le profil
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                        <DialogHeader>
+                          <DialogTitle className="font-serif text-2xl font-bold text-left">{member.name}</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-6">
+                          <div className="flex items-start gap-6">
+                            <div className="w-32 h-32 rounded-full overflow-hidden bg-muted flex-shrink-0">
+                              <img
+                                src={member.photo || "/placeholder.svg"}
+                                alt={member.name}
+                                className="w-full h-full object-cover"
+                              />
+                            </div>
+                            <div className="flex-1">
+                              <h3 className="font-serif text-xl font-bold text-[#0055A4] mb-2">{member.currentPosition}</h3>
+                              <p className="text-lg text-muted-foreground mb-4">{member.company}</p>
+                              <div className="space-y-2">
+                                <div className="flex items-center gap-2 text-sm">
+                                  <GraduationCap className="h-4 w-4 text-[#0055A4]" />
+                                  <span><strong>{member.formation}</strong> - {member.university} ({member.promotion})</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-sm">
+                                  <Briefcase className="h-4 w-4 text-[#0055A4]" />
+                                  <span>{member.sector}</span>
+                                </div>
+                                <div className="flex items-center gap-2 text-sm">
+                                  <MapPin className="h-4 w-4 text-[#0055A4]" />
+                                  <span>{member.city}</span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                          <div>
+                            <h4 className="font-semibold mb-2">À propos</h4>
+                            <p className="text-muted-foreground leading-relaxed">{member.bio}</p>
+                          </div>
+                          <div className="flex gap-2 pt-4 border-t">
+                            <Button className="flex-1 bg-[#0055A4] hover:bg-[#0055A4]/90">
+                              <Mail className="mr-2 h-4 w-4" />
+                              Contacter
+                            </Button>
+                          </div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
                     <Button
                       size="icon"
                       variant="outline"
