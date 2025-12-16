@@ -38,7 +38,7 @@ export function Footer() {
 
           {/* Contact */}
           <div>
-            <h4 className="font-semibold mb-4">Contact</h4>
+            <h4 className="font-semibold mb-4">Contacts</h4>
             <ul className="space-y-2 text-sm text-white/80">
               <li>Institut Français de Guinée</li>
               <li>Conakry, Guinée</li>
@@ -47,7 +47,7 @@ export function Footer() {
                   france.alumni@institutfrancais-guinee.fr
                 </a>
               </li>
-              <li>+224 XXX XX XX XX</li>
+              <li>+224 611 45 45 85</li>
             </ul>
           </div>
 

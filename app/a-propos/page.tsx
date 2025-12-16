@@ -1,9 +1,24 @@
+"use client"
+
 import { Card, CardContent } from "@/components/ui/card"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
 import { teamMembers, partners } from "@/lib/fake-data"
-import { Target, Users, Heart, Globe, Award, Lightbulb } from "lucide-react"
+import { Users, Heart, Globe, Award } from "lucide-react"
+import { useEffect, useState } from "react"
+import type { CarouselApi } from "@/components/ui/carousel"
 
 export default function AboutPage() {
+  const [api, setApi] = useState<CarouselApi>()
+  
+  useEffect(() => {
+    if (!api) return
+
+    const interval = setInterval(() => {
+      api.scrollNext()
+    }, 3000) // Défilement toutes les 3 secondes
+
+    return () => clearInterval(interval)
+  }, [api])
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -21,43 +36,9 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Mission & Vision */}
+      {/* Values */}
       <section className="py-20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-2 gap-12 mb-20">
-            <div>
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-[#0055A4] text-white rounded-lg mb-6">
-                <Target className="h-6 w-6" />
-              </div>
-              <h2 className="font-serif text-3xl font-bold mb-4">Notre Mission</h2>
-              <p className="text-lg text-muted-foreground leading-relaxed mb-4">
-                France Alumni Guinée a pour mission de valoriser les talents de la diaspora guinéenne diplômée de France
-                et de contribuer au développement socio-économique de la Guinée.
-              </p>
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                Nous facilitons le networking, le mentorat et les opportunités professionnelles pour nos membres, tout
-                en promouvant les relations franco-guinéennes dans les domaines de l'éducation, de la culture et de
-                l'économie.
-              </p>
-            </div>
-
-            <div>
-              <div className="inline-flex items-center justify-center w-12 h-12 bg-[#FCD116] text-[#0055A4] rounded-lg mb-6">
-                <Lightbulb className="h-6 w-6" />
-              </div>
-              <h2 className="font-serif text-3xl font-bold mb-4">Notre Vision</h2>
-              <p className="text-lg text-muted-foreground leading-relaxed mb-4">
-                Devenir le réseau de référence des alumni guinéens de France, reconnu pour son impact positif sur le
-                développement de la Guinée et la promotion de l'excellence académique et professionnelle.
-              </p>
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                Nous aspirons à créer un écosystème où chaque alumni peut contribuer, s'épanouir et inspirer les
-                générations futures.
-              </p>
-            </div>
-          </div>
-
-          {/* Values */}
           <div>
             <h2 className="font-serif text-3xl font-bold mb-8 text-center">Nos Valeurs</h2>
             <div className="grid md:grid-cols-3 gap-8">
@@ -104,101 +85,84 @@ export default function AboutPage() {
       {/* Objectives */}
       <section className="py-20 bg-muted">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-serif text-3xl font-bold mb-12 text-center">Nos Objectifs</h2>
-          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            <div className="flex gap-4">
-              <div className="flex-shrink-0">
-                <div className="w-10 h-10 bg-[#0055A4] text-white rounded-full flex items-center justify-center font-bold">
-                  1
-                </div>
-              </div>
-              <div>
-                <h3 className="font-serif text-xl font-bold mb-2">Représentation et influence</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  Valoriser la diaspora guinéenne diplômée de France et contribuer à un lobbying positif auprès des
-                  entreprises et institutions.
-                </p>
-              </div>
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Image à gauche */}
+            <div className="order-2 lg:order-1">
+              <img
+                src="/apropos/nos_objectifs.jpeg"
+                alt="Nos objectifs"
+                className="w-full h-full object-cover rounded-lg shadow-lg"
+              />
             </div>
 
-            <div className="flex gap-4">
-              <div className="flex-shrink-0">
-                <div className="w-10 h-10 bg-[#0055A4] text-white rounded-full flex items-center justify-center font-bold">
-                  2
+            {/* Objectifs à droite */}
+            <div className="order-1 lg:order-2">
+              <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-8">Nos Objectifs</h2>
+              <div className="space-y-6">
+                <div className="flex gap-4">
+                  <div className="flex-shrink-0">
+                    <div className="w-10 h-10 bg-[#0055A4] text-white rounded-full flex items-center justify-center font-bold">
+                      1
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-serif text-xl font-bold mb-2">Représentation et influence</h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Valoriser la diaspora guinéenne diplômée de France et contribuer à un lobbying positif auprès des
+                      entreprises et institutions.
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <div>
-                <h3 className="font-serif text-xl font-bold mb-2">Développement local</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  Promouvoir le transfert de compétences au service du développement en Guinée et renforcer les
-                  synergies avec les plateformes partenaires.
-                </p>
-              </div>
-            </div>
 
-            <div className="flex gap-4">
-              <div className="flex-shrink-0">
-                <div className="w-10 h-10 bg-[#0055A4] text-white rounded-full flex items-center justify-center font-bold">
-                  3
+                <div className="flex gap-4">
+                  <div className="flex-shrink-0">
+                    <div className="w-10 h-10 bg-[#0055A4] text-white rounded-full flex items-center justify-center font-bold">
+                      2
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-serif text-xl font-bold mb-2">Développement local</h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Promouvoir le transfert de compétences au service du développement en Guinée et renforcer les
+                      synergies avec les plateformes partenaires.
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <div>
-                <h3 className="font-serif text-xl font-bold mb-2">Solidarité et soutien</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  Favoriser le mentorat, l'entraide et mobiliser les alumni autour d'initiatives citoyennes, éducatives
-                  et environnementales.
-                </p>
-              </div>
-            </div>
 
-            <div className="flex gap-4">
-              <div className="flex-shrink-0">
-                <div className="w-10 h-10 bg-[#0055A4] text-white rounded-full flex items-center justify-center font-bold">
-                  4
+                <div className="flex gap-4">
+                  <div className="flex-shrink-0">
+                    <div className="w-10 h-10 bg-[#0055A4] text-white rounded-full flex items-center justify-center font-bold">
+                      3
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-serif text-xl font-bold mb-2">Solidarité et soutien</h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Favoriser le mentorat, l'entraide et mobiliser les alumni autour d'initiatives citoyennes, éducatives
+                      et environnementales.
+                    </p>
+                  </div>
                 </div>
-              </div>
-              <div>
-                <h3 className="font-serif text-xl font-bold mb-2">Rayonnement international</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  Renforcer les liens entre la France et la Guinée et promouvoir l'excellence guinéenne à
-                  l'international.
-                </p>
+
+                <div className="flex gap-4">
+                  <div className="flex-shrink-0">
+                    <div className="w-10 h-10 bg-[#0055A4] text-white rounded-full flex items-center justify-center font-bold">
+                      4
+                    </div>
+                  </div>
+                  <div>
+                    <h3 className="font-serif text-xl font-bold mb-2">Rayonnement international</h3>
+                    <p className="text-muted-foreground leading-relaxed">
+                      Renforcer les liens entre la France et la Guinée et promouvoir l'excellence guinéenne à
+                      l'international.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
       </section>
-
-      {/* Team */}
-      {/* <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="font-serif text-3xl font-bold mb-4">Notre Équipe</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Une équipe passionnée et engagée pour faire vivre le réseau France Alumni Guinée
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {teamMembers.map((member, index) => (
-              <Card key={index} className="text-center hover:shadow-lg transition-shadow">
-                <CardContent className="pt-6">
-                  <div className="w-32 h-32 mx-auto mb-4 rounded-full overflow-hidden bg-muted">
-                    <img
-                      src={member.image || "/placeholder.svg"}
-                      alt={member.name}
-                      className="w-full h-full object-cover"
-                    />
-                  </div>
-                  <h3 className="font-serif text-xl font-bold mb-1">{member.name}</h3>
-                  <p className="text-[#0055A4] font-semibold mb-3">{member.role}</p>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{member.bio}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section> */}
 
       {/* Partners */}
       <section className="py-20 bg-muted">
@@ -219,6 +183,7 @@ export default function AboutPage() {
                 align: "start",
                 loop: true,
               }}
+              setApi={setApi}
               className="w-full"
             >
               <CarouselContent className="-ml-2 md:-ml-4">
@@ -243,32 +208,7 @@ export default function AboutPage() {
           </div>
         </div>
       </section>
-
-      {/* CTA */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-r from-[#0055A4] to-[#003d7a] rounded-2xl p-8 sm:p-12 text-white text-center">
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-4">Rejoignez notre communauté</h2>
-            <p className="text-lg text-white/90 mb-8 max-w-2xl mx-auto">
-              Faites partie d'un réseau dynamique d'alumni engagés pour le développement de la Guinée
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <a
-                href="/inscription"
-                className="inline-flex items-center justify-center px-6 py-3 bg-[#FCD116] text-[#0055A4] font-semibold rounded-lg hover:bg-[#FCD116]/90 transition-colors"
-              >
-                Devenir membre
-              </a>
-              <a
-                href="mailto:france.alumni@institutfrancais-guinee.fr"
-                className="inline-flex items-center justify-center px-6 py-3 bg-white/10 text-white font-semibold rounded-lg hover:bg-white/20 transition-colors border border-white"
-              >
-                Nous contacter
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
+   
     </div>
   )
 }

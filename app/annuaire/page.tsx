@@ -1,16 +1,69 @@
 "use client"
 
 import Link from "next/link"
-import { Card, CardContent } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { alumniMembers } from "@/lib/fake-data"
-import { Search, Filter, GraduationCap, Briefcase, MapPin, Mail } from "lucide-react"
-import { useState } from "react"
+import { Search, Filter, GraduationCap, Briefcase, MapPin, Mail, Users, TrendingUp, Globe, Target } from "lucide-react"
+import { useMemo } from "react"
+import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis } from "recharts"
 
 export default function AnnuairePage() {
   const sectors = ["Tous", "Technologie", "Finance", "Santé", "Éducation", "Droit", "Architecture"]
   const cities = ["Tous", "Conakry", "Kindia", "Labé", "Kankan"]
+
+  // Calcul des statistiques
+  const stats = useMemo(() => {
+    const totalAlumni = alumniMembers.length
+    
+    // Calcul par secteur
+    const sectorCount: Record<string, number> = {}
+    alumniMembers.forEach(member => {
+      sectorCount[member.sector] = (sectorCount[member.sector] || 0) + 1
+    })
+    
+    // Calcul par ville
+    const cityCount: Record<string, number> = {}
+    alumniMembers.forEach(member => {
+      cityCount[member.city] = (cityCount[member.city] || 0) + 1
+    })
+
+    // Données pour les graphiques
+    const sectorData = Object.entries(sectorCount)
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value)
+      .slice(0, 5)
+
+    const cityData = Object.entries(cityCount)
+      .map(([name, value]) => ({ name, value }))
+      .sort((a, b) => b.value - a.value)
+
+    // Simulation de données de genre (50/50 pour l'exemple)
+    const genderData = [
+      { name: "Homme", value: Math.floor(totalAlumni * 0.54) },
+      { name: "Femme", value: Math.floor(totalAlumni * 0.46) }
+    ]
+
+    // Simulation de statut professionnel
+    const statusData = [
+      { name: "Employé", value: Math.floor(totalAlumni * 0.65) },
+      { name: "Étudiant", value: Math.floor(totalAlumni * 0.20) },
+      { name: "Entrepreneur", value: Math.floor(totalAlumni * 0.10) },
+      { name: "Sans emploi", value: Math.floor(totalAlumni * 0.05) }
+    ]
+
+    return {
+      totalAlumni,
+      sectorData,
+      cityData,
+      genderData,
+      statusData
+    }
+  }, [])
+
+  const COLORS = ['#0055A4', '#FCD116', '#003d7a', '#6B7280', '#9CA3AF']
 
   return (
     <div className="min-h-screen">
@@ -22,7 +75,7 @@ export default function AnnuairePage() {
               Annuaire des Alumni
             </h1>
             <p className="text-lg sm:text-xl text-white/90 leading-relaxed mb-8">
-              Connectez-vous avec plus de 500 alumni guinéens diplômés des meilleures universités françaises
+              Connectez-vous avec plus de 600 alumni guinéens diplômés de l'enseignement supérieur français
             </p>
 
             {/* Search Bar */}
@@ -197,6 +250,147 @@ export default function AnnuairePage() {
         </div>
       </section>
 
+      {/* Nos Alumni en Chiffres */}
+      <section className="py-20 bg-muted">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-4">Nos Alumni en Chiffres</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              Découvrez les statistiques de notre communauté d'alumni guinéens
+            </p>
+          </div>
+
+          {/* Cartes de Statistiques */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Total Alumni</CardTitle>
+                <Users className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">{stats.totalAlumni.toLocaleString()}</div>
+                <p className="text-xs text-muted-foreground mt-1">Membres actifs</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Répartition par Genre</CardTitle>
+                <TrendingUp className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">{stats.genderData[0].value}</div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  Homme: {stats.genderData[0].value} | Femme: {stats.genderData[1].value}
+                </p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Plan de Retour</CardTitle>
+                <Target className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">684</div>
+                <p className="text-xs text-muted-foreground mt-1">Alumni prévoyant de retourner</p>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">Objectif 2025</CardTitle>
+                <Globe className="h-4 w-4 text-muted-foreground" />
+              </CardHeader>
+              <CardContent>
+                <div className="text-3xl font-bold">684</div>
+                <p className="text-xs text-muted-foreground mt-1">01/01/2025</p>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Graphiques */}
+          <div className="grid lg:grid-cols-2 gap-8 mb-8">
+            {/* Statut Professionnel */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Statut Professionnel</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ChartContainer
+                  config={{
+                    value: { label: "Nombre" }
+                  }}
+                  className="h-[300px]"
+                >
+                  <BarChart data={stats.statusData} layout="vertical">
+                    <XAxis type="number" />
+                    <YAxis dataKey="name" type="category" width={100} />
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                    <Bar dataKey="value" fill="#0055A4" radius={[0, 4, 4, 0]} />
+                  </BarChart>
+                </ChartContainer>
+              </CardContent>
+            </Card>
+
+            {/* Répartition par Genre */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Répartition par Genre</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ChartContainer
+                  config={{
+                    value: { label: "Nombre" }
+                  }}
+                  className="h-[300px]"
+                >
+                  <PieChart>
+                    <Pie
+                      data={stats.genderData}
+                      cx="50%"
+                      cy="50%"
+                      labelLine={false}
+                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                      outerRadius={100}
+                      fill="#8884d8"
+                      dataKey="value"
+                    >
+                      {stats.genderData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                      ))}
+                    </Pie>
+                    <ChartTooltip content={<ChartTooltipContent />} />
+                  </PieChart>
+                </ChartContainer>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Secteurs d'activité */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Top Secteurs d'Activité</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ChartContainer
+                config={{
+                  value: { label: "Nombre" }
+                }}
+                className="h-[300px]"
+              >
+                <BarChart data={stats.sectorData} layout="vertical">
+                  <XAxis type="number" />
+                  <YAxis dataKey="name" type="category" width={120} />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Bar dataKey="value" fill="#0055A4" radius={[0, 4, 4, 0]} />
+                </BarChart>
+              </ChartContainer>
+            </CardContent>
+          </Card>
+        </div>
+      </section>
+      
       {/* CTA Section */}
       <section className="py-16 bg-muted">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
