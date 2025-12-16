@@ -3,7 +3,8 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { ArrowRight, Users, Briefcase, GraduationCap, Globe, MapPin, Mail, Calendar, Clock, MapPin as MapPinIcon } from "lucide-react"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { ArrowRight, Users, Briefcase, GraduationCap, Globe, MapPin, Mail, Calendar, Clock, MapPin as MapPinIcon, User } from "lucide-react"
 import { articles, alumniMembers } from "@/lib/fake-data"
 import { AnimatedTitle } from "@/components/animated-title"
 
@@ -30,9 +31,6 @@ export default function HomePage() {
                 Rejoindre le réseau
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
-              <Button size="lg" variant="outline" className="bg-white/10 text-white border-white hover:bg-white/20">
-                En savoir plus
-              </Button>
             </div>
           </div>
         </div>
@@ -50,7 +48,7 @@ export default function HomePage() {
               <div className="flex justify-between items-end mb-8">
                 <div>
                   <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-4">Actualités récentes</h2>
-                  <p className="text-lg text-muted-foreground">Découvrez les parcours inspirants de nos alumni</p>
+                  <p className="text-lg text-muted-foreground">Au fil des nouvelles : nos alumni</p>
                 </div>
                 <Link href="/actualites">
                   <Button variant="outline">
@@ -76,9 +74,56 @@ export default function HomePage() {
                       <p className="text-muted-foreground text-sm mb-4 line-clamp-3">{article.excerpt}</p>
                       <div className="flex items-center justify-between text-sm text-muted-foreground">
                         <span>{article.date}</span>
-                        <Link href="/actualites" className="text-[#0055A4] font-semibold hover:underline">
-                          Voir toutes les actualités →
-                        </Link>
+                        <Dialog>
+                          <DialogTrigger asChild>
+                            <Button variant="ghost" className="inline-flex items-center text-[#0055A4] font-semibold hover:underline p-0 h-auto">
+                              Lire l'article
+                              <ArrowRight className="ml-1 h-4 w-4" />
+                            </Button>
+                          </DialogTrigger>
+                          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+                            <DialogHeader>
+                              <DialogTitle className="font-serif text-2xl font-bold text-left">{article.title}</DialogTitle>
+                            </DialogHeader>
+                            <div className="space-y-4">
+                              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                                <div className="flex items-center gap-2">
+                                  <User className="h-4 w-4" />
+                                  <span>{article.author}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <Calendar className="h-4 w-4" />
+                                  <span>{article.date}</span>
+                                </div>
+                                <span className="inline-block px-2 py-1 bg-[#0055A4]/10 text-[#0055A4] text-xs font-semibold rounded-full">
+                                  {article.category}
+                                </span>
+                              </div>
+                              <img
+                                src={article.image || "/placeholder.svg"}
+                                alt={article.title}
+                                className="w-full h-64 object-cover rounded-lg"
+                              />
+                              <div className="prose max-w-none">
+                                <p className="text-lg text-muted-foreground leading-relaxed mb-6">{article.excerpt}</p>
+                                <div className="space-y-4 text-foreground">
+                                  <p>{article.content}</p>
+                                  <p>
+                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et
+                                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
+                                    ex ea commodo consequat.
+                                  </p>
+                                  <h3 className="font-serif text-xl font-bold mt-6 mb-3">Un parcours inspirant</h3>
+                                  <p>
+                                    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
+                                    Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est
+                                    laborum.
+                                  </p>
+                                </div>
+                              </div>
+                            </div>
+                          </DialogContent>
+                        </Dialog>
                       </div>
                     </CardContent>
                   </Card>
@@ -219,8 +264,8 @@ export default function HomePage() {
           <div className="bg-gradient-to-r from-[#0055A4] to-[#003d7a] rounded-2xl p-8 sm:p-12 text-white text-center">
             <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-4">Prêt à rejoindre notre communauté ?</h2>
             <p className="text-lg text-white/90 mb-8 max-w-2xl mx-auto">
-              Inscrivez-vous dès maintenant pour accéder à l'annuaire et aux événements
-              exclusifs du réseau.
+              Inscrivez-vous dès maintenant pour découvrir les talents du réseau et tisser de nouvelles connexions 
+              au sein de France Alumni Guinée.
             </p>
             <Button size="lg" className="bg-[#FCD116] text-[#0055A4] hover:bg-[#FCD116]/90 font-semibold">
               S'inscrire maintenant
