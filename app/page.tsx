@@ -1,8 +1,11 @@
+"use client"
+
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { ArrowRight, Users, Briefcase, GraduationCap, Globe, MapPin, Mail, Calendar, Clock, MapPin as MapPinIcon } from "lucide-react"
 import { articles, alumniMembers } from "@/lib/fake-data"
+import { AnimatedTitle } from "@/components/animated-title"
 
 export default function HomePage() {
   const featuredArticles = articles.slice(0, 2)
@@ -16,11 +19,11 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 text-balance">
-              Connectez-vous au réseau France Alumni Guinée
+              <AnimatedTitle />
             </h1>
             <p className="text-lg sm:text-xl text-white/90 mb-8 leading-relaxed">
-              Rejoignez une communauté dynamique d'anciens étudiants guinéens diplômés de France. Partagez, collaborez
-              et contribuez au développement de la Guinée.
+            Rejoignez une communauté dynamique qui connecte les talents guinéens formés en France, ouvre des opportunités professionnelles 
+            et soutient l’entrepreneuriat au service de l’économie locale.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button size="lg" className="bg-[#FCD116] text-[#0055A4] hover:bg-[#FCD116]/90 font-semibold">
@@ -216,7 +219,7 @@ export default function HomePage() {
           <div className="bg-gradient-to-r from-[#0055A4] to-[#003d7a] rounded-2xl p-8 sm:p-12 text-white text-center">
             <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-4">Prêt à rejoindre notre communauté ?</h2>
             <p className="text-lg text-white/90 mb-8 max-w-2xl mx-auto">
-              Inscrivez-vous dès maintenant pour accéder à l'annuaire, aux opportunités d'emploi et aux événements
+              Inscrivez-vous dès maintenant pour accéder à l'annuaire et aux événements
               exclusifs du réseau.
             </p>
             <Button size="lg" className="bg-[#FCD116] text-[#0055A4] hover:bg-[#FCD116]/90 font-semibold">

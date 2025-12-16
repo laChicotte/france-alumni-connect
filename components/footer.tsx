@@ -29,11 +29,6 @@ export function Footer() {
                 </Link>
               </li>
               <li>
-                <Link href="/emploi" className="hover:text-[#FCD116] transition-colors">
-                  Emploi
-                </Link>
-              </li>
-              <li>
                 <Link href="/annuaire" className="hover:text-[#FCD116] transition-colors">
                   Annuaire
                 </Link>

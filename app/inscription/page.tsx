@@ -100,9 +100,9 @@ export default function InscriptionPage() {
             </div>
 
             <div className="flex items-start space-x-2">
-              <Checkbox id="verifDiploma" required />
+              <Checkbox id="verifDiploma" />
               <label htmlFor="verifDiploma" className="text-sm text-muted-foreground leading-relaxed">
-                J'autorise verifDiploma à vérifier et authentifier mon diplôme français pour valider mon inscription au réseau France Alumni Guinée *
+                J'autorise verifDiploma à vérifier et authentifier mon diplôme français pour valider mon inscription au réseau France Alumni Guinée
               </label>
             </div>
 

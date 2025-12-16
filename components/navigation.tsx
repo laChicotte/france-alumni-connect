@@ -50,7 +50,6 @@ export function Navigation() {
     // { href: "/", label: "Accueil" },
     { href: "/a-propos", label: "À propos" },
     { href: "/actualites", label: "Actualités" },
-    { href: "/emploi", label: "Emploi" },
     { href: "/annuaire", label: "Annuaire" },
   ]
 
