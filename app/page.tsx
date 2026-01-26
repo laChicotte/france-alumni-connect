@@ -3,7 +3,6 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { ArrowRight, Users, Briefcase, GraduationCap, Globe, MapPin, Mail, Calendar, Clock, MapPin as MapPinIcon, User } from "lucide-react"
 import { articles, alumniMembers } from "@/lib/fake-data"
 import { AnimatedTitle } from "@/components/animated-title"
@@ -11,21 +10,18 @@ import { AnimatedTitle } from "@/components/animated-title"
 export default function HomePage() {
   const featuredArticles = articles.slice(0, 2)
   const featuredAlumni = alumniMembers.slice(-3)
-  const upcomingEvents = articles.filter((a) => a.category === "Évènements").slice(0, 2)
+  const upcomingEvents = articles.filter((a) => a.category === "Événements").slice(0, 2)
 
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-[#3558A2] via-[#3558A2] to-[#3558A2] text-white py-20 lg:py-32">
+      <section className="relative bg-gradient-to-br from-[#3558A2] via-[#3558A2] to-[#3558A2] text-white py-8 lg:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 text-balance">
               <AnimatedTitle />
             </h1>
-            {/* <p className="text-lg sm:text-xl text-white/90 mb-8 leading-relaxed">
-            Rejoignez une communauté dynamique qui connecte les talents guinéens formés en France, ouvre des opportunités professionnelles 
-            et soutient l’entrepreneuriat au service de l’économie locale.
-            </p> */}
+
             <div className="flex flex-col sm:flex-row gap-4">
               <Button size="lg" className="bg-[#FCD116] text-[#3558A2] hover:bg-[#FCD116]/90 font-semibold">
                 Rejoindre le réseau
@@ -38,6 +34,7 @@ export default function HomePage() {
         {/* Decorative element */}
         <div className="absolute bottom-0 right-0 w-1/3 h-1/3 bg-[#FCD116]/10 rounded-tl-full blur-3xl"></div>
       </section>
+
 
       {/* Actualités et Évènements */}
       <section className="py-20 bg-muted">
@@ -74,56 +71,12 @@ export default function HomePage() {
                       <p className="text-muted-foreground text-sm mb-4 line-clamp-3">{article.excerpt}</p>
                       <div className="flex items-center justify-between text-sm text-muted-foreground">
                         <span>{article.date}</span>
-                        <Dialog>
-                          <DialogTrigger asChild>
-                            <Button variant="ghost" className="inline-flex items-center text-[#3558A2] font-semibold hover:underline p-0 h-auto">
-                              Lire l'article
-                              <ArrowRight className="ml-1 h-4 w-4" />
-                            </Button>
-                          </DialogTrigger>
-                          <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
-                            <DialogHeader>
-                              <DialogTitle className="font-serif text-2xl font-bold text-left">{article.title}</DialogTitle>
-                            </DialogHeader>
-                            <div className="space-y-4">
-                              <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                                <div className="flex items-center gap-2">
-                                  <User className="h-4 w-4" />
-                                  <span>{article.author}</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <Calendar className="h-4 w-4" />
-                                  <span>{article.date}</span>
-                                </div>
-                                <span className="inline-block px-2 py-1 bg-[#3558A2]/10 text-[#3558A2] text-xs font-semibold rounded-full">
-                                  {article.category}
-                                </span>
-                              </div>
-                              <img
-                                src={article.image || "/placeholder.svg"}
-                                alt={article.title}
-                                className="w-full h-64 object-cover rounded-lg"
-                              />
-                              <div className="prose max-w-none">
-                                <p className="text-lg text-muted-foreground leading-relaxed mb-6">{article.excerpt}</p>
-                                <div className="space-y-4 text-foreground">
-                                  <p>{article.content}</p>
-                                  <p>
-                                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et
-                                    dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip
-                                    ex ea commodo consequat.
-                                  </p>
-                                  <h3 className="font-serif text-xl font-bold mt-6 mb-3">Un parcours inspirant</h3>
-                                  <p>
-                                    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.
-                                    Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est
-                                    laborum.
-                                  </p>
-                                </div>
-                              </div>
-                            </div>
-                          </DialogContent>
-                        </Dialog>
+                        <Link href={`/actualites/${article.id}`}>
+                          <Button variant="ghost" className="inline-flex items-center text-[#3558A2] font-semibold hover:underline p-0 h-auto">
+                            Lire l'article
+                            <ArrowRight className="ml-1 h-4 w-4" />
+                          </Button>
+                        </Link>
                       </div>
                     </CardContent>
                   </Card>
