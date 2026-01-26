@@ -63,23 +63,19 @@ export default function AnnuairePage() {
     }
   }, [])
 
-  const COLORS = ['#0055A4', '#FCD116', '#003d7a', '#6B7280', '#9CA3AF']
+  const COLORS = ['#3558A2', '#FCD116', '#3558A2', '#6B7280', '#9CA3AF']
 
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-[#0055A4] via-[#0055A4] to-[#003d7a] text-white py-16 lg:py-20">
+      <section className="bg-gradient-to-br from-[#3558A2] via-[#3558A2] to-[#3558A2] text-white py-6 lg:py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 text-balance">
+            <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold mb-3">
               Annuaire des Alumni
             </h1>
-            <p className="text-lg sm:text-xl text-white/90 leading-relaxed mb-8">
-              Connectez-vous avec plus de 600 alumni guinéens diplômés de l'enseignement supérieur français
-            </p>
 
-            {/* Search Bar */}
-            <div className="bg-white rounded-lg p-2 flex flex-col sm:flex-row gap-2">
+            <div className="bg-white rounded-lg p-1 flex flex-col sm:flex-row gap-2">
               <div className="flex-1 flex items-center gap-2 px-3">
                 <Search className="h-5 w-5 text-muted-foreground" />
                 <input
@@ -88,11 +84,14 @@ export default function AnnuairePage() {
                   className="flex-1 outline-none text-foreground"
                 />
               </div>
-              <Button className="bg-[#0055A4] hover:bg-[#0055A4]/90">Rechercher</Button>
+              <Button className="bg-[#3558A2] hover:bg-[#3558A2]/90">
+                Rechercher
+              </Button>
             </div>
           </div>
         </div>
       </section>
+
 
       {/* Filters */}
       <section className="py-8 bg-muted border-b">
@@ -111,7 +110,7 @@ export default function AnnuairePage() {
                     key={sector}
                     variant={sector === "Tous" ? "default" : "outline"}
                     size="sm"
-                    className={sector === "Tous" ? "bg-[#0055A4] hover:bg-[#0055A4]/90" : ""}
+                    className={sector === "Tous" ? "bg-[#3558A2] hover:bg-[#3558A2]/90" : ""}
                   >
                     {sector}
                   </Button>
@@ -127,7 +126,7 @@ export default function AnnuairePage() {
                     key={city}
                     variant={city === "Tous" ? "default" : "outline"}
                     size="sm"
-                    className={city === "Tous" ? "bg-[#0055A4] hover:bg-[#0055A4]/90" : ""}
+                    className={city === "Tous" ? "bg-[#3558A2] hover:bg-[#3558A2]/90" : ""}
                   >
                     {city}
                   </Button>
@@ -159,10 +158,10 @@ export default function AnnuairePage() {
                         className="w-full h-full object-cover"
                       />
                     </div>
-                    <h3 className="font-serif text-xl font-bold mb-1 group-hover:text-[#0055A4] transition-colors">
+                    <h3 className="font-serif text-xl font-bold mb-1 group-hover:text-[#3558A2] transition-colors">
                       {member.name}
                     </h3>
-                    <p className="text-sm text-[#0055A4] font-semibold mb-2">{member.currentPosition}</p>
+                    <p className="text-sm text-[#3558A2] font-semibold mb-2">{member.currentPosition}</p>
                     <p className="text-sm text-muted-foreground mb-3">{member.company}</p>
                   </div>
 
@@ -186,7 +185,7 @@ export default function AnnuairePage() {
                   <div className="flex gap-2">
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button variant="outline" className="flex-1 bg-transparent hover:bg-[#0055A4] hover:text-white">
+                        <Button variant="outline" className="flex-1 bg-transparent hover:bg-[#3558A2] hover:text-white">
                           Voir le profil
                         </Button>
                       </DialogTrigger>
@@ -204,19 +203,19 @@ export default function AnnuairePage() {
                               />
                             </div>
                             <div className="flex-1">
-                              <h3 className="font-serif text-xl font-bold text-[#0055A4] mb-2">{member.currentPosition}</h3>
+                              <h3 className="font-serif text-xl font-bold text-[#3558A2] mb-2">{member.currentPosition}</h3>
                               <p className="text-lg text-muted-foreground mb-4">{member.company}</p>
                               <div className="space-y-2">
                                 <div className="flex items-center gap-2 text-sm">
-                                  <GraduationCap className="h-4 w-4 text-[#0055A4]" />
+                                  <GraduationCap className="h-4 w-4 text-[#3558A2]" />
                                   <span><strong>{member.formation}</strong> - {member.university} ({member.promotion})</span>
                                 </div>
                                 <div className="flex items-center gap-2 text-sm">
-                                  <Briefcase className="h-4 w-4 text-[#0055A4]" />
+                                  <Briefcase className="h-4 w-4 text-[#3558A2]" />
                                   <span>{member.sector}</span>
                                 </div>
                                 <div className="flex items-center gap-2 text-sm">
-                                  <MapPin className="h-4 w-4 text-[#0055A4]" />
+                                  <MapPin className="h-4 w-4 text-[#3558A2]" />
                                   <span>{member.city}</span>
                                 </div>
                               </div>
@@ -227,7 +226,7 @@ export default function AnnuairePage() {
                             <p className="text-muted-foreground leading-relaxed">{member.bio}</p>
                           </div>
                           <div className="flex gap-2 pt-4 border-t">
-                            <Button className="flex-1 bg-[#0055A4] hover:bg-[#0055A4]/90">
+                            <Button className="flex-1 bg-[#3558A2] hover:bg-[#3558A2]/90">
                               <Mail className="mr-2 h-4 w-4" />
                               Contacter
                             </Button>
@@ -238,7 +237,7 @@ export default function AnnuairePage() {
                     <Button
                       size="icon"
                       variant="outline"
-                      className="bg-transparent hover:bg-[#0055A4] hover:text-white"
+                      className="bg-transparent hover:bg-[#3558A2] hover:text-white"
                     >
                       <Mail className="h-4 w-4" />
                     </Button>
@@ -327,7 +326,7 @@ export default function AnnuairePage() {
                     <XAxis type="number" />
                     <YAxis dataKey="name" type="category" width={100} />
                     <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar dataKey="value" fill="#0055A4" radius={[0, 4, 4, 0]} />
+                    <Bar dataKey="value" fill="#3558A2" radius={[0, 4, 4, 0]} />
                   </BarChart>
                 </ChartContainer>
               </CardContent>
@@ -383,7 +382,7 @@ export default function AnnuairePage() {
                   <XAxis type="number" />
                   <YAxis dataKey="name" type="category" width={120} />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="value" fill="#0055A4" radius={[0, 4, 4, 0]} />
+                  <Bar dataKey="value" fill="#3558A2" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ChartContainer>
             </CardContent>
@@ -394,12 +393,12 @@ export default function AnnuairePage() {
       {/* CTA Section */}
       <section className="py-16 bg-muted">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-r from-[#0055A4] to-[#003d7a] rounded-2xl p-8 sm:p-12 text-white text-center">
+          <div className="bg-gradient-to-r from-[#3558A2] to-[#3558A2] rounded-2xl p-8 sm:p-12 text-white text-center">
             <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-4">Vous n'êtes pas encore inscrit ?</h2>
             <p className="text-lg text-white/90 mb-8 max-w-2xl mx-auto">
               Rejoignez l'annuaire pour être visible auprès de la communauté et développer votre réseau professionnel.
             </p>
-            <Button size="lg" className="bg-[#FCD116] text-[#0055A4] hover:bg-[#FCD116]/90 font-semibold">
+            <Button size="lg" className="bg-[#FCD116] text-[#3558A2] hover:bg-[#FCD116]/90 font-semibold">
               Rejoindre l'annuaire
             </Button>
           </div>

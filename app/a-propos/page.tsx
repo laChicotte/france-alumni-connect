@@ -22,16 +22,13 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-[#0055A4] via-[#0055A4] to-[#003d7a] text-white py-16 lg:py-24">
+      <section className="bg-gradient-to-br from-[#3558A2] via-[#3558A2] to-[#3558A2] text-white py-8 lg:py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-            <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 text-balance">
+          <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 whitespace-nowrap">
               À propos de France Alumni Guinée
             </h1>
-            <p className="text-lg sm:text-xl text-white/90 leading-relaxed">
-              Une communauté dynamique d'anciens étudiants guinéens diplômés de France, unis pour contribuer au
-              développement de la Guinée et renforcer les liens franco-guinéens.
-            </p>
+            
           </div>
         </div>
       </section>
@@ -42,10 +39,10 @@ export default function AboutPage() {
           <div>
             <h2 className="font-serif text-3xl font-bold mb-8 text-center">Nos Valeurs</h2>
             <div className="grid md:grid-cols-3 gap-8">
-              <Card className="border-2 hover:border-[#0055A4] transition-colors">
+              <Card className="border-2 hover:border-[#3558A2] transition-colors">
                 <CardContent className="pt-6">
-                  <div className="w-12 h-12 bg-[#0055A4]/10 rounded-lg flex items-center justify-center mb-4">
-                    <Users className="h-6 w-6 text-[#0055A4]" />
+                  <div className="w-12 h-12 bg-[#3558A2]/10 rounded-lg flex items-center justify-center mb-4">
+                    <Users className="h-6 w-6 text-[#3558A2]" />
                   </div>
                   <h3 className="font-serif text-xl font-bold mb-3">Solidarité</h3>
                   <p className="text-muted-foreground leading-relaxed">
@@ -57,7 +54,7 @@ export default function AboutPage() {
               <Card className="border-2 hover:border-[#FCD116] transition-colors">
                 <CardContent className="pt-6">
                   <div className="w-12 h-12 bg-[#FCD116]/20 rounded-lg flex items-center justify-center mb-4">
-                    <Award className="h-6 w-6 text-[#0055A4]" />
+                    <Award className="h-6 w-6 text-[#3558A2]" />
                   </div>
                   <h3 className="font-serif text-xl font-bold mb-3">Excellence</h3>
                   <p className="text-muted-foreground leading-relaxed">
@@ -66,10 +63,10 @@ export default function AboutPage() {
                 </CardContent>
               </Card>
 
-              <Card className="border-2 hover:border-[#0055A4] transition-colors">
+              <Card className="border-2 hover:border-[#3558A2] transition-colors">
                 <CardContent className="pt-6">
-                  <div className="w-12 h-12 bg-[#0055A4]/10 rounded-lg flex items-center justify-center mb-4">
-                    <Heart className="h-6 w-6 text-[#0055A4]" />
+                  <div className="w-12 h-12 bg-[#3558A2]/10 rounded-lg flex items-center justify-center mb-4">
+                    <Heart className="h-6 w-6 text-[#3558A2]" />
                   </div>
                   <h3 className="font-serif text-xl font-bold mb-3">Engagement</h3>
                   <p className="text-muted-foreground leading-relaxed">
@@ -101,7 +98,7 @@ export default function AboutPage() {
               <div className="space-y-6">
                 <div className="flex gap-4">
                   <div className="flex-shrink-0">
-                    <div className="w-10 h-10 bg-[#0055A4] text-white rounded-full flex items-center justify-center font-bold">
+                    <div className="w-10 h-10 bg-[#3558A2] text-white rounded-full flex items-center justify-center font-bold">
                       1
                     </div>
                   </div>
@@ -116,7 +113,7 @@ export default function AboutPage() {
 
                 <div className="flex gap-4">
                   <div className="flex-shrink-0">
-                    <div className="w-10 h-10 bg-[#0055A4] text-white rounded-full flex items-center justify-center font-bold">
+                    <div className="w-10 h-10 bg-[#3558A2] text-white rounded-full flex items-center justify-center font-bold">
                       2
                     </div>
                   </div>
@@ -131,7 +128,7 @@ export default function AboutPage() {
 
                 <div className="flex gap-4">
                   <div className="flex-shrink-0">
-                    <div className="w-10 h-10 bg-[#0055A4] text-white rounded-full flex items-center justify-center font-bold">
+                    <div className="w-10 h-10 bg-[#3558A2] text-white rounded-full flex items-center justify-center font-bold">
                       3
                     </div>
                   </div>
@@ -146,7 +143,7 @@ export default function AboutPage() {
 
                 <div className="flex gap-4">
                   <div className="flex-shrink-0">
-                    <div className="w-10 h-10 bg-[#0055A4] text-white rounded-full flex items-center justify-center font-bold">
+                    <div className="w-10 h-10 bg-[#3558A2] text-white rounded-full flex items-center justify-center font-bold">
                       4
                     </div>
                   </div>
@@ -168,7 +165,7 @@ export default function AboutPage() {
       <section className="py-20 bg-muted">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-[#0055A4] text-white rounded-lg mb-6 mx-auto">
+            <div className="inline-flex items-center justify-center w-12 h-12 bg-[#3558A2] text-white rounded-lg mb-6 mx-auto">
               <Globe className="h-6 w-6" />
             </div>
             <h2 className="font-serif text-3xl font-bold mb-4">Nos Partenaires</h2>

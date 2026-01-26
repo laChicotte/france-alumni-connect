@@ -59,7 +59,7 @@ export function Navigation() {
         <div className="flex justify-between items-center h-16">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-[#0055A4] to-[#FCD116] rounded-lg flex items-center justify-center">
+            <div className="w-10 h-10 bg-gradient-to-br from-[#3558A2] to-[#FCD116] rounded-lg flex items-center justify-center">
               <span className="text-white font-bold text-xl">FA</span>
             </div>
             <span className="font-serif text-xl font-bold text-foreground hidden sm:block">France Alumni Connect</span>
@@ -76,8 +76,8 @@ export function Navigation() {
                   className={
                     `px-4 py-2 text-sm font-medium rounded-md transition-colors ` +
                     (isActive
-                      ? `text-[#0055A4] bg-[#0055A4]/10 border border-[#0055A4]/20`
-                      : `text-foreground hover:text-[#0055A4] hover:bg-muted`)
+                      ? `text-[#3558A2] bg-[#3558A2]/10 border border-[#3558A2]/20`
+                      : `text-foreground hover:text-[#3558A2] hover:bg-muted`)
                   }
                 >
                   {item.label}
@@ -105,7 +105,7 @@ export function Navigation() {
                         <div className="flex items-center gap-2">
                           <p className="text-sm font-medium leading-none">{user.name}</p>
                           {user.role && (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#0055A4]/10 text-[#0055A4]">
+                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#3558A2]/10 text-[#3558A2]">
                               {user.role}
                             </span>
                           )}
@@ -149,7 +149,7 @@ export function Navigation() {
                     </Button>
                   </Link>
                   <Link href="/inscription">
-                    <Button size="sm" className="bg-[#0055A4] hover:bg-[#0055A4]/90">
+                    <Button size="sm" className="bg-[#3558A2] hover:bg-[#3558A2]/90">
                       S'inscrire
                     </Button>
                   </Link>
@@ -176,8 +176,8 @@ export function Navigation() {
                   className={
                     `block px-4 py-2 text-sm font-medium rounded-md transition-colors ` +
                     (isActive
-                      ? `text-[#0055A4] bg-[#0055A4]/10 border border-[#0055A4]/20`
-                      : `text-foreground hover:text-[#0055A4] hover:bg-muted`)
+                      ? `text-[#3558A2] bg-[#3558A2]/10 border border-[#3558A2]/20`
+                      : `text-foreground hover:text-[#3558A2] hover:bg-muted`)
                   }
                   onClick={() => setIsOpen(false)}
                 >
@@ -205,7 +205,7 @@ export function Navigation() {
                   <div className="space-y-1">
                     <Link
                       href="/profil"
-                      className="flex items-center gap-2 px-2 py-2 text-sm text-foreground hover:text-[#0055A4] hover:bg-muted rounded-md transition-colors"
+                      className="flex items-center gap-2 px-2 py-2 text-sm text-foreground hover:text-[#3558A2] hover:bg-muted rounded-md transition-colors"
                       onClick={() => setIsOpen(false)}
                     >
                       <User className="h-4 w-4" />
@@ -213,7 +213,7 @@ export function Navigation() {
                     </Link>
                     <Link
                       href="/parametres"
-                      className="flex items-center gap-2 px-2 py-2 text-sm text-foreground hover:text-[#0055A4] hover:bg-muted rounded-md transition-colors"
+                      className="flex items-center gap-2 px-2 py-2 text-sm text-foreground hover:text-[#3558A2] hover:bg-muted rounded-md transition-colors"
                       onClick={() => setIsOpen(false)}
                     >
                       <Settings className="h-4 w-4" />
@@ -221,7 +221,7 @@ export function Navigation() {
                     </Link>
                     <Link
                       href="/notifications"
-                      className="flex items-center gap-2 px-2 py-2 text-sm text-foreground hover:text-[#0055A4] hover:bg-muted rounded-md transition-colors"
+                      className="flex items-center gap-2 px-2 py-2 text-sm text-foreground hover:text-[#3558A2] hover:bg-muted rounded-md transition-colors"
                       onClick={() => setIsOpen(false)}
                     >
                       <Bell className="h-4 w-4" />
@@ -232,7 +232,7 @@ export function Navigation() {
                         handleLogout()
                         setIsOpen(false)
                       }}
-                      className="flex items-center gap-2 px-2 py-2 text-sm text-foreground hover:text-[#0055A4] hover:bg-muted rounded-md transition-colors w-full text-left"
+                      className="flex items-center gap-2 px-2 py-2 text-sm text-foreground hover:text-[#3558A2] hover:bg-muted rounded-md transition-colors w-full text-left"
                     >
                       <LogOut className="h-4 w-4" />
                       Se déconnecter
@@ -247,7 +247,7 @@ export function Navigation() {
                     </Button>
                   </Link>
                   <Link href="/inscription" className="block" onClick={() => setIsOpen(false)}>
-                    <Button size="sm" className="w-full bg-[#0055A4] hover:bg-[#0055A4]/90">
+                    <Button size="sm" className="w-full bg-[#3558A2] hover:bg-[#3558A2]/90">
                       S'inscrire
                     </Button>
                   </Link>

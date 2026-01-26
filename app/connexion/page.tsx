@@ -33,7 +33,7 @@ export default function ConnexionPage() {
       password: "alumni123",
       role: "Alumni",
       icon: User,
-      color: "bg-[#0055A4]",
+      color: "bg-[#3558A2]",
       description: "Accès membre standard"
     },
     {
@@ -101,7 +101,7 @@ export default function ConnexionPage() {
     <div className="min-h-screen flex items-center justify-center bg-muted py-12 px-4 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
-          <div className="w-16 h-16 bg-[#0055A4] rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-[#3558A2] rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-2xl font-bold text-white">FA</span>
           </div>
           <CardTitle className="font-serif text-2xl">Connexion</CardTitle>
@@ -116,13 +116,13 @@ export default function ConnexionPage() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Mot de passe</Label>
-                <Link href="/mot-de-passe-oublie" className="text-sm text-[#0055A4] hover:underline">
+                <Link href="/mot-de-passe-oublie" className="text-sm text-[#3558A2] hover:underline">
                   Mot de passe oublié ?
                 </Link>
               </div>
               <Input id="password" type="password" required />
             </div>
-            <Button type="submit" className="w-full bg-[#0055A4] hover:bg-[#0055A4]/90" disabled={isLoading}>
+            <Button type="submit" className="w-full bg-[#3558A2] hover:bg-[#3558A2]/90" disabled={isLoading}>
               {isLoading ? "Connexion..." : "Se connecter"}
             </Button>
           </form>
@@ -130,7 +130,7 @@ export default function ConnexionPage() {
           <div className="mt-6 text-center text-sm">
             <p className="text-muted-foreground">
               Pas encore membre ?{" "}
-              <Link href="/inscription" className="text-[#0055A4] font-semibold hover:underline">
+              <Link href="/inscription" className="text-[#3558A2] font-semibold hover:underline">
                 Créer un compte
               </Link>
             </p>
@@ -156,7 +156,7 @@ export default function ConnexionPage() {
                     variant={selectedProfile === profile.id ? "default" : "outline"}
                     className={`w-full justify-start p-4 h-auto ${
                       selectedProfile === profile.id 
-                        ? "bg-[#0055A4] hover:bg-[#0055A4]/90" 
+                        ? "bg-[#3558A2] hover:bg-[#3558A2]/90" 
                         : "bg-transparent hover:bg-muted"
                     }`}
                     onClick={() => handleProfileSelect(profile)}

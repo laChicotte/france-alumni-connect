@@ -10,7 +10,7 @@ export default function InscriptionPage() {
     <div className="min-h-screen flex items-center justify-center bg-muted py-12 px-4 sm:px-6 lg:px-8">
       <Card className="w-full max-w-2xl">
         <CardHeader className="text-center">
-          <div className="w-16 h-16 bg-[#0055A4] rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-[#3558A2] rounded-full flex items-center justify-center mx-auto mb-4">
             <span className="text-2xl font-bold text-white">FA</span>
           </div>
           <CardTitle className="font-serif text-2xl">Rejoignez France Alumni Guinée</CardTitle>
@@ -78,7 +78,7 @@ export default function InscriptionPage() {
                 type="file" 
                 accept=".pdf,.jpg,.jpeg,.png" 
                 required 
-                className="file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#0055A4] file:text-white hover:file:bg-[#0055A4]/90"
+                className="file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#3558A2] file:text-white hover:file:bg-[#3558A2]/90"
               />
               <p className="text-xs text-muted-foreground">
                 Formats acceptés : PDF, JPG, PNG (max 5MB)
@@ -89,11 +89,11 @@ export default function InscriptionPage() {
               <Checkbox id="terms" required />
               <label htmlFor="terms" className="text-sm text-muted-foreground leading-relaxed">
                 J'accepte les{" "}
-                <Link href="/conditions" className="text-[#0055A4] hover:underline">
+                <Link href="/conditions" className="text-[#3558A2] hover:underline">
                   conditions d'utilisation
                 </Link>{" "}
                 et la{" "}
-                <Link href="/confidentialite" className="text-[#0055A4] hover:underline">
+                <Link href="/confidentialite" className="text-[#3558A2] hover:underline">
                   politique de confidentialité
                 </Link>
               </label>
@@ -113,7 +113,7 @@ export default function InscriptionPage() {
               </label>
             </div>
 
-            <Button type="submit" className="w-full bg-[#0055A4] hover:bg-[#0055A4]/90" size="lg">
+            <Button type="submit" className="w-full bg-[#3558A2] hover:bg-[#3558A2]/90" size="lg">
               Créer mon compte
             </Button>
           </form>
@@ -121,7 +121,7 @@ export default function InscriptionPage() {
           <div className="mt-6 text-center text-sm">
             <p className="text-muted-foreground">
               Vous avez déjà un compte ?{" "}
-              <Link href="/connexion" className="text-[#0055A4] font-semibold hover:underline">
+              <Link href="/connexion" className="text-[#3558A2] font-semibold hover:underline">
                 Se connecter
               </Link>
             </p>

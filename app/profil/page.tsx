@@ -39,7 +39,7 @@ export default function ProfilPage() {
       position: parsedUser.role === "Alumni" ? "CEO & Fondatrice" : parsedUser.role,
       university: "Sciences Po Paris",
       graduation: "2020",
-      degree: "Master en Politiques Publiques",
+      degree: "Politiques Publiques",
       bio: "Passionnée par l'éducation et l'innovation, je contribue au développement de solutions technologiques pour l'éducation en Guinée."
     }
     
@@ -90,37 +90,47 @@ export default function ProfilPage() {
                     </AvatarFallback>
                   </Avatar>
                   <h2 className="font-serif text-xl font-bold mb-1">{formData.name}</h2>
-                  <Badge className="bg-[#0055A4] hover:bg-[#0055A4]/90">
+                  <Badge className="bg-[#3558A2] hover:bg-[#3558A2]/90">
                     {formData.role}
                   </Badge>
                 </div>
 
                 <div className="space-y-3 text-sm">
                   <div className="flex items-center gap-2">
-                    <Mail className="h-4 w-4 text-[#0055A4]" />
+                    <Mail className="h-4 w-4 text-[#3558A2]" />
                     <span>{formData.email}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Phone className="h-4 w-4 text-[#0055A4]" />
+                    <Phone className="h-4 w-4 text-[#3558A2]" />
                     <span>{formData.phone}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-[#0055A4]" />
+                    <MapPin className="h-4 w-4 text-[#3558A2]" />
                     <span>{formData.location}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Building className="h-4 w-4 text-[#0055A4]" />
+                    <Building className="h-4 w-4 text-[#3558A2]" />
                     <span>{formData.company}</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <GraduationCap className="h-4 w-4 text-[#0055A4]" />
+                    <GraduationCap className="h-4 w-4 text-[#3558A2]" />
                     <span>{formData.university}</span>
                   </div>
+                </div>
+
+                <div className="mt-6">
+                  <button
+                    onClick={() => {/* Ajouter votre logique de vérification ici */}}
+                    className="w-full flex items-center justify-center gap-2 bg-[#3558A2] hover:bg-[#3558A2]/90 text-white font-medium py-2.5 px-4 rounded-lg transition-colors"
+                  >
+                    <GraduationCap className="h-4 w-5" />
+                    Authentifiez votre diplôme
+                  </button>
                 </div>
               </CardContent>
             </Card>
           </div>
-
+          {/* Profile Details */}
           {/* Profile Details */}
           <div className="lg:col-span-2">
             <Card>
@@ -137,7 +147,7 @@ export default function ProfilPage() {
                       <X className="h-4 w-4 mr-2" />
                       Annuler
                     </Button>
-                    <Button size="sm" onClick={handleSave} className="bg-[#0055A4] hover:bg-[#0055A4]/90">
+                    <Button size="sm" onClick={handleSave} className="bg-[#3558A2] hover:bg-[#3558A2]/90">
                       <Save className="h-4 w-4 mr-2" />
                       Sauvegarder
                     </Button>
@@ -229,15 +239,73 @@ export default function ProfilPage() {
                     />
                   </div>
                 </div>
+                
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="level" className="mb-0.5 block">Niveau d'études</Label>
+                    <Input
+                      id="level"
+                      value={"Licence"} 
+                      onChange={(e) => setFormData({...formData, level: e.target.value})}
+                      disabled={!isEditing}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="degree" className="mb-0.5 block">Formation</Label>
+                    <Input
+                      id="degree"
+                      value={formData.degree || ''}
+                      onChange={(e) => setFormData({...formData, degree: e.target.value})}
+                      disabled={!isEditing}
+                    />
+                  </div>
+                </div>
 
-                <div>
-                  <Label htmlFor="degree" className="mb-0.5 block">Formation</Label>
-                  <Input
-                    id="degree"
-                    value={formData.degree || ''}
-                    onChange={(e) => setFormData({...formData, degree: e.target.value})}
-                    disabled={!isEditing}
-                  />
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="status" className="mb-0.5 block">Statut actuel</Label>
+                    <Input
+                      id="status"
+                      value={formData.status || ''}
+                      onChange={(e) => setFormData({...formData, status: e.target.value})}
+                      disabled={!isEditing}
+                      placeholder="Entrepreneur / Salarié"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="sector" className="mb-0.5 block">Secteur d'activité</Label>
+                    <Input
+                      id="sector"
+                      value={formData.sector || ''}
+                      onChange={(e) => setFormData({...formData, sector: e.target.value})}
+                      disabled={!isEditing}
+                      placeholder="Finance / Éducation / Technologie..."
+                    />
+                  </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="scholarship" className="mb-0.5 block">Boursier de l'État Français</Label>
+                    <Input
+                      id="scholarship"
+                      value="Oui"
+                      // value="Non"
+                      onChange={(e) => setFormData({...formData, scholarship: e.target.value})}
+                      disabled={!isEditing}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="mobility" className="mb-0.5 block">Projet de mobilité (2 à 5 ans)</Label>
+                    <Input
+                      id="mobility"
+                      value="Rentrer en Guinée"
+                      // value="Changer de pays ailleurs qu'en Guinée ou en France"
+                      // value="Rester en France"
+                      onChange={(e) => setFormData({...formData, mobility: e.target.value})}
+                      disabled={!isEditing}
+                    />
+                  </div>
                 </div>
 
                 <div>
