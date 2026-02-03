@@ -88,8 +88,8 @@ export default function HomePage() {
             <div className="lg:col-span-1">
               <div className="flex justify-between items-end mb-8">
                 <div>
-                  <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-4">Événèments</h2>
-                  <p className="text-lg text-muted-foreground">Rejoignez nos évènements à venir</p>
+                  <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-4">Événements</h2>
+                  <p className="text-lg text-muted-foreground">Rejoignez nos événements à venir</p>
                 </div>
                 {/* Bouton "Voir tout" supprimé pour harmonisation (pas de page évènements dédiée) */}
               </div>

@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { useState, useEffect } from "react"
 import { useRouter, usePathname } from "next/navigation"
 import { Menu, X, User, LogOut, Settings, Bell } from "lucide-react"
@@ -47,26 +48,43 @@ export function Navigation() {
   }
 
   const navItems = [
-    // { href: "/", label: "Accueil" },
-    { href: "/a-propos", label: "À propos" },
-    { href: "/actualites", label: "Actualités" },
-    { href: "/annuaire", label: "Annuaire" },
+    { href: "/a-propos", label: "à propos" },
+    { href: "/actualites", label: "actualités" },
+    { href: "/emploi", label: "emploi" },
+    { href: "/annuaire", label: "annuaire" },
   ]
 
   return (
-    <nav className="bg-white border-b border-border sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-16">
+    <nav className="bg-[#3558A2] border-b border-[#2a4680] sticky top-0 z-50">
+      <div className="w-full">
+        <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-[#3558A2] to-[#FCD116] rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-xl">FA</span>
-            </div>
-            <span className="font-serif text-xl font-bold text-foreground hidden sm:block">France Alumni Connect</span>
+          <Link href="/" className="flex items-center gap-3 pl-2 sm:pl-4">
+            <Image
+              src="/logo/logo.png"
+              alt="Institut Français - France Alumni"
+              width={120}
+              height={60}
+              className="object-contain h-14 w-auto"
+            />
+            <span
+              className="text-white font-bold text-2xl uppercase tracking-wide hidden sm:block"
+              style={{
+                letterSpacing: '0.05em',
+                textShadow: `
+                  2px 2px 0 #E85D3A,
+                  3px 3px 0 #E85D3A,
+                  4px 4px 0 #D94A2A,
+                  5px 5px 0 #C93820
+                `
+              }}
+            >
+              France Alumni Connect
+            </span>
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-1">
+          <div className="hidden md:flex items-center gap-6 pr-6">
             {navItems.map((item) => {
               const isActive = pathname.startsWith(item.href)
               return (
@@ -74,10 +92,10 @@ export function Navigation() {
                   key={item.href}
                   href={item.href}
                   className={
-                    `px-4 py-2 text-sm font-medium rounded-md transition-colors ` +
+                    `px-3 py-2 text-base font-normal transition-colors ` +
                     (isActive
-                      ? `text-[#3558A2] bg-[#3558A2]/10 border border-[#3558A2]/20`
-                      : `text-foreground hover:text-[#3558A2] hover:bg-muted`)
+                      ? `text-white font-semibold border-b-2 border-white`
+                      : `text-white/90 hover:text-white hover:border-b-2 hover:border-white/50`)
                   }
                 >
                   {item.label}
@@ -86,11 +104,11 @@ export function Navigation() {
             })}
             
             {/* User Profile */}
-            <div className="ml-4">
+            <div className="ml-6">
               {isAuthenticated ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-8 w-8 rounded-full">
+                    <Button variant="ghost" className="relative h-8 w-8 rounded-full hover:bg-white/10">
                       <Avatar className="h-8 w-8">
                         <AvatarImage src={user.avatar && user.avatar !== '/placeholder.svg' ? user.avatar : undefined} alt={user.name} />
                         <AvatarFallback className="bg-gradient-to-br from-gray-600 to-gray-800 text-white text-xs font-bold">
@@ -142,24 +160,20 @@ export function Navigation() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <div className="flex items-center gap-2">
-                  <Link href="/connexion">
-                    <Button variant="outline" size="sm">
-                      Se connecter
-                    </Button>
-                  </Link>
-                  <Link href="/inscription">
-                    <Button size="sm" className="bg-[#3558A2] hover:bg-[#3558A2]/90">
-                      S'inscrire
-                    </Button>
-                  </Link>
-                </div>
+                <Link href="/connexion">
+                  <Button
+                    size="sm"
+                    className="bg-white text-[#3558A2] hover:bg-white/90 font-normal px-6 py-2 rounded-md"
+                  >
+                    se connecter
+                  </Button>
+                </Link>
               )}
             </div>
           </div>
 
           {/* Mobile menu button */}
-          <Button variant="ghost" size="icon" className="md:hidden" onClick={() => setIsOpen(!isOpen)}>
+          <Button variant="ghost" size="icon" className="md:hidden text-white hover:bg-white/10 mr-4" onClick={() => setIsOpen(!isOpen)}>
             {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </Button>
         </div>
@@ -174,10 +188,10 @@ export function Navigation() {
                   key={item.href}
                   href={item.href}
                   className={
-                    `block px-4 py-2 text-sm font-medium rounded-md transition-colors ` +
+                    `block px-4 py-3 text-base transition-colors ` +
                     (isActive
-                      ? `text-[#3558A2] bg-[#3558A2]/10 border border-[#3558A2]/20`
-                      : `text-foreground hover:text-[#3558A2] hover:bg-muted`)
+                      ? `text-white font-semibold bg-white/10`
+                      : `text-white/90 hover:text-white hover:bg-white/5`)
                   }
                   onClick={() => setIsOpen(false)}
                 >
@@ -187,7 +201,7 @@ export function Navigation() {
             })}
             
             {/* Mobile User Profile */}
-            <div className="px-4 py-2 border-t border-border mt-4">
+            <div className="px-4 py-2 border-t border-white/20 mt-4">
               {isAuthenticated ? (
                 <div className="space-y-2">
                   <div className="flex items-center gap-3 px-2 py-2">
@@ -198,14 +212,14 @@ export function Navigation() {
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="text-sm font-medium">{user.name}</p>
-                      <p className="text-xs text-muted-foreground">{user.email}</p>
+                      <p className="text-sm font-medium text-white">{user.name}</p>
+                      <p className="text-xs text-white/70">{user.email}</p>
                     </div>
                   </div>
                   <div className="space-y-1">
                     <Link
                       href="/profil"
-                      className="flex items-center gap-2 px-2 py-2 text-sm text-foreground hover:text-[#3558A2] hover:bg-muted rounded-md transition-colors"
+                      className="flex items-center gap-2 px-2 py-2 text-sm text-white/90 hover:text-white hover:bg-white/5 rounded-md transition-colors"
                       onClick={() => setIsOpen(false)}
                     >
                       <User className="h-4 w-4" />
@@ -213,7 +227,7 @@ export function Navigation() {
                     </Link>
                     <Link
                       href="/parametres"
-                      className="flex items-center gap-2 px-2 py-2 text-sm text-foreground hover:text-[#3558A2] hover:bg-muted rounded-md transition-colors"
+                      className="flex items-center gap-2 px-2 py-2 text-sm text-white/90 hover:text-white hover:bg-white/5 rounded-md transition-colors"
                       onClick={() => setIsOpen(false)}
                     >
                       <Settings className="h-4 w-4" />
@@ -221,7 +235,7 @@ export function Navigation() {
                     </Link>
                     <Link
                       href="/notifications"
-                      className="flex items-center gap-2 px-2 py-2 text-sm text-foreground hover:text-[#3558A2] hover:bg-muted rounded-md transition-colors"
+                      className="flex items-center gap-2 px-2 py-2 text-sm text-white/90 hover:text-white hover:bg-white/5 rounded-md transition-colors"
                       onClick={() => setIsOpen(false)}
                     >
                       <Bell className="h-4 w-4" />
@@ -232,7 +246,7 @@ export function Navigation() {
                         handleLogout()
                         setIsOpen(false)
                       }}
-                      className="flex items-center gap-2 px-2 py-2 text-sm text-foreground hover:text-[#3558A2] hover:bg-muted rounded-md transition-colors w-full text-left"
+                      className="flex items-center gap-2 px-2 py-2 text-sm text-white/90 hover:text-white hover:bg-white/5 rounded-md transition-colors w-full text-left"
                     >
                       <LogOut className="h-4 w-4" />
                       Se déconnecter
@@ -242,13 +256,8 @@ export function Navigation() {
               ) : (
                 <div className="space-y-2">
                   <Link href="/connexion" className="block" onClick={() => setIsOpen(false)}>
-                    <Button variant="outline" size="sm" className="w-full">
-                      Se connecter
-                    </Button>
-                  </Link>
-                  <Link href="/inscription" className="block" onClick={() => setIsOpen(false)}>
-                    <Button size="sm" className="w-full bg-[#3558A2] hover:bg-[#3558A2]/90">
-                      S'inscrire
+                    <Button size="sm" className="w-full bg-white text-[#3558A2] hover:bg-white/90">
+                      se connecter
                     </Button>
                   </Link>
                 </div>

@@ -169,9 +169,6 @@ export default function AboutPage() {
               <Globe className="h-6 w-6" />
             </div>
             <h2 className="font-serif text-3xl font-bold mb-4">Nos Partenaires</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Nous collaborons avec des institutions de référence pour renforcer notre impact
-            </p>
           </div>
 
           <div className="max-w-6xl mx-auto">
