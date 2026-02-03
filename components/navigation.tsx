@@ -72,10 +72,10 @@ export function Navigation() {
               style={{
                 letterSpacing: '0.05em',
                 textShadow: `
-                  2px 2px 0 #E85D3A,
-                  3px 3px 0 #E85D3A,
-                  4px 4px 0 #D94A2A,
-                  5px 5px 0 #C93820
+                  2px 2px 0 #ea292c,
+                  3px 3px 0 #ea292c,
+                  4px 4px 0 #f48988,
+                  5px 5px 0 #f48988
                 `
               }}
             >

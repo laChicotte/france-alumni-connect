@@ -32,7 +32,7 @@ export default function HomePage() {
         </div>
 
         {/* Decorative element */}
-        <div className="absolute bottom-0 right-0 w-1/3 h-1/3 bg-[#FCD116]/10 rounded-tl-full blur-3xl"></div>
+        <div className="absolute bottom-0 right-0 w-1/3 h-1/3 bg-[#ffe8e4]/10 rounded-tl-full blur-3xl"></div>
       </section>
 
 
@@ -103,7 +103,7 @@ export default function HomePage() {
                           <Calendar className="h-5 w-5 text-[#3558A2]" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="inline-block px-2 py-1 bg-[#FCD116]/20 text-[#3558A2] text-xs font-semibold rounded-full mb-2">
+                          <div className="inline-block px-2 py-1 bg-[#ffe8e4] text-[#3558A2] text-xs font-semibold rounded-full mb-2">
                             Événement
                           </div>
                           <h3 className="font-serif text-base font-bold mb-1 line-clamp-2">{event.title}</h3>

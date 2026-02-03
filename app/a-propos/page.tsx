@@ -51,9 +51,9 @@ export default function AboutPage() {
                 </CardContent>
               </Card>
 
-              <Card className="border-2 hover:border-[#FCD116] transition-colors">
+              <Card className="border-2 hover:border-[#f48988] transition-colors">
                 <CardContent className="pt-6">
-                  <div className="w-12 h-12 bg-[#FCD116]/20 rounded-lg flex items-center justify-center mb-4">
+                  <div className="w-12 h-12 bg-[#ffe8e4] rounded-lg flex items-center justify-center mb-4">
                     <Award className="h-6 w-6 text-[#3558A2]" />
                   </div>
                   <h3 className="font-serif text-xl font-bold mb-3">Excellence</h3>

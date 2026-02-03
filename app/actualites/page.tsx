@@ -31,10 +31,10 @@ export default function ActualitesPage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-[#3558A2] via-[#3558A2] to-[#3558A2] text-white py-8 lg:py-12">
-        <div className="w-full px-2 sm:px-4">
-          <div className="max-w-3xl">
-            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 text-balance">
+      <section className="bg-gradient-to-br from-[#3558A2] via-[#3558A2] to-[#3558A2] text-white py-4 lg:py-6">
+        <div className="w-full px-2 sm:px-4 flex flex-col items-center">
+          <div className="max-w-3xl text-center">
+            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-balance">
               Actualités & Témoignages
             </h1>
           </div>
@@ -42,15 +42,21 @@ export default function ActualitesPage() {
       </section>
 
       {/* Categories Filter */}
-      <section className="py-8 bg-muted border-b">
-        <div className="w-full px-2 sm:px-4">
+      <section className="py-6 bg-muted border-b">
+        <div className="max-w-[85%] mx-auto px-2 sm:px-4">
           <div className="flex flex-wrap gap-3">
             {categories.map((category) => (
               <Button
                 key={category}
                 variant={category === selectedCategory ? "default" : "outline"}
                 className={
-                  category === selectedCategory ? "bg-[#3558A2] hover:bg-[#3558A2]/90" : "hover:bg-[#3558A2] hover:text-white"
+                  category === "Événements"
+                    ? category === selectedCategory
+                      ? "bg-[#fcd116] text-black hover:bg-[#fcd116]/90"
+                      : "border-[#fcd116] bg-[#fcd116]/20 text-foreground hover:bg-[#fcd116]/40 hover:text-black"
+                    : category === selectedCategory
+                      ? "bg-[#3558A2] hover:bg-[#3558A2]/90"
+                      : "hover:bg-[#3558A2] hover:text-white"
                 }
                 onClick={() => {
                   setSelectedCategory(category)
