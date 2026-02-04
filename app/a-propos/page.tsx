@@ -25,7 +25,7 @@ export default function AboutPage() {
       <section className="lg:py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
-          <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 whitespace-nowrap">
+          <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 text-balance text-left whitespace-normal lg:whitespace-nowrap">
               À propos de France Alumni Guinée
             </h1>
             
