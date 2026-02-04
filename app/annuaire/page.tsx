@@ -141,7 +141,7 @@ export default function AnnuairePage() {
               <Card key={member.id} className="hover:shadow-lg transition-shadow group">
                 <CardContent className="pt-6">
                   <div className="flex flex-col items-center text-center mb-4">
-                    <div className="w-24 h-24 rounded-full overflow-hidden bg-muted mb-4">
+                    <div className="w-24 h-24 rounded-full overflow-hidden bg-muted mb-1">
                       <img
                         src={member.photo || "/placeholder.svg"}
                         alt={member.name}
@@ -151,8 +151,8 @@ export default function AnnuairePage() {
                     <h3 className="font-serif text-xl font-bold mb-1 group-hover:text-[#3558A2] transition-colors">
                       {member.name}
                     </h3>
-                    <p className="text-sm text-[#3558A2] font-semibold mb-2">{member.currentPosition}</p>
-                    <p className="text-sm text-muted-foreground mb-3">{member.company}</p>
+                    {/* <p className="text-sm text-[#3558A2] font-semibold mb-2">{member.currentPosition}</p> */}
+                    <p className="text-sm text-muted-foreground mb-1">{member.company}</p>
                   </div>
 
                   <div className="space-y-2 mb-4">
@@ -166,10 +166,10 @@ export default function AnnuairePage() {
                       <Briefcase className="h-4 w-4 flex-shrink-0" />
                       <span>{member.sector}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    {/* <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <MapPin className="h-4 w-4 flex-shrink-0" />
                       <span>{member.city}</span>
-                    </div>
+                    </div> */}
                   </div>
 
                   <div className="flex gap-2">
