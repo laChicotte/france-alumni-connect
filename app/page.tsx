@@ -3,25 +3,61 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
 import { ArrowRight, Users, Briefcase, GraduationCap, Globe, MapPin, Mail, Calendar, Clock, MapPin as MapPinIcon, User } from "lucide-react"
 import { articles, alumniMembers } from "@/lib/fake-data"
-import { AnimatedTitle } from "@/components/animated-title"
+import { useEffect, useState } from "react"
+import type { CarouselApi } from "@/components/ui/carousel"
+
+const heroSlides = [
+  { src: "/accueil/caroussel/anime.gif", alt: "France Alumni Connect" },
+  { src: "/accueil/caroussel/fixe.png", alt: "France Alumni Connect" },
+]
 
 export default function HomePage() {
-  const featuredArticles = articles.slice(0, 2)
+  const [api, setApi] = useState<CarouselApi>()
+  const featuredArticles = articles.slice(0, 3)
   const featuredAlumni = alumniMembers.slice(-3)
   const upcomingEvents = articles.filter((a) => a.category === "Événements").slice(0, 2)
 
+  useEffect(() => {
+    if (!api) return
+    const interval = setInterval(() => api.scrollNext(), 4000)
+    return () => clearInterval(interval)
+  }, [api])
+
   return (
-    <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-[#3558A2] via-[#3558A2] to-[#3558A2] text-white py-8 lg:py-12">
+    <div className="min-h-screen bg-[#ffe8e4]">
+      {/* Hero : carrousel d'images */}
+      <section className="relative w-full overflow-hidden bg-muted/30 py-4">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
+          <Carousel setApi={setApi} opts={{ loop: true }}>
+            <CarouselContent className="ml-0">
+              {heroSlides.map((slide, index) => (
+              <CarouselItem key={index} className="pl-0 basis-full">
+                <div className="relative w-full">
+                  <img
+                    src={slide.src}
+                    alt={slide.alt}
+                      className="w-full h-auto object-contain max-h-[220px] sm:max-h-[260px]"
+                  />
+                </div>
+              </CarouselItem>
+              ))}
+            </CarouselContent>
+            <CarouselPrevious className="left-2" />
+            <CarouselNext className="right-2" />
+          </Carousel>
+        </div>
+      </section>
+
+      {/* Ancienne section hero (titré + bouton) — commentée
+      <section className="lg:py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 text-balance">
               <AnimatedTitle />
             </h1>
-
             <div className="flex flex-col sm:flex-row gap-4">
               <Button size="lg" className="bg-[#FCD116] text-[#3558A2] hover:bg-[#FCD116]/90 font-semibold">
                 Rejoindre le réseau
@@ -30,19 +66,18 @@ export default function HomePage() {
             </div>
           </div>
         </div>
-
-        {/* Decorative element */}
         <div className="absolute bottom-0 right-0 w-1/3 h-1/3 bg-[#ffe8e4]/10 rounded-tl-full blur-3xl"></div>
       </section>
+      */}
 
 
       {/* Actualités et Évènements */}
-      <section className="py-20 bg-muted">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid lg:grid-cols-3 gap-8">
+      <section className="py-8 bg-muted">
+        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
+          <div className="grid lg:grid-cols-3 gap-6">
             {/* Actualités - 2/3 */}
             <div className="lg:col-span-2">
-              <div className="flex justify-between items-end mb-8">
+              <div className="flex justify-between items-end mb-6">
                 <div>
                   <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-4">Actualités récentes</h2>
                   <p className="text-lg text-muted-foreground">Au fil des nouvelles : nos alumni</p>
@@ -55,31 +90,25 @@ export default function HomePage() {
                 </Link>
               </div>
 
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-3 gap-4">
                 {featuredArticles.map((article) => (
-                  <Card key={article.id} className="overflow-hidden hover:shadow-lg transition-shadow">
-                    <img
-                      src={article.image || "/placeholder.svg"}
-                      alt={article.title}
-                      className="w-full h-48 object-cover"
-                    />
-                    <CardContent className="pt-6">
-                      <div className="inline-block px-3 py-1 bg-[#3558A2]/10 text-[#3558A2] text-xs font-semibold rounded-full mb-3">
-                        {article.category}
-                      </div>
-                      <h3 className="font-serif text-xl font-bold mb-2 line-clamp-2">{article.title}</h3>
-                      <p className="text-muted-foreground text-sm mb-4 line-clamp-3">{article.excerpt}</p>
-                      <div className="flex items-center justify-between text-sm text-muted-foreground">
-                        <span>{article.date}</span>
-                        <Link href={`/actualites/${article.id}`}>
-                          <Button variant="ghost" className="inline-flex items-center text-[#3558A2] font-semibold hover:underline p-0 h-auto">
-                            Lire l'article
-                            <ArrowRight className="ml-1 h-4 w-4" />
-                          </Button>
-                        </Link>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <Link key={article.id} href={`/actualites/${article.id}`} className="block">
+                    <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer h-full">
+                      <img
+                        src={article.image || "/placeholder.svg"}
+                        alt={article.title}
+                        className="w-full h-32 object-cover"
+                      />
+                      <CardContent className="pt-4 pb-4 px-4">
+                        <div className="inline-block px-2 py-0.5 bg-[#3558A2]/10 text-[#3558A2] text-[10px] font-semibold rounded-full mb-2">
+                          {article.category}
+                        </div>
+                        <h3 className="font-serif text-base font-bold mb-1 line-clamp-2">{article.title}</h3>
+                        <p className="text-muted-foreground text-xs mb-2 line-clamp-2">{article.excerpt}</p>
+                        <span className="text-xs text-muted-foreground">{article.date}</span>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 ))}
               </div>
             </div>
@@ -88,7 +117,7 @@ export default function HomePage() {
             <div className="lg:col-span-1">
               <div className="flex justify-between items-end mb-8">
                 <div>
-                  <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-4">Événements</h2>
+                  <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-2">Événements</h2>
                   <p className="text-lg text-muted-foreground">Rejoignez nos événements à venir</p>
                 </div>
                 {/* Bouton "Voir tout" supprimé pour harmonisation (pas de page évènements dédiée) */}
@@ -103,11 +132,11 @@ export default function HomePage() {
                           <Calendar className="h-5 w-5 text-[#3558A2]" />
                         </div>
                         <div className="flex-1 min-w-0">
-                          <div className="inline-block px-2 py-1 bg-[#ffe8e4] text-[#3558A2] text-xs font-semibold rounded-full mb-2">
+                          <div className="inline-block px-2 py-1 bg-[#ffe8e4] text-[#3558A2] text-xs font-semibold rounded-full mb-0">
                             Événement
                           </div>
                           <h3 className="font-serif text-base font-bold mb-1 line-clamp-2">{event.title}</h3>
-                          <div className="space-y-1 text-xs text-muted-foreground">
+                          <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-muted-foreground">
                             <div className="flex items-center gap-2">
                               <Calendar className="h-3 w-3" />
                               <span>{event.date}</span>
@@ -139,9 +168,9 @@ export default function HomePage() {
       </section>
       
       {/* Aperçu Annuaire */}
-      <section className="py-20">
+      <section className="py-2">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-end mb-12">
+          <div className="flex justify-between items-end mb-8">
             <div>
               <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-4">Annuaire des Alumni</h2>
               <p className="text-lg text-muted-foreground">Découvrez les parcours inspirants de nos alumni</p>
@@ -212,11 +241,11 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-r from-[#3558A2] to-[#3558A2] rounded-2xl p-8 sm:p-12 text-white text-center">
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-4">Prêt à rejoindre notre communauté ?</h2>
-            <p className="text-lg text-white/90 mb-8 max-w-2xl mx-auto">
+      <section className="py-2 bg-muted">
+        <div className="">
+          <div className="rounded-2xl p-8 sm:p-4 text-center">
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-1">Prêt à rejoindre notre communauté ?</h2>
+            <p className="text-lg  mb-2 max-w-2xl mx-auto">
               Inscrivez-vous dès maintenant pour découvrir les talents du réseau et tisser de nouvelles connexions 
               au sein de France Alumni Guinée.
             </p>

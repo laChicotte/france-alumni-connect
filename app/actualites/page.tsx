@@ -31,7 +31,7 @@ export default function ActualitesPage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-[#3558A2] via-[#3558A2] to-[#3558A2] text-white py-4 lg:py-6">
+      <section className="py-4 lg:py-6">
         <div className="w-full px-2 sm:px-4 flex flex-col items-center">
           <div className="max-w-3xl text-center">
             <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-balance">
@@ -42,7 +42,7 @@ export default function ActualitesPage() {
       </section>
 
       {/* Categories Filter */}
-      <section className="py-6 bg-muted border-b">
+      <section className="py-6 bg-[#ffe8e4] border-b">
         <div className="max-w-[85%] mx-auto px-2 sm:px-4">
           <div className="flex flex-wrap gap-3">
             {categories.map((category) => (
@@ -71,7 +71,7 @@ export default function ActualitesPage() {
       </section>
 
       {/* Articles Grid */}
-      <section className="py-16">
+      <section className="py-6">
         <div className="max-w-[85%] mx-auto px-2 sm:px-4">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {currentArticles.map((article) => (
@@ -155,11 +155,11 @@ export default function ActualitesPage() {
       </section>
 
       {/* Newsletter CTA */}
-      <section className="py-16 bg-muted">
+      <section className="py-4 bg-[#ffe8e4]">
         <div className="w-full px-2 sm:px-4">
           <div className="max-w-2xl mx-auto text-center">
             <h2 className="font-serif text-3xl font-bold mb-4">Restez informé</h2>
-            <p className="text-lg text-muted-foreground mb-6">
+            <p className="text-lg text-muted-foreground mb-3">
               Inscrivez-vous à notre newsletter pour recevoir les dernières actualités et opportunités du réseau.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">

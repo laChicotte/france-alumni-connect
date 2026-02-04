@@ -53,13 +53,13 @@ export default function EmploiPage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-[#3558A2] via-[#3558A2] to-[#3558A2] text-white py-8 lg:py-12">
-        <div className="w-full px-2 sm:px-4">
+      <section className="lg:py-2">
+        <div className="max-w-[85%] mx-auto px-2 sm:px-4">
           <div className="max-w-3xl">
             <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 text-balance">
               Offres d&apos;Emploi
             </h1>
-            <p className="text-lg text-white/90">
+            <p className="text-lg">
               Découvrez les opportunités professionnelles partagées par notre réseau
             </p>
           </div>
@@ -67,7 +67,7 @@ export default function EmploiPage() {
       </section>
 
       {/* Job Listings */}
-      <section className="py-16">
+      <section className="py-4 bg-[#ffe8e4]">
         <div className="max-w-[85%] mx-auto px-2 sm:px-4">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {jobOffers.map((job) => (
@@ -116,7 +116,7 @@ export default function EmploiPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-16 bg-muted">
+      <section className="py-4">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="font-serif text-3xl font-bold mb-4">Vous recrutez ?</h2>
           <p className="text-lg text-muted-foreground mb-6">

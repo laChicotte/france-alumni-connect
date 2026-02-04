@@ -22,7 +22,7 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-[#3558A2] via-[#3558A2] to-[#3558A2] text-white py-8 lg:py-12">
+      <section className="lg:py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
           <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 whitespace-nowrap">
@@ -34,7 +34,7 @@ export default function AboutPage() {
       </section>
 
       {/* Values */}
-      <section className="py-20">
+      <section className="py-4 bg-[#ffe8e4]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div>
             <h2 className="font-serif text-3xl font-bold mb-8 text-center">Nos Valeurs</h2>
@@ -80,8 +80,9 @@ export default function AboutPage() {
       </section>
 
       {/* Objectives */}
-      <section className="py-20 bg-muted">
+      <section className="py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-8 text-center">Nos Objectifs</h2>
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Image à gauche */}
             <div className="order-2 lg:order-1">
@@ -94,7 +95,7 @@ export default function AboutPage() {
 
             {/* Objectifs à droite */}
             <div className="order-1 lg:order-2">
-              <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-8">Nos Objectifs</h2>
+              
               <div className="space-y-6">
                 <div className="flex gap-4">
                   <div className="flex-shrink-0">
@@ -162,14 +163,17 @@ export default function AboutPage() {
       </section>
 
       {/* Partners */}
-      <section className="py-20 bg-muted">
+      <section className="py-4 bg-[#ffe8e4]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <div className="inline-flex items-center justify-center w-12 h-12 bg-[#3558A2] text-white rounded-lg mb-6 mx-auto">
+          <div className="flex items-center justify-center gap-4 mb-2">
+            <div className="flex items-center justify-center w-12 h-12 bg-[#3558A2] text-white rounded-lg">
               <Globe className="h-6 w-6" />
             </div>
-            <h2 className="font-serif text-3xl font-bold mb-4">Nos Partenaires</h2>
+            <h2 className="font-serif text-3xl font-bold">
+              Nos Partenaires
+            </h2>
           </div>
+
 
           <div className="max-w-6xl mx-auto">
             <Carousel

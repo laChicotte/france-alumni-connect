@@ -68,15 +68,28 @@ export default function AnnuairePage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="bg-gradient-to-br from-[#3558A2] via-[#3558A2] to-[#3558A2] text-white py-6 lg:py-8">
+      <section className="py-4 lg:py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-3xl">
             <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold mb-3">
               Annuaire des Alumni
-            </h1>
+            </h1>           
+          </div>
+        </div>
+      </section>
 
+
+      {/* Filters */}
+      <section className="py-4 bg-[#ffe8e4] border-b">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-4 mb-4">
+            <Filter className="h-5 w-5 text-muted-foreground" />
+            <span className="font-semibold">Recherche & Filtres:</span>
+          </div>
+
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
             <div className="bg-white rounded-lg p-1 flex flex-col sm:flex-row gap-2">
-              <div className="flex-1 flex items-center gap-2 px-3">
+              <div className="flex items-center gap-2 px-3 w-full sm:w-100">
                 <Search className="h-5 w-5 text-muted-foreground" />
                 <input
                   type="text"
@@ -88,57 +101,34 @@ export default function AnnuairePage() {
                 Rechercher
               </Button>
             </div>
-          </div>
-        </div>
-      </section>
 
-
-      {/* Filters */}
-      <section className="py-8 bg-muted border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-4 mb-4">
-            <Filter className="h-5 w-5 text-muted-foreground" />
-            <span className="font-semibold">Filtres:</span>
-          </div>
-
-          <div className="space-y-4">
-            <div>
-              <p className="text-sm font-medium mb-2">Secteur d'activité</p>
-              <div className="flex flex-wrap gap-2">
+            <div className="flex flex-col">
+              <label className="text-sm font-medium mb-1">Secteur d'activité</label>
+              <select className="bg-white rounded-md border border-input px-3 py-2 text-sm">
                 {sectors.map((sector) => (
-                  <Button
-                    key={sector}
-                    variant={sector === "Tous" ? "default" : "outline"}
-                    size="sm"
-                    className={sector === "Tous" ? "bg-[#3558A2] hover:bg-[#3558A2]/90" : ""}
-                  >
+                  <option key={sector} value={sector}>
                     {sector}
-                  </Button>
+                  </option>
                 ))}
-              </div>
+              </select>
             </div>
 
-            <div>
-              <p className="text-sm font-medium mb-2">Ville</p>
-              <div className="flex flex-wrap gap-2">
+            <div className="flex flex-col">
+              <label className="text-sm font-medium mb-1">Ville</label>
+              <select className="bg-white rounded-md border border-input px-3 py-2 text-sm">
                 {cities.map((city) => (
-                  <Button
-                    key={city}
-                    variant={city === "Tous" ? "default" : "outline"}
-                    size="sm"
-                    className={city === "Tous" ? "bg-[#3558A2] hover:bg-[#3558A2]/90" : ""}
-                  >
+                  <option key={city} value={city}>
                     {city}
-                  </Button>
+                  </option>
                 ))}
-              </div>
+              </select>
             </div>
           </div>
         </div>
       </section>
 
       {/* Alumni Grid */}
-      <section className="py-16">
+      <section className="py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center mb-8">
             <p className="text-muted-foreground">
@@ -250,9 +240,9 @@ export default function AnnuairePage() {
       </section>
 
       {/* Nos Alumni en Chiffres */}
-      <section className="py-20 bg-muted">
+      <section className="py-4 bg-[#ffe8e4]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
+          <div className="text-center mb-5">
             <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-4">Nos Alumni en Chiffres</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Découvrez les statistiques de notre communauté d'alumni guinéens
@@ -260,7 +250,7 @@ export default function AnnuairePage() {
           </div>
 
           {/* Cartes de Statistiques */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-5">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Alumni</CardTitle>
@@ -309,7 +299,7 @@ export default function AnnuairePage() {
           </div>
 
           {/* Graphiques */}
-          <div className="grid lg:grid-cols-2 gap-8 mb-8">
+          <div className="grid lg:grid-cols-2 gap-8 mb-5">
             {/* Statut Professionnel */}
             <Card>
               <CardHeader>
@@ -391,11 +381,11 @@ export default function AnnuairePage() {
       </section>
       
       {/* CTA Section */}
-      <section className="py-16 bg-muted">
+      <section className="py-2">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-gradient-to-r from-[#3558A2] to-[#3558A2] rounded-2xl p-8 sm:p-12 text-white text-center">
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-4">Vous n'êtes pas encore inscrit ?</h2>
-            <p className="text-lg text-white/90 mb-8 max-w-2xl mx-auto">
+          <div className="rounded-2xl p-8 sm:p-12 text-center">
+            <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-2">Vous n'êtes pas encore inscrit ?</h2>
+            <p className="text-lg mb-2 max-w-2xl mx-auto">
               Rejoignez l'annuaire pour être visible auprès de la communauté et développer votre réseau professionnel.
             </p>
             <Button size="lg" className="bg-[#FCD116] text-[#3558A2] hover:bg-[#FCD116]/90 font-semibold">
