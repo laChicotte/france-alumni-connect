@@ -89,11 +89,11 @@ export default function ActualitesPage() {
                       </span>
                     </div>
                   </div>
-                  <CardContent className="pt-6">
+                  <CardContent className="pt-2">
                     <h3 className="font-serif text-lg font-bold mb-3 line-clamp-2 group-hover:text-[#3558A2] transition-colors">
                       {article.title}
                     </h3>
-                    <p className="text-muted-foreground text-sm mb-4 line-clamp-3 leading-relaxed">{article.excerpt}</p>
+                    {/* <p className="text-muted-foreground text-sm mb-4 line-clamp-3 leading-relaxed">{article.excerpt}</p> */}
                     <div className="flex items-center justify-between text-sm text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <Calendar className="h-4 w-4" />

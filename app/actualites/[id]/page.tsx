@@ -32,26 +32,26 @@ export default function ArticlePage() {
   return (
     <div className="min-h-screen">
        {/* Hero Section */}
-        <section className="bg-gradient-to-br from-[#3558A2] via-[#3558A2] to-[#3558A2] text-white py-6 lg:py-8">
+        <section className="py-3 lg:py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
             <Link href="/actualites">
-            <Button variant="ghost" className="mb-4 text-white hover:bg-white/10">
+            <Button variant="ghost" className="mb-2 hover:bg-[#f48988] bg-[#3558A2]">
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Retour aux actualités
             </Button>
             </Link>
 
             <div className="max-w-4xl">
-            <span className="inline-block px-3 py-1 bg-white/20 text-white text-sm font-semibold rounded-full mb-3">
+            <span className="inline-block px-3 py-1 text-sm font-semibold rounded-full mb-2 bg-[#f48988]">
                 {article.category}
             </span>
 
-            <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold mb-3 whitespace-nowrap">
+            <h1 className="font-serif text-2xl sm:text-2xl lg:text-3xl font-bold mb-2 whitespace-nowrap">
                 {article.title}
             </h1>
 
-            <div className="flex items-center gap-6 text-white/90">
+            <div className="flex items-center gap-6">
                 <div className="flex items-center gap-2">
                 <User className="h-4 w-4" />
                 <span>{article.author}</span>
@@ -67,7 +67,7 @@ export default function ArticlePage() {
 
 
       {/* Article Content */}
-      <section className="py-16">
+      <section className="py-4 bg-muted">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           {article.category === "Événements" && !showRegistrationForm ? (
             <div className="space-y-8">

@@ -104,7 +104,8 @@ export default function HomePage() {
                           {article.category}
                         </div>
                         <h3 className="font-serif text-base font-bold mb-1 line-clamp-2">{article.title}</h3>
-                        <p className="text-muted-foreground text-xs mb-2 line-clamp-2">{article.excerpt}</p>
+                        {/* <p className="text-muted-foreground text-xs mb-2 line-clamp-2">{article.excerpt}</p> */}
+                        <p className="text-muted-foreground text-xs mb-2 line-clamp-2">{article.author}</p>
                         <span className="text-xs text-muted-foreground">{article.date}</span>
                       </CardContent>
                     </Card>
@@ -126,7 +127,7 @@ export default function HomePage() {
               <div className="space-y-3">
                 {upcomingEvents.map((event) => (
                   <Card key={event.id} className="hover:shadow-lg transition-shadow">
-                    <CardContent className="px-3 py-[9px]">
+                    <CardContent className="px-3 py-[2px]">
                       <div className="flex items-start gap-3">
                         <div className="w-10 h-10 bg-[#3558A2]/10 rounded-lg flex items-center justify-center flex-shrink-0">
                           <Calendar className="h-5 w-5 text-[#3558A2]" />
