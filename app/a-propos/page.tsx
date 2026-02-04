@@ -166,9 +166,9 @@ export default function AboutPage() {
       <section className="py-4 bg-[#ffe8e4]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-center gap-4 mb-2">
-            <div className="flex items-center justify-center w-12 h-12 bg-[#3558A2] text-white rounded-lg">
+            {/* <div className="flex items-center justify-center w-12 h-12 bg-[#3558A2] text-white rounded-lg">
               <Globe className="h-6 w-6" />
-            </div>
+            </div> */}
             <h2 className="font-serif text-3xl font-bold">
               Nos Partenaires
             </h2>

@@ -199,7 +199,7 @@ export default function HomePage() {
                     <h3 className="font-serif text-lg font-bold mb-1 group-hover:text-[#3558A2] transition-colors">
                       {member.name}
                     </h3>
-                    <p className="text-sm text-[#3558A2] font-semibold mb-2">{member.currentPosition}</p>
+                    {/* <p className="text-sm text-[#3558A2] font-semibold mb-2">{member.currentPosition}</p> */}
                     <p className="text-sm text-muted-foreground mb-3">{member.company}</p>
                   </div>
 
@@ -210,14 +210,14 @@ export default function HomePage() {
                         {member.formation} - {member.university}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    {/* <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Briefcase className="h-4 w-4 flex-shrink-0" />
                       <span>{member.sector}</span>
-                    </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    </div> */}
+                    {/* <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <MapPin className="h-4 w-4 flex-shrink-0" />
                       <span>{member.city}</span>
-                    </div>
+                    </div> */}
                   </div>
 
                   <div className="flex gap-2">
@@ -250,7 +250,7 @@ export default function HomePage() {
               Inscrivez-vous dès maintenant pour découvrir les talents du réseau et tisser de nouvelles connexions 
               au sein de France Alumni Guinée.
             </p>
-            <Button size="lg" className="bg-[#FCD116] text-[#3558A2] hover:bg-[#FCD116]/90 font-semibold">
+            <Button size="lg" className="bg-[#ea292c] hover:bg-[#f48988]/90 font-semibold">
               S'inscrire maintenant
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>

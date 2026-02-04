@@ -3,7 +3,8 @@
 import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { MapPin, Briefcase, Clock, Calendar } from "lucide-react"
+import { MapPin, Briefcase, Clock, Calendar, Search, Filter } from "lucide-react"
+import { useMemo, useState } from "react"
 
 // Données d'exemple pour les offres d'emploi
 const jobOffers = [
@@ -50,6 +51,43 @@ const jobOffers = [
 ]
 
 export default function EmploiPage() {
+  const [searchTerm, setSearchTerm] = useState("")
+  const [selectedCategory, setSelectedCategory] = useState("Tous")
+  const [selectedType, setSelectedType] = useState("Tous")
+  const [selectedLocation, setSelectedLocation] = useState("Tous")
+
+  const { categories, types, locations } = useMemo(() => {
+    const categorySet = new Set(jobOffers.map((job) => job.category))
+    const typeSet = new Set(jobOffers.map((job) => job.type))
+    const locationSet = new Set(jobOffers.map((job) => job.location))
+
+    return {
+      categories: ["Tous", ...Array.from(categorySet)],
+      types: ["Tous", ...Array.from(typeSet)],
+      locations: ["Tous", ...Array.from(locationSet)],
+    }
+  }, [])
+
+  const filteredJobs = useMemo(() => {
+    const normalizedSearch = searchTerm.trim().toLowerCase()
+
+    return jobOffers.filter((job) => {
+      const matchesSearch =
+        !normalizedSearch ||
+        job.title.toLowerCase().includes(normalizedSearch) ||
+        job.company.toLowerCase().includes(normalizedSearch) ||
+        job.location.toLowerCase().includes(normalizedSearch) ||
+        job.category.toLowerCase().includes(normalizedSearch) ||
+        job.type.toLowerCase().includes(normalizedSearch)
+
+      const matchesCategory = selectedCategory === "Tous" || job.category === selectedCategory
+      const matchesType = selectedType === "Tous" || job.type === selectedType
+      const matchesLocation = selectedLocation === "Tous" || job.location === selectedLocation
+
+      return matchesSearch && matchesCategory && matchesType && matchesLocation
+    })
+  }, [searchTerm, selectedCategory, selectedType, selectedLocation])
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
@@ -66,11 +104,84 @@ export default function EmploiPage() {
         </div>
       </section>
 
+      {/* Recherche et filtres */}
+      <section className="py-4 bg-[#ffe8e4] border-b">
+        <div className="max-w-[85%] mx-auto px-2 sm:px-4">
+          <div className="flex items-center gap-4 mb-4">
+            <Filter className="h-5 w-5 text-muted-foreground" />
+            <span className="font-semibold">Filtres:</span>
+          </div>
+
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
+            <div className="bg-white rounded-lg p-1 flex flex-col sm:flex-row gap-2">
+              <div className="flex items-center gap-2 px-3 w-full sm:w-72">
+                <Search className="h-5 w-5 text-muted-foreground" />
+                <input
+                  type="text"
+                  placeholder="Poste, entreprise, lieu..."
+                  className="flex-1 outline-none text-foreground"
+                  value={searchTerm}
+                  onChange={(event) => setSearchTerm(event.target.value)}
+                />
+              </div>
+              <Button className="bg-[#3558A2] hover:bg-[#3558A2]/90">
+                Rechercher
+              </Button>
+            </div>
+
+            <div className="flex flex-col">
+              <label className="text-sm font-medium mb-1">Secteur</label>
+              <select
+                className="bg-white rounded-md border border-input px-3 py-2 text-sm"
+                value={selectedCategory}
+                onChange={(event) => setSelectedCategory(event.target.value)}
+              >
+                {categories.map((category) => (
+                  <option key={category} value={category}>
+                    {category}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex flex-col">
+              <label className="text-sm font-medium mb-1">Type de contrat</label>
+              <select
+                className="bg-white rounded-md border border-input px-3 py-2 text-sm"
+                value={selectedType}
+                onChange={(event) => setSelectedType(event.target.value)}
+              >
+                {types.map((type) => (
+                  <option key={type} value={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex flex-col">
+              <label className="text-sm font-medium mb-1">Ville</label>
+              <select
+                className="bg-white rounded-md border border-input px-3 py-2 text-sm"
+                value={selectedLocation}
+                onChange={(event) => setSelectedLocation(event.target.value)}
+              >
+                {locations.map((location) => (
+                  <option key={location} value={location}>
+                    {location}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* Job Listings */}
-      <section className="py-4 bg-[#ffe8e4]">
+      <section className="py-4">
         <div className="max-w-[85%] mx-auto px-2 sm:px-4">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {jobOffers.map((job) => (
+            {filteredJobs.map((job) => (
               <Card key={job.id} className="overflow-hidden hover:shadow-lg transition-shadow group h-full">
                 <CardContent className="pt-6">
                   <div className="mb-4">
@@ -116,13 +227,13 @@ export default function EmploiPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-4">
+      <section className="py-4 bg-[#ffe8e4]">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="font-serif text-3xl font-bold mb-4">Vous recrutez ?</h2>
           <p className="text-lg text-muted-foreground mb-6">
             Publiez vos offres d&apos;emploi et trouvez les meilleurs talents du réseau France Alumni Guinée.
           </p>
-          <Button size="lg" className="bg-[#FCD116] text-[#3558A2] hover:bg-[#FCD116]/90 font-semibold">
+          <Button size="lg" className="bg-[#ea292c] hover:bg-[#f48988]/90 font-semibold">
             Publier une offre
           </Button>
         </div>

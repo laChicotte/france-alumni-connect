@@ -162,10 +162,10 @@ export default function AnnuairePage() {
                         {member.formation} - {member.university}
                       </span>
                     </div>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    {/* <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <Briefcase className="h-4 w-4 flex-shrink-0" />
                       <span>{member.sector}</span>
-                    </div>
+                    </div> */}
                     {/* <div className="flex items-center gap-2 text-sm text-muted-foreground">
                       <MapPin className="h-4 w-4 flex-shrink-0" />
                       <span>{member.city}</span>
@@ -388,7 +388,7 @@ export default function AnnuairePage() {
             <p className="text-lg mb-2 max-w-2xl mx-auto">
               Rejoignez l'annuaire pour être visible auprès de la communauté et développer votre réseau professionnel.
             </p>
-            <Button size="lg" className="bg-[#FCD116] text-[#3558A2] hover:bg-[#FCD116]/90 font-semibold">
+            <Button size="lg" className="bg-[#ea292c] hover:bg-[#f48988]/90 font-semibold">
               Rejoindre l'annuaire
             </Button>
           </div>

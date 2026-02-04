@@ -160,14 +160,25 @@ export function Navigation() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <Link href="/connexion">
-                  <Button
-                    size="sm"
-                    className="bg-white text-[#3558A2] hover:bg-white/90 font-normal px-6 py-2 rounded-md"
-                  >
-                    se connecter
-                  </Button>
-                </Link>
+                <div className="flex items-center gap-3">
+                  <Link href="/inscription">
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="bg-white text-[#3558A2] hover:bg-white/90 font-normal px-5 py-2 rounded-md"
+                    >
+                      créer mon compte
+                    </Button>
+                  </Link>
+                  <Link href="/connexion">
+                    <Button
+                      size="sm"
+                      className="bg-white text-[#3558A2] hover:bg-white/90 font-normal px-6 py-2 rounded-md"
+                    >
+                      se connecter
+                    </Button>
+                  </Link>
+                </div>
               )}
             </div>
           </div>
@@ -255,6 +266,11 @@ export function Navigation() {
                 </div>
               ) : (
                 <div className="space-y-2">
+                  <Link href="/inscription" className="block" onClick={() => setIsOpen(false)}>
+                    <Button size="sm" variant="outline" className="w-full border-white text-white hover:bg-white/10">
+                      créer un compte
+                    </Button>
+                  </Link>
                   <Link href="/connexion" className="block" onClick={() => setIsOpen(false)}>
                     <Button size="sm" className="w-full bg-white text-[#3558A2] hover:bg-white/90">
                       se connecter
