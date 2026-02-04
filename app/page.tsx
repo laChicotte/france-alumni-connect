@@ -22,7 +22,7 @@ export default function HomePage() {
 
   useEffect(() => {
     if (!api) return
-    const interval = setInterval(() => api.scrollNext(), 4000)
+    const interval = setInterval(() => api.scrollNext(), 5000)
     return () => clearInterval(interval)
   }, [api])
 
