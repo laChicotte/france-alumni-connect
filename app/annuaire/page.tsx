@@ -242,7 +242,7 @@ export default function AnnuairePage() {
       {/* Nos Alumni en Chiffres */}
       <section className="py-4 bg-[#ffe8e4]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-5">
+          <div className="text-center mb-6 sm:mb-5">
             <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-4">Nos Alumni en Chiffres</h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
               Découvrez les statistiques de notre communauté d'alumni guinéens
@@ -250,7 +250,7 @@ export default function AnnuairePage() {
           </div>
 
           {/* Cartes de Statistiques */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Total Alumni</CardTitle>
@@ -299,22 +299,22 @@ export default function AnnuairePage() {
           </div>
 
           {/* Graphiques */}
-          <div className="grid lg:grid-cols-2 gap-8 mb-5">
+          <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 mb-6">
             {/* Statut Professionnel */}
-            <Card>
+            <Card className="min-w-0">
               <CardHeader>
                 <CardTitle>Statut Professionnel</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-3 sm:px-6 overflow-hidden">
                 <ChartContainer
                   config={{
                     value: { label: "Nombre" }
                   }}
-                  className="h-[300px]"
+                  className="h-[200px] sm:h-[240px] md:h-[300px] w-full"
                 >
                   <BarChart data={stats.statusData} layout="vertical">
                     <XAxis type="number" />
-                    <YAxis dataKey="name" type="category" width={100} />
+                    <YAxis dataKey="name" type="category" width={60} tick={{ fontSize: 10 }} />
                     <ChartTooltip content={<ChartTooltipContent />} />
                     <Bar dataKey="value" fill="#3558A2" radius={[0, 4, 4, 0]} />
                   </BarChart>
@@ -323,16 +323,16 @@ export default function AnnuairePage() {
             </Card>
 
             {/* Répartition par Genre */}
-            <Card>
+            <Card className="min-w-0">
               <CardHeader>
                 <CardTitle>Répartition par Genre</CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="px-3 sm:px-6 overflow-hidden">
                 <ChartContainer
                   config={{
                     value: { label: "Nombre" }
                   }}
-                  className="h-[300px]"
+                  className="h-[200px] sm:h-[240px] md:h-[300px] w-full"
                 >
                   <PieChart>
                     <Pie
@@ -341,7 +341,7 @@ export default function AnnuairePage() {
                       cy="50%"
                       labelLine={false}
                       label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                      outerRadius={100}
+                      outerRadius={70}
                       fill="#8884d8"
                       dataKey="value"
                     >
@@ -357,20 +357,20 @@ export default function AnnuairePage() {
           </div>
 
           {/* Secteurs d'activité */}
-          <Card>
+          <Card className="min-w-0">
             <CardHeader>
               <CardTitle>Top Secteurs d'Activité</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-3 sm:px-6 overflow-hidden">
               <ChartContainer
                 config={{
                   value: { label: "Nombre" }
                 }}
-                className="h-[300px]"
+                className="h-[200px] sm:h-[240px] md:h-[300px] w-full"
               >
                 <BarChart data={stats.sectorData} layout="vertical">
                   <XAxis type="number" />
-                  <YAxis dataKey="name" type="category" width={120} />
+                  <YAxis dataKey="name" type="category" width={70} tick={{ fontSize: 10 }} />
                   <ChartTooltip content={<ChartTooltipContent />} />
                   <Bar dataKey="value" fill="#3558A2" radius={[0, 4, 4, 0]} />
                 </BarChart>
