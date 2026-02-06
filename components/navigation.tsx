@@ -4,7 +4,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { useState, useEffect } from "react"
 import { useRouter, usePathname } from "next/navigation"
-import { Menu, X, User, LogOut, Settings, Bell } from "lucide-react"
+import { Menu, X, User, LogOut, Settings, Bell, Shield } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
@@ -15,6 +15,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { supabase } from "@/lib/supabase"
 
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
@@ -23,7 +24,10 @@ export function Navigation() {
     name: "",
     email: "",
     avatar: "",
-    role: ""
+    role: "",
+    nom: "",
+    prenom: "",
+    photo_url: ""
   })
   const router = useRouter()
   const pathname = usePathname()
@@ -32,20 +36,32 @@ export function Navigation() {
     // Vérifier l'état de connexion au chargement
     const authStatus = localStorage.getItem('isAuthenticated')
     const userData = localStorage.getItem('user')
-    
+
     if (authStatus === 'true' && userData) {
       setIsAuthenticated(true)
-      setUser(JSON.parse(userData))
+      const parsedUser = JSON.parse(userData)
+      setUser({
+        ...parsedUser,
+        name: parsedUser.nom && parsedUser.prenom
+          ? `${parsedUser.prenom} ${parsedUser.nom}`
+          : parsedUser.name || '',
+        avatar: parsedUser.photo_url || parsedUser.avatar || ''
+      })
     }
   }, [])
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await supabase.auth.signOut()
     localStorage.removeItem('isAuthenticated')
     localStorage.removeItem('user')
     setIsAuthenticated(false)
-    setUser({ name: "", email: "", avatar: "", role: "" })
+    setUser({ name: "", email: "", avatar: "", role: "", nom: "", prenom: "", photo_url: "" })
     router.push('/')
+    window.location.reload()
   }
+
+  // Vérifier si l'utilisateur est admin ou modérateur
+  const isAdminOrModerator = user.role === 'admin' || user.role === 'moderateur'
 
   const navItems = [
     { href: "/a-propos", label: "à propos" },
@@ -102,7 +118,23 @@ export function Navigation() {
                 </Link>
               )
             })}
-            
+
+            {/* Bouton Admin - Visible uniquement pour admin/modérateur */}
+            {isAuthenticated && isAdminOrModerator && (
+              <Link
+                href="/admin"
+                className={
+                  `px-3 py-2 text-base font-normal transition-colors flex items-center gap-1.5 ` +
+                  (pathname.startsWith('/admin')
+                    ? `text-yellow-300 font-semibold border-b-2 border-yellow-300`
+                    : `text-yellow-300/90 hover:text-yellow-300 hover:border-b-2 hover:border-yellow-300/50`)
+                }
+              >
+                <Shield className="h-4 w-4" />
+                Admin
+              </Link>
+            )}
+
             {/* User Profile */}
             <div className="ml-6">
               {isAuthenticated ? (
@@ -123,7 +155,13 @@ export function Navigation() {
                         <div className="flex items-center gap-2">
                           <p className="text-sm font-medium leading-none">{user.name}</p>
                           {user.role && (
-                            <span className="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-[#3558A2]/10 text-[#3558A2]">
+                            <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
+                              user.role === 'admin'
+                                ? 'bg-red-100 text-red-700'
+                                : user.role === 'moderateur'
+                                ? 'bg-green-100 text-green-700'
+                                : 'bg-[#3558A2]/10 text-[#3558A2]'
+                            }`}>
                               {user.role}
                             </span>
                           )}
@@ -134,6 +172,20 @@ export function Navigation() {
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
+
+                    {/* Lien Admin dans le dropdown aussi */}
+                    {isAdminOrModerator && (
+                      <>
+                        <DropdownMenuItem asChild>
+                          <Link href="/admin" className="cursor-pointer">
+                            <Shield className="mr-2 h-4 w-4" />
+                            <span>Administration</span>
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                      </>
+                    )}
+
                     <DropdownMenuItem asChild>
                       <Link href="/profil" className="cursor-pointer">
                         <User className="mr-2 h-4 w-4" />
@@ -210,7 +262,24 @@ export function Navigation() {
                 </Link>
               )
             })}
-            
+
+            {/* Bouton Admin Mobile - Visible uniquement pour admin/modérateur */}
+            {isAuthenticated && isAdminOrModerator && (
+              <Link
+                href="/admin"
+                className={
+                  `flex items-center gap-2 px-4 py-3 text-base transition-colors ` +
+                  (pathname.startsWith('/admin')
+                    ? `text-yellow-300 font-semibold bg-white/10`
+                    : `text-yellow-300/90 hover:text-yellow-300 hover:bg-white/5`)
+                }
+                onClick={() => setIsOpen(false)}
+              >
+                <Shield className="h-5 w-5" />
+                Administration
+              </Link>
+            )}
+
             {/* Mobile User Profile */}
             <div className="px-4 py-2 border-t border-white/20 mt-4">
               {isAuthenticated ? (
@@ -223,7 +292,20 @@ export function Navigation() {
                       </AvatarFallback>
                     </Avatar>
                     <div>
-                      <p className="text-sm font-medium text-white">{user.name}</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-sm font-medium text-white">{user.name}</p>
+                        {user.role && (
+                          <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium ${
+                            user.role === 'admin'
+                              ? 'bg-red-500/20 text-red-200'
+                              : user.role === 'moderateur'
+                              ? 'bg-green-500/20 text-green-200'
+                              : 'bg-white/20 text-white'
+                          }`}>
+                            {user.role}
+                          </span>
+                        )}
+                      </div>
                       <p className="text-xs text-white/70">{user.email}</p>
                     </div>
                   </div>

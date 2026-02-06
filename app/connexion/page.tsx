@@ -6,97 +6,119 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Badge } from "@/components/ui/badge"
-import { User, Shield, Users } from "lucide-react"
-import { useRouter } from "next/navigation"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { AlertCircle, Loader2 } from "lucide-react"
+import { supabase } from "@/lib/supabase"
+import type { User, AlumniProfile } from "@/types/database.types"
 
 export default function ConnexionPage() {
-  const [selectedProfile, setSelectedProfile] = useState<string | null>(null)
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
-
-  const testProfiles = [
-    {
-      id: "admin",
-      name: "Administrateur",
-      email: "admin@france-alumni-guinee.com",
-      password: "admin123",
-      role: "Administrateur",
-      icon: Shield,
-      color: "bg-red-500",
-      description: "Accès complet à toutes les fonctionnalités"
-    },
-    {
-      id: "alumni",
-      name: "Fatoumata Diallo",
-      email: "f.diallo@edutech-guinee.com",
-      password: "alumni123",
-      role: "Alumni",
-      icon: User,
-      color: "bg-[#3558A2]",
-      description: "Accès membre standard"
-    },
-    {
-      id: "moderator",
-      name: "Mamadou Sylla",
-      email: "m.sylla@gds.gn",
-      password: "mod123",
-      role: "Modérateur",
-      icon: Users,
-      color: "bg-green-500",
-      description: "Accès modération et gestion"
-    }
-  ]
-
-  const handleProfileSelect = (profile: typeof testProfiles[0]) => {
-    setSelectedProfile(profile.id)
-    // Remplir automatiquement les champs
-    const emailInput = document.getElementById('email') as HTMLInputElement
-    const passwordInput = document.getElementById('password') as HTMLInputElement
-    if (emailInput && passwordInput) {
-      emailInput.value = profile.email
-      passwordInput.value = profile.password
-    }
-  }
+  const [error, setError] = useState<string | null>(null)
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
+    setError(null)
 
-    const emailInput = document.getElementById('email') as HTMLInputElement
-    const passwordInput = document.getElementById('password') as HTMLInputElement
-    
-    if (!emailInput || !passwordInput) return
+    try {
+      // Connexion avec Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      })
 
-    const email = emailInput.value
-    const password = passwordInput.value
+      if (authError) {
+        if (authError.message === "Invalid login credentials") {
+          setError("Email ou mot de passe incorrect")
+        } else if (authError.message === "Email not confirmed") {
+          setError("Veuillez confirmer votre email avant de vous connecter")
+        } else {
+          setError(authError.message)
+        }
+        setIsLoading(false)
+        return
+      }
 
-    // Simuler une vérification des identifiants
-    const profile = testProfiles.find(p => p.email === email && p.password === password)
-    
-    if (profile) {
+      if (!authData.user) {
+        setError("Erreur de connexion")
+        setIsLoading(false)
+        return
+      }
+
+      // Récupérer les infos du user depuis notre table users
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', authData.user.id)
+        .single()
+
+      if (userError || !userData) {
+        console.error('Erreur user:', userError)
+        setError("Erreur lors de la récupération du profil")
+        setIsLoading(false)
+        return
+      }
+
+      const user = userData as User
+
+      // Vérifier si le compte est actif
+      if (user.status === 'en_attente') {
+        setError("Votre compte est en attente de validation")
+        await supabase.auth.signOut()
+        setIsLoading(false)
+        return
+      }
+
+      if (user.status === 'banni') {
+        setError("Votre compte a été suspendu")
+        await supabase.auth.signOut()
+        setIsLoading(false)
+        return
+      }
+
+      // Si c'est un alumni, récupérer son profil alumni
+      let alumniProfile: AlumniProfile | null = null
+      if (user.role === 'alumni') {
+        const { data: profileData } = await supabase
+          .from('alumni_profiles')
+          .select('*')
+          .eq('user_id', authData.user.id)
+          .single()
+
+        alumniProfile = profileData as AlumniProfile | null
+      }
+
       // Sauvegarder les données utilisateur dans localStorage
-      localStorage.setItem('user', JSON.stringify({
-        id: profile.id,
-        name: profile.name,
-        email: profile.email,
-        role: profile.role,
-        avatar: profile.id === 'alumni' ? '/african-woman-professional-portrait.png' : '/placeholder.svg'
-      }))
+      const userToStore = {
+        id: user.id,
+        email: user.email,
+        nom: user.role === 'alumni' && alumniProfile ? alumniProfile.nom : user.nom,
+        prenom: user.role === 'alumni' && alumniProfile ? alumniProfile.prenom : user.prenom,
+        role: user.role,
+        status: user.status,
+        photo_url: user.role === 'alumni' && alumniProfile ? alumniProfile.photo_url : user.photo_url,
+        alumniProfile: alumniProfile
+      }
+
+      localStorage.setItem('user', JSON.stringify(userToStore))
       localStorage.setItem('isAuthenticated', 'true')
-      
-      // Rediriger vers la page d'accueil et forcer le rechargement
-      router.push('/')
-      // Forcer le rechargement pour mettre à jour l'état de navigation
-      setTimeout(() => {
-        window.location.reload()
-      }, 100)
-    } else {
-      alert('Identifiants incorrects')
+
+      // Rediriger selon le rôle avec window.location pour forcer le rechargement
+      if (user.role === 'admin' || user.role === 'moderateur') {
+        window.location.href = '/admin'
+      } else {
+        window.location.href = '/'
+      }
+
+    } catch (err) {
+      console.error('Erreur:', err)
+      setError("Une erreur est survenue. Veuillez réessayer.")
+      setIsLoading(false)
     }
-    
-    setIsLoading(false)
   }
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-muted py-12 px-4 sm:px-6 lg:px-8">
       <Card className="w-full max-w-md">
@@ -108,10 +130,24 @@ export default function ConnexionPage() {
           <CardDescription>Accédez à votre espace membre France Alumni Guinée</CardDescription>
         </CardHeader>
         <CardContent>
+          {error && (
+            <Alert variant="destructive" className="mb-4">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
           <form className="space-y-4" onSubmit={handleLogin}>
             <div className="space-y-2">
               <Label htmlFor="email">Adresse email</Label>
-              <Input id="email" type="email" placeholder="votre@email.com" required />
+              <Input
+                id="email"
+                type="email"
+                placeholder="votre@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
             </div>
             <div className="space-y-2">
               <div className="flex items-center justify-between">
@@ -120,10 +156,27 @@ export default function ConnexionPage() {
                   Mot de passe oublié ?
                 </Link>
               </div>
-              <Input id="password" type="password" required />
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
             </div>
-            <Button type="submit" className="w-full bg-[#3558A2] hover:bg-[#3558A2]/90" disabled={isLoading}>
-              {isLoading ? "Connexion..." : "Se connecter"}
+            <Button
+              type="submit"
+              className="w-full bg-[#3558A2] hover:bg-[#3558A2]/90"
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Connexion...
+                </>
+              ) : (
+                "Se connecter"
+              )}
             </Button>
           </form>
 
@@ -134,57 +187,6 @@ export default function ConnexionPage() {
                 Créer un compte
               </Link>
             </p>
-          </div>
-
-          {/* Profils de test */}
-          <div className="mt-8">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t"></div>
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-card text-muted-foreground">Profils de test</span>
-              </div>
-            </div>
-
-            <div className="mt-6 space-y-3">
-              {testProfiles.map((profile) => {
-                const IconComponent = profile.icon
-                return (
-                  <Button
-                    key={profile.id}
-                    variant={selectedProfile === profile.id ? "default" : "outline"}
-                    className={`w-full justify-start p-4 h-auto ${
-                      selectedProfile === profile.id 
-                        ? "bg-[#3558A2] hover:bg-[#3558A2]/90" 
-                        : "bg-transparent hover:bg-muted"
-                    }`}
-                    onClick={() => handleProfileSelect(profile)}
-                  >
-                    <div className="flex items-center gap-3 w-full">
-                      <div className={`w-8 h-8 rounded-full ${profile.color} flex items-center justify-center`}>
-                        <IconComponent className="h-4 w-4 text-white" />
-                      </div>
-                      <div className="flex-1 text-left">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium">{profile.name}</span>
-                          <Badge variant="secondary" className="text-xs">
-                            {profile.role}
-                          </Badge>
-                        </div>
-                        <p className="text-xs text-muted-foreground">{profile.description}</p>
-                      </div>
-                    </div>
-                  </Button>
-                )
-              })}
-            </div>
-            
-            <div className="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded-md">
-              <p className="text-xs text-yellow-800 text-center">
-                <strong>Mode test :</strong> Cliquez sur un profil pour remplir automatiquement les champs de connexion
-              </p>
-            </div>
           </div>
         </CardContent>
       </Card>
