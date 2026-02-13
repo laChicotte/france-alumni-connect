@@ -212,25 +212,15 @@ export function Navigation() {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <div className="flex items-center gap-3">
-                  <Link href="/inscription">
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="bg-white text-[#3558A2] hover:bg-white/90 font-normal px-5 py-2 rounded-md"
-                    >
-                      créer mon compte
-                    </Button>
-                  </Link>
-                  <Link href="/connexion">
-                    <Button
-                      size="sm"
-                      className="bg-white text-[#3558A2] hover:bg-white/90 font-normal px-6 py-2 rounded-md"
-                    >
-                      se connecter
-                    </Button>
-                  </Link>
-                </div>
+                <Link href="/connexion" aria-label="Se connecter">
+                  <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:bg-[#ea292c]/10 cursor-pointer">
+                    <Avatar className="h-10 w-10">
+                      <AvatarFallback className="bg-white/20 text-white">
+                        <User className="h-5 w-5" />
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </Link>
               )}
             </div>
           </div>
@@ -347,18 +337,20 @@ export function Navigation() {
                   </div>
                 </div>
               ) : (
-                <div className="space-y-2">
-                  <Link href="/inscription" className="block" onClick={() => setIsOpen(false)}>
-                    <Button size="sm" variant="outline" className="w-full border-white text-white hover:bg-white/10">
-                      créer un compte
-                    </Button>
-                  </Link>
-                  <Link href="/connexion" className="block" onClick={() => setIsOpen(false)}>
-                    <Button size="sm" className="w-full bg-white text-[#3558A2] hover:bg-white/90">
-                      se connecter
-                    </Button>
-                  </Link>
-                </div>
+                <Link
+                  href="/connexion"
+                  className="block cursor-pointer"
+                  onClick={() => setIsOpen(false)}
+                  aria-label="Se connecter"
+                >
+                  <Button variant="ghost" className="w-full justify-center hover:bg-white/10 cursor-pointer">
+                    <Avatar className="h-10 w-10">
+                      <AvatarFallback className="bg-white/20 text-white">
+                        <User className="h-5 w-5" />
+                      </AvatarFallback>
+                    </Avatar>
+                  </Button>
+                </Link>
               )}
             </div>
           </div>

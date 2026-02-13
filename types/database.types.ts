@@ -61,6 +61,7 @@ export interface Database {
           bio: string | null
           linkedin_url: string | null
           visible_annuaire: boolean
+          document_diplome_url: string | null
           created_at: string
           updated_at: string
         }
@@ -83,6 +84,7 @@ export interface Database {
           bio?: string | null
           linkedin_url?: string | null
           visible_annuaire?: boolean
+          document_diplome_url?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -104,6 +106,7 @@ export interface Database {
           bio?: string | null
           linkedin_url?: string | null
           visible_annuaire?: boolean
+          document_diplome_url?: string | null
           updated_at?: string
         }
       }

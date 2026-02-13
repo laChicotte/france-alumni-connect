@@ -5,6 +5,7 @@ import { AdminWrapper } from "@/components/admin/admin-wrapper"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Badge } from "@/components/ui/badge"
 import {
   Table,
@@ -37,9 +38,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Search, MoreHorizontal, Check, X, Shield, UserCog, Ban, Loader2 } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Search, MoreHorizontal, Check, Ban, UserCog, Loader2, Plus, AlertCircle, Trash2 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
-import type { User } from "@/types/database.types"
+import type { User, UserRole } from "@/types/database.types"
 
 export default function UtilisateursPage() {
   const [users, setUsers] = useState<User[]>([])
@@ -50,6 +52,17 @@ export default function UtilisateursPage() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [dialogAction, setDialogAction] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // État pour le formulaire d'ajout admin/moderateur
+  const [showAddDialog, setShowAddDialog] = useState(false)
+  const [addError, setAddError] = useState<string | null>(null)
+  const [newUser, setNewUser] = useState({
+    email: "",
+    password: "",
+    nom: "",
+    prenom: "",
+    role: "moderateur" as UserRole
+  })
 
   useEffect(() => {
     fetchUsers()
@@ -72,8 +85,8 @@ export default function UtilisateursPage() {
 
   const handleStatusChange = async (user: User, newStatus: 'actif' | 'banni') => {
     setIsSubmitting(true)
-    const { error } = await supabase
-      .from('users')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase.from('users') as any)
       .update({ status: newStatus })
       .eq('id', user.id)
 
@@ -85,10 +98,10 @@ export default function UtilisateursPage() {
     setSelectedUser(null)
   }
 
-  const handleRoleChange = async (user: User, newRole: 'admin' | 'moderateur' | 'alumni') => {
+  const handleRoleChange = async (user: User, newRole: UserRole) => {
     setIsSubmitting(true)
-    const { error } = await supabase
-      .from('users')
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error } = await (supabase.from('users') as any)
       .update({ role: newRole })
       .eq('id', user.id)
 
@@ -98,6 +111,139 @@ export default function UtilisateursPage() {
     setIsSubmitting(false)
     setDialogAction(null)
     setSelectedUser(null)
+  }
+
+  const [deleteError, setDeleteError] = useState<string | null>(null)
+
+  const handleDeleteUser = async (user: User) => {
+    setIsSubmitting(true)
+    setDeleteError(null)
+
+    try {
+      // Appeler la fonction RPC qui supprime complètement l'utilisateur
+      // (auth.users + users + alumni_profiles)
+      const { error } = await supabase.rpc('delete_user_completely', {
+        user_id_to_delete: user.id
+      })
+
+      if (error) {
+        console.error('Erreur suppression:', error)
+        setDeleteError(`Erreur: ${error.message || 'Impossible de supprimer l\'utilisateur'}`)
+        setIsSubmitting(false)
+        return
+      }
+
+      // Succès
+      fetchUsers()
+      setDialogAction(null)
+      setSelectedUser(null)
+
+    } catch (err) {
+      console.error('Erreur:', err)
+      setDeleteError('Une erreur est survenue lors de la suppression')
+    }
+
+    setIsSubmitting(false)
+  }
+
+  const handleAddUser = async () => {
+    setIsSubmitting(true)
+    setAddError(null)
+
+    // Validation
+    if (!newUser.email || !newUser.password || !newUser.nom || !newUser.prenom) {
+      setAddError("Tous les champs sont obligatoires")
+      setIsSubmitting(false)
+      return
+    }
+
+    if (newUser.password.length < 6) {
+      setAddError("Le mot de passe doit contenir au moins 6 caractères")
+      setIsSubmitting(false)
+      return
+    }
+
+    try {
+      // 1. Créer l'utilisateur avec Supabase Auth
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: newUser.email,
+        password: newUser.password,
+        options: {
+          data: {
+            nom: newUser.nom,
+            prenom: newUser.prenom,
+          }
+        }
+      })
+
+      if (authError) {
+        if (authError.message.includes("already registered")) {
+          setAddError("Un compte existe déjà avec cette adresse email")
+        } else if (authError.message.includes("rate limit")) {
+          setAddError("Trop de tentatives. Veuillez réessayer dans quelques minutes.")
+        } else {
+          setAddError(authError.message)
+        }
+        setIsSubmitting(false)
+        return
+      }
+
+      if (!authData.user) {
+        setAddError("Erreur lors de la création du compte")
+        setIsSubmitting(false)
+        return
+      }
+
+      // Attendre que le trigger crée l'entrée dans users
+      await new Promise(resolve => setTimeout(resolve, 1000))
+
+      // 2. Mettre à jour le rôle et le statut (le trigger crée avec role='alumni' et status='en_attente')
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error: updateError } = await (supabase.from('users') as any)
+        .update({
+          role: newUser.role,
+          status: 'actif',
+          nom: newUser.nom,
+          prenom: newUser.prenom
+        })
+        .eq('id', authData.user.id)
+
+      if (updateError) {
+        console.error('Erreur mise à jour:', updateError)
+        // Si le trigger n'a pas créé l'utilisateur, on l'insère manuellement
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { error: insertError } = await (supabase.from('users') as any).insert({
+          id: authData.user.id,
+          email: newUser.email,
+          nom: newUser.nom,
+          prenom: newUser.prenom,
+          role: newUser.role,
+          status: 'actif'
+        })
+
+        if (insertError) {
+          console.error('Erreur insertion:', insertError)
+          setAddError("L'utilisateur a été créé mais son profil n'a pas pu être configuré")
+        }
+      }
+
+      // Succès
+      setShowAddDialog(false)
+      setNewUser({
+        email: "",
+        password: "",
+        nom: "",
+        prenom: "",
+        role: "moderateur"
+      })
+      fetchUsers()
+
+    } catch (err) {
+      console.error('Erreur:', err)
+      setAddError("Une erreur est survenue")
+    }
+
+    setIsSubmitting(false)
   }
 
   const filteredUsers = users.filter(user => {
@@ -142,9 +288,15 @@ export default function UtilisateursPage() {
     <AdminWrapper>
       <div className="p-6">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-gray-900">Utilisateurs</h1>
-          <p className="text-gray-500">Gérez les comptes utilisateurs de la plateforme</p>
+        <div className="flex justify-between items-start mb-8">
+          <div>
+            <h1 className="text-2xl font-bold text-gray-900">Utilisateurs</h1>
+            <p className="text-gray-500">Gérez les comptes utilisateurs de la plateforme</p>
+          </div>
+          <Button onClick={() => setShowAddDialog(true)} className="bg-[#3558A2] hover:bg-[#3558A2]/90">
+            <Plus className="h-4 w-4 mr-2" />
+            Ajouter un administrateur
+          </Button>
         </div>
 
       {/* Filters */}
@@ -283,6 +435,17 @@ export default function UtilisateursPage() {
                               <UserCog className="mr-2 h-4 w-4" />
                               Changer le rôle
                             </DropdownMenuItem>
+                            <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setSelectedUser(user)
+                                setDialogAction('delete')
+                              }}
+                              className="text-red-600 focus:text-red-600"
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Supprimer
+                            </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </TableCell>
@@ -294,6 +457,102 @@ export default function UtilisateursPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Dialog Add Admin/Moderateur */}
+      <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Ajouter un administrateur ou modérateur</DialogTitle>
+            <DialogDescription>
+              Créez un compte avec des droits d'administration
+            </DialogDescription>
+          </DialogHeader>
+
+          {addError && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{addError}</AlertDescription>
+            </Alert>
+          )}
+
+          <div className="space-y-4 py-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="add-prenom">Prénom *</Label>
+                <Input
+                  id="add-prenom"
+                  value={newUser.prenom}
+                  onChange={(e) => setNewUser(prev => ({ ...prev, prenom: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="add-nom">Nom *</Label>
+                <Input
+                  id="add-nom"
+                  value={newUser.nom}
+                  onChange={(e) => setNewUser(prev => ({ ...prev, nom: e.target.value }))}
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="add-email">Email *</Label>
+              <Input
+                id="add-email"
+                type="email"
+                value={newUser.email}
+                onChange={(e) => setNewUser(prev => ({ ...prev, email: e.target.value }))}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="add-password">Mot de passe *</Label>
+              <Input
+                id="add-password"
+                type="password"
+                value={newUser.password}
+                onChange={(e) => setNewUser(prev => ({ ...prev, password: e.target.value }))}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="add-role">Rôle *</Label>
+              <Select
+                value={newUser.role}
+                onValueChange={(v) => setNewUser(prev => ({ ...prev, role: v as UserRole }))}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="moderateur">Modérateur</SelectItem>
+                  <SelectItem value="admin">Administrateur</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowAddDialog(false)}>
+              Annuler
+            </Button>
+            <Button
+              onClick={handleAddUser}
+              disabled={isSubmitting}
+              className="bg-[#3558A2] hover:bg-[#3558A2]/90"
+            >
+              {isSubmitting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Création...
+                </>
+              ) : (
+                'Créer le compte'
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Dialog Validate */}
       <Dialog open={dialogAction === 'validate'} onOpenChange={() => setDialogAction(null)}>
@@ -400,6 +659,38 @@ export default function UtilisateursPage() {
               Administrateur
             </Button>
           </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog Delete */}
+      <Dialog open={dialogAction === 'delete'} onOpenChange={() => { setDialogAction(null); setDeleteError(null); }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Supprimer l'utilisateur</DialogTitle>
+            <DialogDescription>
+              Voulez-vous vraiment supprimer définitivement {selectedUser?.email} ? Cette action est irréversible et supprimera également son profil alumni.
+            </DialogDescription>
+          </DialogHeader>
+
+          {deleteError && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{deleteError}</AlertDescription>
+            </Alert>
+          )}
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setDialogAction(null); setDeleteError(null); }}>
+              Annuler
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={() => selectedUser && handleDeleteUser(selectedUser)}
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Supprimer'}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
       </div>
