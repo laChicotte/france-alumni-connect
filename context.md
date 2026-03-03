@@ -11,6 +11,11 @@ Ici on travaille étape par étape et selon des règles c'est à dire:
 - L'interface du admin il me plait comme ca pour le moment on y touche pas sans m'avertir
 - La deconnexion aussi marche
 - L'inscription d'un alumni : formulaire → API /api/inscription (service role) → création dans auth.users, users et alumni_profiles + upload du diplôme. L'alumni doit être approuvé par un admin avant de pouvoir se connecter.
+- La page annuaire des alumni est maintenant dynamique.
+- Si l'utilisateur est connecté : profils réels avec recherche, filtres et pagination.
+- Si l'utilisateur n'est pas connecté : aperçu limité de profils aléatoires, sans accès aux détails complets (popup pour se connecter / s'inscrire).
+- Les statistiques en bas restent inchangées pour le moment (on y reviendra après).
+- La section hero de la page d'accueil a été refaite avec un bloc vidéo fixe (hauteur 400px), masque SVG texte géant alternant ALUMNI puis CONNECT (11s chacun), et disparition du bloc au scroll.
+- Le menu de navigation sur la page d'accueil est transparent au départ puis devient bleu navy avec ombre au scroll.
 **Sur quoi on travaille actuellement**
-- La page annuaire des alumni : afficher les alumni (visible_annuaire = true, status = actif) avec leurs profils, filtres, recherche, etc.
--donc la page statique actuelle doit devenir dynamique
+on mettre les vrais logos

@@ -20,6 +20,7 @@ import { supabase } from "@/lib/supabase"
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [isScrolled, setIsScrolled] = useState(false)
   const [user, setUser] = useState({
     name: "",
     email: "",
@@ -31,6 +32,8 @@ export function Navigation() {
   })
   const router = useRouter()
   const pathname = usePathname()
+  const isHome = pathname === "/"
+  const useWhiteLogo = true
 
   useEffect(() => {
     // Vérifier l'état de connexion au chargement
@@ -48,6 +51,13 @@ export function Navigation() {
         avatar: parsedUser.photo_url || parsedUser.avatar || ''
       })
     }
+  }, [])
+
+  useEffect(() => {
+    const onScroll = () => setIsScrolled(window.scrollY > 10)
+    onScroll()
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
   }, [])
 
   const handleLogout = async () => {
@@ -71,13 +81,21 @@ export function Navigation() {
   ]
 
   return (
-    <nav className="bg-[#3558A2] border-b border-[#2a4680] sticky top-0 z-50">
+    <nav
+      className={`sticky top-0 z-[100] w-full border-b transition-all duration-300 ${
+        isHome
+          ? isScrolled
+            ? "bg-[#1e2a5a] border-[#1e2a5a] shadow-[0_8px_24px_rgba(0,0,0,0.25)]"
+            : "bg-transparent border-transparent shadow-none"
+          : "bg-[#3558A2] border-[#2a4680]"
+      }`}
+    >
       <div className="w-full">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3 pl-2 sm:pl-4">
             <Image
-              src="/logo/logo.png"
+              src={useWhiteLogo ? "/logo/logo_alumni_blanc.png" : "/logo/logo_alumni_bleu.png"}
               alt="Institut Français - France Alumni"
               width={120}
               height={60}

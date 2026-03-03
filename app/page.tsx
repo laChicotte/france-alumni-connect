@@ -3,74 +3,129 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
-import { ArrowRight, Users, Briefcase, GraduationCap, Globe, MapPin, Mail, Calendar, Clock, MapPin as MapPinIcon, User } from "lucide-react"
+import { ArrowRight, GraduationCap, Mail, Calendar, Clock, MapPin as MapPinIcon } from "lucide-react"
 import { articles, alumniMembers } from "@/lib/fake-data"
-import { useEffect, useState } from "react"
-import type { CarouselApi } from "@/components/ui/carousel"
+import { useEffect, useRef, useState } from "react"
 
-const heroSlides = [
-  { src: "/accueil/caroussel/anime.gif", alt: "France Alumni Connect" },
-  { src: "/accueil/caroussel/fixe.png", alt: "France Alumni Connect" },
-]
+const HERO_WORDS = ["ALUMNI", "CONNECT"]
+const WORD_DURATION_MS = 11000
 
 export default function HomePage() {
-  const [api, setApi] = useState<CarouselApi>()
+  const heroRef = useRef<HTMLDivElement | null>(null)
+  const badgeRef = useRef<HTMLDivElement | null>(null)
+  const maskTextRef = useRef<SVGTextElement | null>(null)
+  const [currentWordIndex, setCurrentWordIndex] = useState(0)
   const featuredArticles = articles.slice(0, 3)
   const featuredAlumni = alumniMembers.slice(-3)
   const upcomingEvents = articles.filter((a) => a.category === "Événements").slice(0, 2)
 
   useEffect(() => {
-    if (!api) return
-    const interval = setInterval(() => api.scrollNext(), 5000)
-    return () => clearInterval(interval)
-  }, [api])
+    const handleScroll = () => {
+      const scrollY = window.scrollY
+
+      const phase1Progress = Math.min(Math.max(scrollY / 400, 0), 1)
+      const scaleY = 1 - 0.55 * phase1Progress // 1 -> 0.45 (reste lisible)
+
+      if (maskTextRef.current) {
+        maskTextRef.current.setAttribute("x", "500")
+        maskTextRef.current.setAttribute("y", "250")
+        maskTextRef.current.setAttribute(
+          "transform",
+          `translate(500 250) scale(1 ${scaleY}) translate(-500 -250)`
+        )
+      }
+
+      if (badgeRef.current) {
+        badgeRef.current.style.opacity = String(1 - phase1Progress)
+      }
+
+      const phase2Progress = Math.min(Math.max((scrollY - 450) / 300, 0), 1)
+      const translateY = -240 * phase2Progress
+      const opacity = 1 - phase2Progress
+
+      if (heroRef.current) {
+        heroRef.current.style.transform = `translateY(${translateY}px)`
+        heroRef.current.style.opacity = String(opacity)
+      }
+    }
+
+    handleScroll()
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  useEffect(() => {
+    const interval = window.setInterval(() => {
+      setCurrentWordIndex((prev) => (prev + 1) % HERO_WORDS.length)
+    }, WORD_DURATION_MS)
+
+    return () => window.clearInterval(interval)
+  }, [])
 
   return (
     <div className="min-h-screen bg-[#ffe8e4]">
-      {/* Hero : carrousel d'images */}
-      <section className="relative w-full overflow-hidden bg-muted/30 py-4">
-        <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
-          <Carousel setApi={setApi} opts={{ loop: true }}>
-            <CarouselContent className="ml-0">
-              {heroSlides.map((slide, index) => (
-              <CarouselItem key={index} className="pl-0 basis-full">
-                <div className="relative w-full">
-                  <img
-                    src={slide.src}
-                    alt={slide.alt}
-                      className="w-full h-auto object-contain max-h-[220px] sm:max-h-[260px]"
-                  />
-                </div>
-              </CarouselItem>
-              ))}
-            </CarouselContent>
-            <CarouselPrevious className="left-2" />
-            <CarouselNext className="right-2" />
-          </Carousel>
-        </div>
-      </section>
+      {/* Hero fixe : video visible uniquement dans ALUMNI */}
+      <section ref={heroRef} className="fixed left-0 top-0 z-10 h-[400px] w-screen overflow-hidden" style={{ background: "#1e2a5a" }}>
+        <div
+          className="absolute inset-0 bg-cover bg-center"
+          style={{ backgroundImage: "url('/accueil/caroussel/fixe.png')" }}
+        />
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          src="/video/video_accueil.mp4"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
 
-      {/* Ancienne section hero (titré + bouton) — commentée
-      <section className="lg:py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold mb-6 text-balance">
-              <AnimatedTitle />
-            </h1>
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button size="lg" className="bg-[#FCD116] text-[#3558A2] hover:bg-[#FCD116]/90 font-semibold">
-                Rejoindre le réseau
-                <ArrowRight className="ml-2 h-5 w-5" />
-              </Button>
-            </div>
+        <svg
+          className="absolute inset-0 h-full w-full"
+          viewBox="0 0 1000 500"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+          <defs>
+            <mask id="alumni-cutout-mask">
+              <rect x="0" y="0" width="1000" height="500" fill="white" />
+              <text
+                ref={maskTextRef}
+                x="500"
+                y="250"
+                textAnchor="middle"
+                dominantBaseline="middle"
+                textLength="940"
+                lengthAdjust="spacingAndGlyphs"
+                fill="black"
+                style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 900, fontSize: 220, letterSpacing: 0 }}
+              >
+                {HERO_WORDS[currentWordIndex]}
+              </text>
+            </mask>
+          </defs>
+          <rect x="0" y="0" width="1000" height="500" fill="#1e2a5a" mask="url(#alumni-cutout-mask)" />
+        </svg>
+
+        <div
+          ref={badgeRef}
+          className="absolute bottom-6 right-6 z-20 rounded-lg bg-white/95 px-3 py-2 text-xs text-[#1e2a5a] shadow-md"
+        >
+          <div className="font-semibold">en lien avec</div>
+          <div className="mt-1 flex items-center gap-2">
+            <span
+              className="inline-block h-3 w-5 overflow-hidden rounded-[2px]"
+              aria-hidden="true"
+              style={{ background: "linear-gradient(90deg, #0055A4 0 33%, #FFFFFF 33% 66%, #EF4135 66% 100%)" }}
+            />
+            <span>Ambassade de France en Guinée et en Sierra Leone</span>
           </div>
         </div>
-        <div className="absolute bottom-0 right-0 w-1/3 h-1/3 bg-[#ffe8e4]/10 rounded-tl-full blur-3xl"></div>
       </section>
-      */}
 
+      {/* Spacer pour laisser le hero fixed occuper le premier écran */}
+      <div className="h-[400px]" />
 
+      <div className="relative z-20 bg-[#ffe8e4]">
       {/* Actualités et Évènements */}
       <section className="py-8 bg-muted">
         <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
@@ -257,6 +312,7 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+      </div>
     </div>
   )
 }
