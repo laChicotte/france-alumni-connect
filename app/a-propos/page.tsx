@@ -86,7 +86,6 @@ export default function AboutPage() {
               <Link href="/a-propos" className="text-base font-semibold">à propos</Link>
               <Link href="/actualites" className="text-base font-semibold">actualités</Link>
               <Link href="/emploi" className="text-base font-semibold">emploi</Link>
-              <a href="#" className="text-base font-semibold">formations</a>
               <Link href="/annuaire" className="text-base font-semibold">annuaire</Link>
               <Link href="/connexion" className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#f48988]">
                 <User className="h-4 w-4 text-[#f48988]" />

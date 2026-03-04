@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useEffect, useState, useMemo } from "react"
+import { useEffect, useState, useMemo, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { supabase } from "@/lib/supabase"
 import { alumniMembers } from "@/lib/fake-data"
-import { Search, Filter, GraduationCap, Briefcase, MapPin, Mail, Users, TrendingUp, Globe, Target, Loader2 } from "lucide-react"
+import { Search, Filter, GraduationCap, Briefcase, MapPin, Mail, Users, TrendingUp, Globe, Target, Loader2, User } from "lucide-react"
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis } from "recharts"
 import type { AlumniProfile } from "@/types/database.types"
 
@@ -20,6 +20,8 @@ type AlumniWithJoins = AlumniProfile & {
 }
 
 const PAGE_SIZE = 9
+const HERO_HEIGHT = 350
+
 
 function shuffle<T>(items: T[]): T[] {
   const arr = [...items]
@@ -41,6 +43,36 @@ export default function AnnuairePage() {
   const [filterSecteur, setFilterSecteur] = useState("")
   const [filterVille, setFilterVille] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
+  const [menuSolid, setMenuSolid] = useState(false)
+  const heroRef = useRef<HTMLElement | null>(null)
+  const heroTitleRef = useRef<HTMLHeadingElement | null>(null)
+  useEffect(() => {
+    document.body.classList.add("hide-global-nav")
+    return () => document.body.classList.remove("hide-global-nav")
+  }, [])
+
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY
+      const progress = Math.min(Math.max(y / 260, 0), 1)
+      const translateY = -120 * progress
+      const opacity = 1 - progress
+
+      if (heroRef.current) {
+        heroRef.current.style.transform = `translateY(${translateY}px)`
+        heroRef.current.style.opacity = String(opacity)
+      }
+      if (heroTitleRef.current) {
+        heroTitleRef.current.style.opacity = String(opacity)
+      }
+
+      setMenuSolid(y > 220)
+    }
+    onScroll()
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
+
 
   // Charger les alumni: complet si connecté, aperçu limité si visiteur
   useEffect(() => {
@@ -155,16 +187,70 @@ export default function AnnuairePage() {
 
   return (
     <div className="min-h-screen">
-      {/* Hero Section */}
-      <section className="py-4 lg:py-6">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-            <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold mb-3">
-              Annuaire des Alumni
-            </h1>
+      <style jsx global>{`
+        body.hide-global-nav > nav {
+          display: none !important;
+        }
+      `}</style>
+
+      {/* Menu local superposé */}
+      <div
+        className={`fixed left-0 top-0 z-40 w-full px-4 sm:px-6 lg:px-8 py-3 border-b transition-all duration-300 ${
+          menuSolid ? "bg-white border-[#d9d9d9] shadow-sm" : "bg-transparent border-white/80"
+        }`}
+      >
+        <div className="mx-auto flex max-w-7xl items-center justify-between">
+          <Link href="/" className="flex items-center gap-4">
+            <img src="/logo/logo_alumni_bleu.png" alt="France Alumni Connect" className="h-10 w-auto object-contain" />
+            <span
+              className={`font-bold text-xl uppercase tracking-wide hidden sm:block ${
+                menuSolid ? "text-[#3558A2]" : "text-white"
+              }`}
+              style={{
+                letterSpacing: "0.05em",
+                textShadow: menuSolid
+                  ? "none"
+                  : `
+                    2px 2px 0 #ea292c,
+                    3px 3px 0 #ea292c,
+                    4px 4px 0 #f48988,
+                    5px 5px 0 #f48988
+                  `,
+              }}
+            >
+              France Alumni Connect
+            </span>
+          </Link>
+          <div className={`hidden md:flex items-center gap-6 ${menuSolid ? "text-[#3558A2]" : "text-white"}`}>
+            <Link href="/a-propos" className="text-base font-semibold">à propos</Link>
+            <Link href="/actualites" className="text-base font-semibold">actualités</Link>
+            <Link href="/emploi" className="text-base font-semibold">emploi</Link>
+            <Link href="/annuaire" className="text-base font-semibold">annuaire</Link>
+            <Link
+              href="/connexion"
+              className={`inline-flex h-8 w-8 items-center justify-center rounded-full border ${
+                menuSolid ? "border-[#3558A2]" : "border-[#f48988]"
+              }`}
+            >
+              <User className={`h-4 w-4 ${menuSolid ? "text-[#3558A2]" : "text-[#f48988]"}`} />
+            </Link>
           </div>
         </div>
+      </div>
+
+      {/* Hero image */}
+      <section ref={heroRef} className="fixed left-0 top-0 z-10 h-[350px] w-full overflow-hidden">
+        <img src="/annuaire/annuaire.jpg" alt="Annuaire" className="absolute inset-0 h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-black/20" />
+        <div className="relative z-10 h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-end pb-8">
+          <h1 ref={heroTitleRef} className="font-serif text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-none">
+            annuaire
+          </h1>
+        </div>
       </section>
+
+      {/* Spacer du hero */}
+      <div style={{ height: HERO_HEIGHT }} />
 
       {/* Filters */}
       <section className="py-4 bg-[#ffe8e4] border-b">
