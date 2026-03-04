@@ -32,7 +32,11 @@ export function Navigation() {
   })
   const router = useRouter()
   const pathname = usePathname()
+  const hideForCustomHeroPages = pathname === "/" || pathname === "/a-propos"
+
   const isHome = pathname === "/"
+  const isAbout = pathname === "/a-propos"
+  const useTransparentHeroNav = isHome || isAbout
   const useWhiteLogo = true
 
   useEffect(() => {
@@ -80,10 +84,14 @@ export function Navigation() {
     { href: "/annuaire", label: "annuaire" },
   ]
 
+  if (hideForCustomHeroPages) {
+    return null
+  }
+
   return (
     <nav
       className={`sticky top-0 z-[100] w-full border-b transition-all duration-300 ${
-        isHome
+        useTransparentHeroNav
           ? isScrolled
             ? "bg-[#1e2a5a] border-[#1e2a5a] shadow-[0_8px_24px_rgba(0,0,0,0.25)]"
             : "bg-transparent border-transparent shadow-none"

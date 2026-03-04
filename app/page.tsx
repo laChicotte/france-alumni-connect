@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { ArrowRight, GraduationCap, Mail, Calendar, Clock, MapPin as MapPinIcon } from "lucide-react"
+import { ArrowRight, GraduationCap, Mail, Calendar, Clock, MapPin as MapPinIcon, User } from "lucide-react"
 import { articles, alumniMembers } from "@/lib/fake-data"
 import { useEffect, useRef, useState } from "react"
 
@@ -66,6 +66,37 @@ export default function HomePage() {
     <div className="min-h-screen bg-[#ffe8e4]">
       {/* Hero fixe : video visible uniquement dans ALUMNI */}
       <section ref={heroRef} className="fixed left-0 top-0 z-10 h-[400px] w-screen overflow-hidden" style={{ background: "#1e2a5a" }}>
+        <div className="absolute left-0 top-0 z-30 w-full px-4 sm:px-6 lg:px-8 py-3">
+          <div className="mx-auto flex max-w-7xl items-center justify-between border-b border-white/80 pb-3">
+            <Link href="/" className="flex items-center gap-4">
+              <img src="/logo/logo_alumni_blanc.png" alt="France Alumni Connect" className="h-10 w-auto object-contain" />
+              <span
+                className="text-white font-bold text-xl uppercase tracking-wide hidden sm:block"
+                style={{
+                  letterSpacing: "0.05em",
+                  textShadow: `
+                    2px 2px 0 #ea292c,
+                    3px 3px 0 #ea292c,
+                    4px 4px 0 #f48988,
+                    5px 5px 0 #f48988
+                  `,
+                }}
+              >
+                France Alumni Connect
+              </span>
+            </Link>
+            <div className="hidden md:flex items-center gap-6 text-white">
+              <Link href="/a-propos" className="text-base font-semibold">à propos</Link>
+              <Link href="/actualites" className="text-base font-semibold">actualités</Link>
+              <Link href="/emploi" className="text-base font-semibold">emploi</Link>
+              <a href="#" className="text-base font-semibold">formations</a>
+              <Link href="/annuaire" className="text-base font-semibold">annuaire</Link>
+              <Link href="/connexion" className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#f48988]">
+                <User className="h-4 w-4 text-[#f48988]" />
+              </Link>
+            </div>
+          </div>
+        </div>
         <div
           className="absolute inset-0 bg-cover bg-center"
           style={{ backgroundImage: "url('/accueil/caroussel/fixe.png')" }}

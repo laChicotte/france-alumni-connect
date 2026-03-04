@@ -17,5 +17,8 @@ Ici on travaille étape par étape et selon des règles c'est à dire:
 - Les statistiques en bas restent inchangées pour le moment (on y reviendra après).
 - La section hero de la page d'accueil a été refaite avec un bloc vidéo fixe (hauteur 400px), masque SVG texte géant alternant ALUMNI puis CONNECT (11s chacun), et disparition du bloc au scroll.
 - Le menu de navigation sur la page d'accueil est transparent au départ puis devient bleu navy avec ombre au scroll.
+- Le logo du menu a été remplacé avec les nouveaux assets (logo alumni blanc / bleu).
+- Sur l'accueil et la page à propos, on utilise maintenant un menu local superposé à l'image/vidéo (menu en dur), avec logo blanc.
+- Cliquer sur le logo ou sur le texte "FRANCE ALUMNI CONNECT" redirige vers la page d'accueil.
+- Le composant global `components/navigation.tsx` est masqué uniquement sur `/` et `/a-propos`, sans erreur Hooks.
 **Sur quoi on travaille actuellement**
-on mettre les vrais logos

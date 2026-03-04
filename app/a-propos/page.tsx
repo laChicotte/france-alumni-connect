@@ -1,15 +1,24 @@
 "use client"
 
+import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
 import { teamMembers, partners } from "@/lib/fake-data"
-import { Users, Heart, Globe, Award } from "lucide-react"
-import { useEffect, useState } from "react"
+import { Users, Heart, Globe, Award, User } from "lucide-react"
+import { useEffect, useRef, useState } from "react"
 import type { CarouselApi } from "@/components/ui/carousel"
+
+const HERO_MAX_HEIGHT = 400
+const HERO_MIN_HEIGHT = 200
 
 export default function AboutPage() {
   const [api, setApi] = useState<CarouselApi>()
-  
+  const [heroHeight, setHeroHeight] = useState(HERO_MAX_HEIGHT)
+  const [heroTitle, setHeroTitle] = useState("à propos")
+  const valuesRef = useRef<HTMLElement | null>(null)
+  const objectivesRef = useRef<HTMLElement | null>(null)
+  const partnersRef = useRef<HTMLElement | null>(null)
+
   useEffect(() => {
     if (!api) return
 
@@ -19,22 +28,100 @@ export default function AboutPage() {
 
     return () => clearInterval(interval)
   }, [api])
+
+  useEffect(() => {
+    const onScroll = () => {
+      const y = window.scrollY
+      const nextHeight = Math.max(HERO_MIN_HEIGHT, HERO_MAX_HEIGHT - y * 0.5)
+      setHeroHeight(nextHeight)
+
+      const triggerY = nextHeight + 80
+      const partnersTop = partnersRef.current?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY
+      const objectivesTop = objectivesRef.current?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY
+      const valuesTop = valuesRef.current?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY
+
+      if (partnersTop <= triggerY) {
+        setHeroTitle("nos partenaires")
+      } else if (objectivesTop <= triggerY) {
+        setHeroTitle("nos objectifs")
+      } else if (valuesTop <= triggerY) {
+        setHeroTitle("nos valeurs")
+      } else {
+        setHeroTitle("à propos")
+      }
+    }
+
+    onScroll()
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
+  }, [])
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="lg:py-4">
+      <section
+        className="sticky top-0 z-20 w-full overflow-hidden"
+        style={{ height: `${heroHeight}px` }}
+      >
+        <div className="absolute left-0 top-0 z-30 w-full px-4 sm:px-6 lg:px-8 py-3">
+          <div className="mx-auto flex max-w-7xl items-center justify-between border-b border-white/80 pb-3">
+            <Link href="/" className="flex items-center gap-4">
+              <img src="/logo/logo_alumni_blanc.png" alt="France Alumni Connect" className="h-10 w-auto object-contain" />
+              <span
+                className="text-white font-bold text-xl uppercase tracking-wide hidden sm:block"
+                style={{
+                  letterSpacing: "0.05em",
+                  textShadow: `
+                    2px 2px 0 #ea292c,
+                    3px 3px 0 #ea292c,
+                    4px 4px 0 #f48988,
+                    5px 5px 0 #f48988
+                  `,
+                }}
+              >
+                France Alumni Connect
+              </span>
+            </Link>
+            <div className="hidden md:flex items-center gap-6 text-white">
+              <Link href="/a-propos" className="text-base font-semibold">à propos</Link>
+              <Link href="/actualites" className="text-base font-semibold">actualités</Link>
+              <Link href="/emploi" className="text-base font-semibold">emploi</Link>
+              <a href="#" className="text-base font-semibold">formations</a>
+              <Link href="/annuaire" className="text-base font-semibold">annuaire</Link>
+              <Link href="/connexion" className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#f48988]">
+                <User className="h-4 w-4 text-[#f48988]" />
+              </Link>
+            </div>
+          </div>
+        </div>
+        <img
+          src="/apropos/apropos.jpg"
+          alt="France Alumni Guinée"
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/20" />
+        <div className="relative z-10 h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-end pb-8">
+          <h1 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-none">
+            {heroTitle}
+          </h1>
+        </div>
+      </section>
+
+      <section className="py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl">
-          <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold mb-4 text-balance text-left whitespace-normal lg:whitespace-nowrap">
-              À propos de France Alumni Guinée
-            </h1>
-            
+          <div className="max-w-4xl">
+            <p className="text-lg text-[#3558A2] leading-relaxed">
+              France Alumni Guinée, dans le prolongement de <strong>Campus France Guinée</strong>, est une
+              communauté dynamique de Guinéennes et Guinéens diplômés de l&apos;enseignement français, rassemblés
+              par leur parcours d&apos;études en France et leur engagement pour la coopération, le partage
+              d&apos;expériences, la création d&apos;opportunités et l&apos;impact positif sur la Guinée.
+            </p>
           </div>
         </div>
       </section>
 
       {/* Values */}
-      <section className="py-4 bg-[#ffe8e4]">
+      <section ref={valuesRef} className="py-4 bg-[#ffe8e4]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div>
             <h2 className="font-serif text-3xl font-bold mb-8 text-center">Nos Valeurs</h2>
@@ -80,7 +167,7 @@ export default function AboutPage() {
       </section>
 
       {/* Objectives */}
-      <section className="py-4">
+      <section ref={objectivesRef} className="py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-8 text-center">Nos Objectifs</h2>
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -163,7 +250,7 @@ export default function AboutPage() {
       </section>
 
       {/* Partners */}
-      <section className="py-4 bg-[#ffe8e4]">
+      <section ref={partnersRef} className="py-4 bg-[#ffe8e4]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-center gap-4 mb-2">
             {/* <div className="flex items-center justify-center w-12 h-12 bg-[#3558A2] text-white rounded-lg">
