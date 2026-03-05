@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { ArrowRight, GraduationCap, Mail, Calendar, Clock, MapPin as MapPinIcon, User } from "lucide-react"
+import { ArrowRight, GraduationCap, Mail, Calendar, Clock, MapPin as MapPinIcon, User, Menu, X } from "lucide-react"
 import { articles, alumniMembers } from "@/lib/fake-data"
 import { useEffect, useRef, useState } from "react"
 
@@ -15,6 +15,7 @@ export default function HomePage() {
   const badgeRef = useRef<HTMLDivElement | null>(null)
   const maskTextRef = useRef<SVGTextElement | null>(null)
   const [currentWordIndex, setCurrentWordIndex] = useState(0)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const featuredArticles = articles.slice(0, 3)
   const featuredAlumni = alumniMembers.slice(-3)
   const upcomingEvents = articles.filter((a) => a.category === "Événements").slice(0, 2)
@@ -65,7 +66,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-[#ffe8e4]">
       {/* Hero fixe : video visible uniquement dans ALUMNI */}
-      <section ref={heroRef} className="fixed left-0 top-0 z-10 h-[400px] w-screen overflow-hidden" style={{ background: "#1e2a5a" }}>
+      <section ref={heroRef} className="fixed left-0 top-0 z-10 h-[320px] w-screen overflow-hidden sm:h-[400px]" style={{ background: "#1e2a5a" }}>
         <div className="absolute left-0 top-0 z-30 w-full px-4 sm:px-6 lg:px-8 py-3">
           <div className="mx-auto flex max-w-7xl items-center justify-between border-b border-white/80 pb-3">
             <Link href="/" className="flex items-center gap-4">
@@ -94,7 +95,34 @@ export default function HomePage() {
                 <User className="h-4 w-4 text-[#f48988]" />
               </Link>
             </div>
+            <button
+              type="button"
+              aria-label="Ouvrir le menu"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-white/50 text-white md:hidden"
+              onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+            >
+              {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
           </div>
+          {isMobileMenuOpen && (
+          <div className="mx-auto mt-3 grid max-w-7xl grid-cols-2 gap-2 rounded-lg border border-white/30 bg-[#1e2a5a]/80 p-2 backdrop-blur-sm md:hidden">
+            <Link onClick={() => setIsMobileMenuOpen(false)} href="/a-propos" className="rounded-md border border-white/50 px-3 py-2 text-center text-xs font-semibold text-white">
+              à propos
+            </Link>
+            <Link onClick={() => setIsMobileMenuOpen(false)} href="/actualites" className="rounded-md border border-white/50 px-3 py-2 text-center text-xs font-semibold text-white">
+              actualités
+            </Link>
+            <Link onClick={() => setIsMobileMenuOpen(false)} href="/emploi" className="rounded-md border border-white/50 px-3 py-2 text-center text-xs font-semibold text-white">
+              emploi
+            </Link>
+            <Link onClick={() => setIsMobileMenuOpen(false)} href="/annuaire" className="rounded-md border border-white/50 px-3 py-2 text-center text-xs font-semibold text-white">
+              annuaire
+            </Link>
+            <Link onClick={() => setIsMobileMenuOpen(false)} href="/connexion" className="col-span-2 rounded-md border border-[#f48988] px-3 py-2 text-center text-xs font-semibold text-[#f48988]">
+              connexion
+            </Link>
+          </div>
+          )}
         </div>
         <div
           className="absolute inset-0 bg-cover bg-center"
@@ -138,7 +166,7 @@ export default function HomePage() {
 
         <div
           ref={badgeRef}
-          className="absolute bottom-6 right-6 z-20 rounded-lg bg-white/95 px-3 py-2 text-xs text-[#1e2a5a] shadow-md"
+          className="absolute bottom-3 right-3 z-20 max-w-[85vw] rounded-lg bg-white/95 px-2 py-1.5 text-[10px] text-[#1e2a5a] shadow-md sm:bottom-6 sm:right-6 sm:max-w-none sm:px-3 sm:py-2 sm:text-xs"
         >
           <div className="font-semibold">en lien avec</div>
           <div className="mt-1 flex items-center gap-2">
@@ -153,7 +181,7 @@ export default function HomePage() {
       </section>
 
       {/* Spacer pour laisser le hero fixed occuper le premier écran */}
-      <div className="h-[400px]" />
+      <div className="h-[320px] sm:h-[400px]" />
 
       <div className="relative z-20 bg-[#ffe8e4]">
       {/* Actualités et Évènements */}
@@ -162,13 +190,13 @@ export default function HomePage() {
           <div className="grid lg:grid-cols-3 gap-6">
             {/* Actualités - 2/3 */}
             <div className="lg:col-span-2">
-              <div className="flex justify-between items-end mb-6">
+              <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
                 <div>
-                  <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-4">Actualités récentes</h2>
-                  <p className="text-lg text-muted-foreground">Au fil des nouvelles : nos alumni</p>
+                  <h2 className="mb-2 font-serif text-2xl font-bold sm:mb-4 sm:text-4xl">Actualités récentes</h2>
+                  <p className="text-base text-muted-foreground sm:text-lg">Au fil des nouvelles : nos alumni</p>
                 </div>
                 <Link href="/actualites">
-                  <Button variant="outline">
+                  <Button variant="outline" className="w-full sm:w-auto">
                     Voir tout
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Button>
@@ -201,10 +229,10 @@ export default function HomePage() {
 
             {/* Évènements - 1/3 */}
             <div className="lg:col-span-1">
-              <div className="flex justify-between items-end mb-8">
+              <div className="mb-6 flex flex-col gap-3 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
                 <div>
-                  <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-2">Événements</h2>
-                  <p className="text-lg text-muted-foreground">Rejoignez nos événements à venir</p>
+                  <h2 className="font-serif text-2xl font-bold sm:text-4xl">Événements</h2>
+                  <p className="text-base text-muted-foreground sm:text-lg">Rejoignez nos événements à venir</p>
                 </div>
                 {/* Bouton "Voir tout" supprimé pour harmonisation (pas de page évènements dédiée) */}
               </div>
@@ -256,13 +284,13 @@ export default function HomePage() {
       {/* Aperçu Annuaire */}
       <section className="py-2">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-end mb-8">
+          <div className="mb-6 flex flex-col gap-3 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-4">Annuaire des Alumni</h2>
-              <p className="text-lg text-muted-foreground">Découvrez les parcours inspirants de nos alumni</p>
+              <h2 className="mb-2 font-serif text-2xl font-bold sm:mb-4 sm:text-4xl">Annuaire des Alumni</h2>
+              <p className="text-base text-muted-foreground sm:text-lg">Découvrez les parcours inspirants de nos alumni</p>
             </div>
             <Link href="/annuaire">
-              <Button variant="outline">
+              <Button variant="outline" className="w-full sm:w-auto">
                 Voir tout l'annuaire
                 <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
@@ -328,14 +356,14 @@ export default function HomePage() {
 
       {/* CTA Section */}
       <section className="py-2 bg-muted">
-        <div className="">
-          <div className="rounded-2xl p-8 sm:p-4 text-center">
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-1">Prêt à rejoindre notre communauté ?</h2>
-            <p className="text-lg  mb-2 max-w-2xl mx-auto">
+        <div className="px-2 sm:px-4">
+          <div className="rounded-2xl p-6 text-center sm:p-8">
+            <h2 className="mb-2 font-serif text-2xl font-bold sm:text-4xl">Prêt à rejoindre notre communauté ?</h2>
+            <p className="mx-auto mb-4 max-w-2xl text-base sm:text-lg">
               Inscrivez-vous dès maintenant pour découvrir les talents du réseau et tisser de nouvelles connexions 
               au sein de France Alumni Guinée.
             </p>
-            <Button size="lg" className="bg-[#ea292c] hover:bg-[#f48988]/90 font-semibold">
+            <Button size="lg" className="w-full bg-[#ea292c] font-semibold hover:bg-[#f48988]/90 sm:w-auto">
               S'inscrire maintenant
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
