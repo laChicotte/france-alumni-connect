@@ -4,7 +4,7 @@ import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
 import { teamMembers, partners } from "@/lib/fake-data"
-import { Users, Heart, Globe, Award, User } from "lucide-react"
+import { Users, Heart, Globe, Award, User, Menu, X } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import type { CarouselApi } from "@/components/ui/carousel"
 
@@ -15,6 +15,7 @@ export default function AboutPage() {
   const [api, setApi] = useState<CarouselApi>()
   const [heroHeight, setHeroHeight] = useState(HERO_MAX_HEIGHT)
   const [heroTitle, setHeroTitle] = useState("à propos")
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const valuesRef = useRef<HTMLElement | null>(null)
   const objectivesRef = useRef<HTMLElement | null>(null)
   const partnersRef = useRef<HTMLElement | null>(null)
@@ -91,7 +92,34 @@ export default function AboutPage() {
                 <User className="h-4 w-4 text-[#f48988]" />
               </Link>
             </div>
+            <button
+              type="button"
+              aria-label="Ouvrir le menu"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-white/50 text-white md:hidden"
+              onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+            >
+              {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </button>
           </div>
+          {isMobileMenuOpen && (
+            <div className="mx-auto mt-3 grid max-w-7xl grid-cols-2 gap-2 rounded-lg border border-white/30 bg-[#1e2a5a]/80 p-2 backdrop-blur-sm md:hidden">
+              <Link onClick={() => setIsMobileMenuOpen(false)} href="/a-propos" className="rounded-md border border-white/50 px-3 py-2 text-center text-xs font-semibold text-white">
+                à propos
+              </Link>
+              <Link onClick={() => setIsMobileMenuOpen(false)} href="/actualites" className="rounded-md border border-white/50 px-3 py-2 text-center text-xs font-semibold text-white">
+                actualités
+              </Link>
+              <Link onClick={() => setIsMobileMenuOpen(false)} href="/emploi" className="rounded-md border border-white/50 px-3 py-2 text-center text-xs font-semibold text-white">
+                emploi
+              </Link>
+              <Link onClick={() => setIsMobileMenuOpen(false)} href="/annuaire" className="rounded-md border border-white/50 px-3 py-2 text-center text-xs font-semibold text-white">
+                annuaire
+              </Link>
+              <Link onClick={() => setIsMobileMenuOpen(false)} href="/connexion" className="col-span-2 rounded-md border border-[#f48988] px-3 py-2 text-center text-xs font-semibold text-[#f48988]">
+                connexion
+              </Link>
+            </div>
+          )}
         </div>
         <img
           src="/apropos/apropos.jpg"
@@ -99,8 +127,8 @@ export default function AboutPage() {
           className="absolute inset-0 h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-black/20" />
-        <div className="relative z-10 h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-end pb-8">
-          <h1 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-none">
+        <div className="relative z-10 h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-end pb-6 sm:pb-8">
+          <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold text-white leading-none">
             {heroTitle}
           </h1>
         </div>
@@ -109,7 +137,7 @@ export default function AboutPage() {
       <section className="py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl">
-            <p className="text-lg text-[#3558A2] leading-relaxed">
+            <p className="text-base sm:text-lg text-[#3558A2] leading-relaxed">
               France Alumni Guinée, dans le prolongement de <strong>Campus France Guinée</strong>, est une
               communauté dynamique de Guinéennes et Guinéens diplômés de l&apos;enseignement français, rassemblés
               par leur parcours d&apos;études en France et leur engagement pour la coopération, le partage
@@ -123,8 +151,8 @@ export default function AboutPage() {
       <section ref={valuesRef} className="py-4 bg-[#ffe8e4]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div>
-            <h2 className="font-serif text-3xl font-bold mb-8 text-center">Nos Valeurs</h2>
-            <div className="grid md:grid-cols-3 gap-8">
+            <h2 className="font-serif text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-center">Nos Valeurs</h2>
+            <div className="grid md:grid-cols-3 gap-4 sm:gap-8">
               <Card className="border-2 hover:border-[#3558A2] transition-colors">
                 <CardContent className="pt-6">
                   <div className="w-12 h-12 bg-[#3558A2]/10 rounded-lg flex items-center justify-center mb-4">
@@ -168,8 +196,8 @@ export default function AboutPage() {
       {/* Objectives */}
       <section ref={objectivesRef} className="py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-8 text-center">Nos Objectifs</h2>
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <h2 className="font-serif text-2xl sm:text-4xl font-bold mb-6 sm:mb-8 text-center">Nos Objectifs</h2>
+          <div className="grid lg:grid-cols-2 gap-6 sm:gap-12 items-center">
             {/* Image à gauche */}
             <div className="order-2 lg:order-1">
               <img
@@ -183,14 +211,14 @@ export default function AboutPage() {
             <div className="order-1 lg:order-2">
               
               <div className="space-y-6">
-                <div className="flex gap-4">
+                <div className="flex gap-3 sm:gap-4">
                   <div className="flex-shrink-0">
                     <div className="w-10 h-10 bg-[#3558A2] text-white rounded-full flex items-center justify-center font-bold">
                       1
                     </div>
                   </div>
                   <div>
-                    <h3 className="font-serif text-xl font-bold mb-2">Représentation et influence</h3>
+                    <h3 className="font-serif text-lg sm:text-xl font-bold mb-2">Représentation et influence</h3>
                     <p className="text-muted-foreground leading-relaxed">
                       Valoriser la diaspora guinéenne diplômée de France et contribuer à un lobbying positif auprès des
                       entreprises et institutions.
@@ -198,14 +226,14 @@ export default function AboutPage() {
                   </div>
                 </div>
 
-                <div className="flex gap-4">
+                <div className="flex gap-3 sm:gap-4">
                   <div className="flex-shrink-0">
                     <div className="w-10 h-10 bg-[#3558A2] text-white rounded-full flex items-center justify-center font-bold">
                       2
                     </div>
                   </div>
                   <div>
-                    <h3 className="font-serif text-xl font-bold mb-2">Développement local</h3>
+                    <h3 className="font-serif text-lg sm:text-xl font-bold mb-2">Développement local</h3>
                     <p className="text-muted-foreground leading-relaxed">
                       Promouvoir le transfert de compétences au service du développement en Guinée et renforcer les
                       synergies avec les plateformes partenaires.
@@ -213,14 +241,14 @@ export default function AboutPage() {
                   </div>
                 </div>
 
-                <div className="flex gap-4">
+                <div className="flex gap-3 sm:gap-4">
                   <div className="flex-shrink-0">
                     <div className="w-10 h-10 bg-[#3558A2] text-white rounded-full flex items-center justify-center font-bold">
                       3
                     </div>
                   </div>
                   <div>
-                    <h3 className="font-serif text-xl font-bold mb-2">Solidarité et soutien</h3>
+                    <h3 className="font-serif text-lg sm:text-xl font-bold mb-2">Solidarité et soutien</h3>
                     <p className="text-muted-foreground leading-relaxed">
                       Favoriser le mentorat, l'entraide et mobiliser les alumni autour d'initiatives citoyennes, éducatives
                       et environnementales.
@@ -228,14 +256,14 @@ export default function AboutPage() {
                   </div>
                 </div>
 
-                <div className="flex gap-4">
+                <div className="flex gap-3 sm:gap-4">
                   <div className="flex-shrink-0">
                     <div className="w-10 h-10 bg-[#3558A2] text-white rounded-full flex items-center justify-center font-bold">
                       4
                     </div>
                   </div>
                   <div>
-                    <h3 className="font-serif text-xl font-bold mb-2">Rayonnement international</h3>
+                    <h3 className="font-serif text-lg sm:text-xl font-bold mb-2">Rayonnement international</h3>
                     <p className="text-muted-foreground leading-relaxed">
                       Renforcer les liens entre la France et la Guinée et promouvoir l'excellence guinéenne à
                       l'international.
@@ -255,7 +283,7 @@ export default function AboutPage() {
             {/* <div className="flex items-center justify-center w-12 h-12 bg-[#3558A2] text-white rounded-lg">
               <Globe className="h-6 w-6" />
             </div> */}
-            <h2 className="font-serif text-3xl font-bold">
+            <h2 className="font-serif text-2xl sm:text-3xl font-bold">
               Nos Partenaires
             </h2>
           </div>

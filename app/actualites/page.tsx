@@ -5,11 +5,8 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { articles } from "@/lib/fake-data"
 import type { Article } from "@/lib/fake-data"
-import { Calendar, User, ChevronLeft, ChevronRight } from "lucide-react"
+import { Calendar, User, ChevronLeft, ChevronRight, Menu, X } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
-
-const HERO_HEIGHT = 350
-
 
 export default function ActualitesPage() {
   type BaseCategory = Article["category"]
@@ -19,6 +16,7 @@ export default function ActualitesPage() {
   const [selectedCategory, setSelectedCategory] = useState<ArticleCategory>("Tous")
   const [currentPage, setCurrentPage] = useState(1)
   const [menuSolid, setMenuSolid] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const heroRef = useRef<HTMLElement | null>(null)
   const heroTitleRef = useRef<HTMLHeadingElement | null>(null)
   const articlesPerPage = 8
@@ -113,26 +111,89 @@ export default function ActualitesPage() {
               <User className={`h-4 w-4 ${menuSolid ? "text-[#3558A2]" : "text-[#f48988]"}`} />
             </Link>
           </div>
+          <button
+            type="button"
+            aria-label="Ouvrir le menu"
+            className={`inline-flex h-9 w-9 items-center justify-center rounded-md border md:hidden ${
+              menuSolid ? "border-[#3558A2]/40 text-[#3558A2]" : "border-white/50 text-white"
+            }`}
+            onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+          >
+            {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         </div>
+        {isMobileMenuOpen && (
+          <div
+            className={`mx-auto mt-3 grid max-w-7xl grid-cols-2 gap-2 rounded-lg p-2 md:hidden ${
+              menuSolid ? "border border-[#3558A2]/30 bg-white" : "border border-white/30 bg-[#1e2a5a]/80 backdrop-blur-sm"
+            }`}
+          >
+            <Link
+              onClick={() => setIsMobileMenuOpen(false)}
+              href="/a-propos"
+              className={`rounded-md border px-3 py-2 text-center text-xs font-semibold ${
+                menuSolid ? "border-[#3558A2]/40 text-[#3558A2]" : "border-white/50 text-white"
+              }`}
+            >
+              à propos
+            </Link>
+            <Link
+              onClick={() => setIsMobileMenuOpen(false)}
+              href="/actualites"
+              className={`rounded-md border px-3 py-2 text-center text-xs font-semibold ${
+                menuSolid ? "border-[#3558A2]/40 text-[#3558A2]" : "border-white/50 text-white"
+              }`}
+            >
+              actualités
+            </Link>
+            <Link
+              onClick={() => setIsMobileMenuOpen(false)}
+              href="/emploi"
+              className={`rounded-md border px-3 py-2 text-center text-xs font-semibold ${
+                menuSolid ? "border-[#3558A2]/40 text-[#3558A2]" : "border-white/50 text-white"
+              }`}
+            >
+              emploi
+            </Link>
+            <Link
+              onClick={() => setIsMobileMenuOpen(false)}
+              href="/annuaire"
+              className={`rounded-md border px-3 py-2 text-center text-xs font-semibold ${
+                menuSolid ? "border-[#3558A2]/40 text-[#3558A2]" : "border-white/50 text-white"
+              }`}
+            >
+              annuaire
+            </Link>
+            <Link
+              onClick={() => setIsMobileMenuOpen(false)}
+              href="/connexion"
+              className={`col-span-2 rounded-md border px-3 py-2 text-center text-xs font-semibold ${
+                menuSolid ? "border-[#3558A2]/40 text-[#3558A2]" : "border-[#f48988] text-[#f48988]"
+              }`}
+            >
+              connexion
+            </Link>
+          </div>
+        )}
       </div>
 
       {/* Hero image */}
-      <section ref={heroRef} className="fixed left-0 top-0 z-10 h-[350px] w-full overflow-hidden">
+      <section ref={heroRef} className="fixed left-0 top-0 z-10 h-[300px] w-full overflow-hidden sm:h-[350px]">
         <img src="/actualites/actualites.jpg" alt="Actualités" className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-black/20" />
-        <div className="relative z-10 h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-end pb-8">
-          <h1 ref={heroTitleRef} className="font-serif text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-none">
+        <div className="relative z-10 flex h-full max-w-7xl items-end px-4 pb-6 sm:px-6 sm:pb-8 lg:px-8">
+          <h1 ref={heroTitleRef} className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold text-white leading-none">
             actualités
           </h1>
         </div>
       </section>
 
       {/* Spacer du hero */}
-      <div style={{ height: HERO_HEIGHT }} />
+      <div className="h-[300px] sm:h-[350px]" />
 
       {/* Categories Filter */}
       <section className="py-6 bg-[#ffe8e4] border-b">
-        <div className="max-w-[85%] mx-auto px-2 sm:px-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap gap-3">
             {categories.map((category) => (
               <Button
@@ -161,7 +222,7 @@ export default function ActualitesPage() {
 
       {/* Articles Grid */}
       <section className="py-6">
-        <div className="max-w-[85%] mx-auto px-2 sm:px-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
             {currentArticles.map((article) => (
               <Link key={article.id} href={`/actualites/${article.id}`}>
@@ -201,7 +262,7 @@ export default function ActualitesPage() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex justify-center items-center gap-2 mt-12">
+            <div className="mt-10 flex items-center justify-center gap-2">
               <Button
                 variant="outline"
                 size="icon"
@@ -212,7 +273,7 @@ export default function ActualitesPage() {
                 <ChevronLeft className="h-4 w-4" />
               </Button>
 
-              <div className="flex gap-2">
+              <div className="hidden gap-2 sm:flex">
                 {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                   <Button
                     key={page}
@@ -228,6 +289,9 @@ export default function ActualitesPage() {
                   </Button>
                 ))}
               </div>
+              <span className="text-sm text-muted-foreground sm:hidden">
+                {currentPage} / {totalPages}
+              </span>
 
               <Button
                 variant="outline"

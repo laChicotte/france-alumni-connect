@@ -3,11 +3,8 @@
 import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { MapPin, Briefcase, Clock, Calendar, Search, Filter, User } from "lucide-react"
+import { MapPin, Briefcase, Clock, Calendar, Search, User, Menu, X } from "lucide-react"
 import { useEffect, useMemo, useRef, useState } from "react"
-
-const HERO_HEIGHT = 350
-
 
 // Données d'exemple pour les offres d'emploi
 const jobOffers = [
@@ -59,6 +56,7 @@ export default function EmploiPage() {
   const [selectedType, setSelectedType] = useState("Tous")
   const [selectedLocation, setSelectedLocation] = useState("Tous")
   const [menuSolid, setMenuSolid] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const heroRef = useRef<HTMLElement | null>(null)
   const heroTitleRef = useRef<HTMLHeadingElement | null>(null)
 
@@ -172,27 +170,90 @@ export default function EmploiPage() {
               <User className={`h-4 w-4 ${menuSolid ? "text-[#3558A2]" : "text-[#f48988]"}`} />
             </Link>
           </div>
+          <button
+            type="button"
+            aria-label="Ouvrir le menu"
+            className={`inline-flex h-9 w-9 items-center justify-center rounded-md border md:hidden ${
+              menuSolid ? "border-[#3558A2]/40 text-[#3558A2]" : "border-white/50 text-white"
+            }`}
+            onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+          >
+            {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         </div>
+        {isMobileMenuOpen && (
+          <div
+            className={`mx-auto mt-3 grid max-w-7xl grid-cols-2 gap-2 rounded-lg p-2 md:hidden ${
+              menuSolid ? "border border-[#3558A2]/30 bg-white" : "border border-white/30 bg-[#1e2a5a]/80 backdrop-blur-sm"
+            }`}
+          >
+            <Link
+              onClick={() => setIsMobileMenuOpen(false)}
+              href="/a-propos"
+              className={`rounded-md border px-3 py-2 text-center text-xs font-semibold ${
+                menuSolid ? "border-[#3558A2]/40 text-[#3558A2]" : "border-white/50 text-white"
+              }`}
+            >
+              à propos
+            </Link>
+            <Link
+              onClick={() => setIsMobileMenuOpen(false)}
+              href="/actualites"
+              className={`rounded-md border px-3 py-2 text-center text-xs font-semibold ${
+                menuSolid ? "border-[#3558A2]/40 text-[#3558A2]" : "border-white/50 text-white"
+              }`}
+            >
+              actualités
+            </Link>
+            <Link
+              onClick={() => setIsMobileMenuOpen(false)}
+              href="/emploi"
+              className={`rounded-md border px-3 py-2 text-center text-xs font-semibold ${
+                menuSolid ? "border-[#3558A2]/40 text-[#3558A2]" : "border-white/50 text-white"
+              }`}
+            >
+              emploi
+            </Link>
+            <Link
+              onClick={() => setIsMobileMenuOpen(false)}
+              href="/annuaire"
+              className={`rounded-md border px-3 py-2 text-center text-xs font-semibold ${
+                menuSolid ? "border-[#3558A2]/40 text-[#3558A2]" : "border-white/50 text-white"
+              }`}
+            >
+              annuaire
+            </Link>
+            <Link
+              onClick={() => setIsMobileMenuOpen(false)}
+              href="/connexion"
+              className={`col-span-2 rounded-md border px-3 py-2 text-center text-xs font-semibold ${
+                menuSolid ? "border-[#3558A2]/40 text-[#3558A2]" : "border-[#f48988] text-[#f48988]"
+              }`}
+            >
+              connexion
+            </Link>
+          </div>
+        )}
       </div>
 
       {/* Hero image */}
-      <section ref={heroRef} className="fixed left-0 top-0 z-10 h-[350px] w-full overflow-hidden">
+      <section ref={heroRef} className="fixed left-0 top-0 z-10 h-[300px] w-full overflow-hidden sm:h-[350px]">
         <img src="/emploi/emploi.jpg" alt="Emploi" className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-black/20" />
-        <div className="relative z-10 h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-end pb-8">
-          <h1 ref={heroTitleRef} className="font-serif text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-none">
+        <div className="relative z-10 flex h-full max-w-7xl items-end px-4 pb-6 sm:px-6 sm:pb-8 lg:px-8">
+          <h1 ref={heroTitleRef} className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold text-white leading-none">
             emploi
           </h1>
         </div>
       </section>
 
-      <div style={{ height: HERO_HEIGHT }} />
+      <div className="h-[300px] sm:h-[350px]" />
 
       {/* Recherche et filtres */}
       <section className="py-4 bg-[#ffe8e4] border-b border-[#d9d9d9]">
-        <div className="max-w-[85%] mx-auto px-2 sm:px-4">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
-            <div className="bg-white rounded-lg p-1 flex flex-col sm:flex-row gap-2">
+            <div className="bg-white rounded-lg p-1 flex flex-col sm:flex-row gap-2 w-full lg:w-auto">
               <div className="flex items-center gap-2 px-3 w-full sm:w-72">
                 <Search className="h-5 w-5 text-muted-foreground" />
                 <input
@@ -208,7 +269,7 @@ export default function EmploiPage() {
               </Button>
             </div>
 
-            <div className="flex flex-col">
+            <div className="flex w-full flex-col lg:w-auto">
               <label className="text-sm font-medium mb-1">Secteur</label>
               <select
                 className="bg-white rounded-md border border-input px-3 py-2 text-sm"
@@ -223,7 +284,7 @@ export default function EmploiPage() {
               </select>
             </div>
 
-            <div className="flex flex-col">
+            <div className="flex w-full flex-col lg:w-auto">
               <label className="text-sm font-medium mb-1">Type de contrat</label>
               <select
                 className="bg-white rounded-md border border-input px-3 py-2 text-sm"
@@ -238,7 +299,7 @@ export default function EmploiPage() {
               </select>
             </div>
 
-            <div className="flex flex-col">
+            <div className="flex w-full flex-col lg:w-auto">
               <label className="text-sm font-medium mb-1">Ville</label>
               <select
                 className="bg-white rounded-md border border-input px-3 py-2 text-sm"
@@ -258,7 +319,7 @@ export default function EmploiPage() {
 
       {/* Job Listings */}
       <section className="py-4">
-        <div className="max-w-[85%] mx-auto px-2 sm:px-4">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {filteredJobs.map((job) => (
               <Card key={job.id} className="overflow-hidden hover:shadow-lg transition-shadow group h-full">
@@ -308,11 +369,11 @@ export default function EmploiPage() {
       {/* CTA Section */}
       <section className="py-4 bg-[#ffe8e4]">
         <div className="max-w-4xl mx-auto px-4 text-center">
-          <h2 className="font-serif text-3xl font-bold mb-4">Vous recrutez ?</h2>
-          <p className="text-lg text-muted-foreground mb-6">
+          <h2 className="font-serif text-2xl sm:text-3xl font-bold mb-4">Vous recrutez ?</h2>
+          <p className="text-base sm:text-lg text-muted-foreground mb-6">
             Publiez vos offres d&apos;emploi et trouvez les meilleurs talents du réseau France Alumni Guinée.
           </p>
-          <Button size="lg" className="bg-[#ea292c] hover:bg-[#f48988]/90 font-semibold">
+          <Button size="lg" className="w-full sm:w-auto bg-[#ea292c] hover:bg-[#f48988]/90 font-semibold">
             Publier une offre
           </Button>
         </div>

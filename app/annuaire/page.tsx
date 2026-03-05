@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { supabase } from "@/lib/supabase"
 import { alumniMembers } from "@/lib/fake-data"
-import { Search, Filter, GraduationCap, Briefcase, MapPin, Mail, Users, TrendingUp, Globe, Target, Loader2, User } from "lucide-react"
+import { Search, Filter, GraduationCap, Briefcase, MapPin, Mail, Users, TrendingUp, Globe, Target, Loader2, User, Menu, X } from "lucide-react"
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis } from "recharts"
 import type { AlumniProfile } from "@/types/database.types"
 
@@ -20,7 +20,6 @@ type AlumniWithJoins = AlumniProfile & {
 }
 
 const PAGE_SIZE = 9
-const HERO_HEIGHT = 350
 
 
 function shuffle<T>(items: T[]): T[] {
@@ -44,6 +43,7 @@ export default function AnnuairePage() {
   const [filterVille, setFilterVille] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const [menuSolid, setMenuSolid] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const heroRef = useRef<HTMLElement | null>(null)
   const heroTitleRef = useRef<HTMLHeadingElement | null>(null)
   useEffect(() => {
@@ -235,29 +235,92 @@ export default function AnnuairePage() {
               <User className={`h-4 w-4 ${menuSolid ? "text-[#3558A2]" : "text-[#f48988]"}`} />
             </Link>
           </div>
+          <button
+            type="button"
+            aria-label="Ouvrir le menu"
+            className={`inline-flex h-9 w-9 items-center justify-center rounded-md border md:hidden ${
+              menuSolid ? "border-[#3558A2]/40 text-[#3558A2]" : "border-white/50 text-white"
+            }`}
+            onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+          >
+            {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
         </div>
+        {isMobileMenuOpen && (
+          <div
+            className={`mx-auto mt-3 grid max-w-7xl grid-cols-2 gap-2 rounded-lg p-2 md:hidden ${
+              menuSolid ? "border border-[#3558A2]/30 bg-white" : "border border-white/30 bg-[#1e2a5a]/80 backdrop-blur-sm"
+            }`}
+          >
+            <Link
+              onClick={() => setIsMobileMenuOpen(false)}
+              href="/a-propos"
+              className={`rounded-md border px-3 py-2 text-center text-xs font-semibold ${
+                menuSolid ? "border-[#3558A2]/40 text-[#3558A2]" : "border-white/50 text-white"
+              }`}
+            >
+              à propos
+            </Link>
+            <Link
+              onClick={() => setIsMobileMenuOpen(false)}
+              href="/actualites"
+              className={`rounded-md border px-3 py-2 text-center text-xs font-semibold ${
+                menuSolid ? "border-[#3558A2]/40 text-[#3558A2]" : "border-white/50 text-white"
+              }`}
+            >
+              actualités
+            </Link>
+            <Link
+              onClick={() => setIsMobileMenuOpen(false)}
+              href="/emploi"
+              className={`rounded-md border px-3 py-2 text-center text-xs font-semibold ${
+                menuSolid ? "border-[#3558A2]/40 text-[#3558A2]" : "border-white/50 text-white"
+              }`}
+            >
+              emploi
+            </Link>
+            <Link
+              onClick={() => setIsMobileMenuOpen(false)}
+              href="/annuaire"
+              className={`rounded-md border px-3 py-2 text-center text-xs font-semibold ${
+                menuSolid ? "border-[#3558A2]/40 text-[#3558A2]" : "border-white/50 text-white"
+              }`}
+            >
+              annuaire
+            </Link>
+            <Link
+              onClick={() => setIsMobileMenuOpen(false)}
+              href="/connexion"
+              className={`col-span-2 rounded-md border px-3 py-2 text-center text-xs font-semibold ${
+                menuSolid ? "border-[#3558A2]/40 text-[#3558A2]" : "border-[#f48988] text-[#f48988]"
+              }`}
+            >
+              connexion
+            </Link>
+          </div>
+        )}
       </div>
 
       {/* Hero image */}
-      <section ref={heroRef} className="fixed left-0 top-0 z-10 h-[350px] w-full overflow-hidden">
+      <section ref={heroRef} className="fixed left-0 top-0 z-10 h-[300px] w-full overflow-hidden sm:h-[350px]">
         <img src="/annuaire/annuaire.jpg" alt="Annuaire" className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-black/20" />
-        <div className="relative z-10 h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-end pb-8">
-          <h1 ref={heroTitleRef} className="font-serif text-5xl sm:text-6xl lg:text-7xl font-bold text-white leading-none">
+        <div className="relative z-10 flex h-full max-w-7xl items-end px-4 pb-6 sm:px-6 sm:pb-8 lg:px-8">
+          <h1 ref={heroTitleRef} className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold text-white leading-none">
             annuaire
           </h1>
         </div>
       </section>
 
       {/* Spacer du hero */}
-      <div style={{ height: HERO_HEIGHT }} />
+      <div className="h-[300px] sm:h-[350px]" />
 
       {/* Filters */}
       <section className="py-4 bg-[#ffe8e4] border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-4 mb-4">
+          <div className="mb-4 flex items-center gap-3 sm:gap-4">
             <Filter className="h-5 w-5 text-muted-foreground" />
-            <span className="font-semibold">Recherche & Filtres:</span>
+            <span className="text-sm font-semibold sm:text-base">Recherche & Filtres:</span>
           </div>
 
           {isAuthenticated ? (
@@ -275,10 +338,10 @@ export default function AnnuairePage() {
                 </div>
               </div>
 
-              <div className="flex flex-col">
+              <div className="flex w-full flex-col lg:w-auto">
                 <label className="text-sm font-medium mb-1">Secteur d&apos;activité</label>
                 <select
-                  className="bg-white rounded-md border border-input px-3 py-2 text-sm min-w-[180px]"
+                  className="bg-white rounded-md border border-input px-3 py-2 text-sm min-w-0 lg:min-w-[180px]"
                   value={filterSecteur}
                   onChange={(e) => setFilterSecteur(e.target.value)}
                 >
@@ -291,10 +354,10 @@ export default function AnnuairePage() {
                 </select>
               </div>
 
-              <div className="flex flex-col">
+              <div className="flex w-full flex-col lg:w-auto">
                 <label className="text-sm font-medium mb-1">Ville</label>
                 <select
-                  className="bg-white rounded-md border border-input px-3 py-2 text-sm min-w-[180px]"
+                  className="bg-white rounded-md border border-input px-3 py-2 text-sm min-w-0 lg:min-w-[180px]"
                   value={filterVille}
                   onChange={(e) => setFilterVille(e.target.value)}
                 >
@@ -325,7 +388,7 @@ export default function AnnuairePage() {
             </div>
           ) : (
             <>
-              <div className="flex justify-between items-center mb-8">
+              <div className="mb-6 flex items-center justify-between sm:mb-8">
                 <p className="text-muted-foreground">
                   <span className="font-semibold text-foreground">
                     {isAuthenticated ? filteredAlumni.length : displayedAlumni.length}
@@ -469,7 +532,8 @@ export default function AnnuairePage() {
                     onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
                     disabled={currentPage === 1}
                   >
-                    Précédent
+                    <span className="hidden sm:inline">Précédent</span>
+                    <span className="sm:hidden">Prev</span>
                   </Button>
                   <span className="text-sm text-muted-foreground">
                     Page {currentPage} / {totalPages}
@@ -479,7 +543,8 @@ export default function AnnuairePage() {
                     onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
                     disabled={currentPage === totalPages}
                   >
-                    Suivant
+                    <span className="hidden sm:inline">Suivant</span>
+                    <span className="sm:hidden">Next</span>
                   </Button>
                 </div>
               )}
@@ -496,7 +561,7 @@ export default function AnnuairePage() {
           <p className="text-muted-foreground">
             Inscrivez-vous ou connectez-vous pour consulter les profils complets et contacter les alumni.
           </p>
-          <div className="flex gap-2 pt-2">
+          <div className="flex flex-col gap-2 pt-2 sm:flex-row">
             <Button className="flex-1 bg-[#3558A2] hover:bg-[#3558A2]/90" onClick={() => router.push("/connexion")}>
               Se connecter
             </Button>
