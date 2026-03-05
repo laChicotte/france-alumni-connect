@@ -21,7 +21,7 @@ Ici on travaille étape par étape et selon des règles c'est à dire:
 - Sur l'accueil et la page à propos, on utilise maintenant un menu local superposé à l'image/vidéo (menu en dur), avec logo blanc.
 - Cliquer sur le logo ou sur le texte "FRANCE ALUMNI CONNECT" redirige vers la page d'accueil.
 - Le composant global `components/navigation.tsx` est masqué uniquement sur `/` et `/a-propos`, sans erreur Hooks.
-**Sur quoi on travaille actuellement**
 - Responsivité (desktop, tablette, mobile) des pages publiques.
 - Déjà fait: `/`, `/a-propos`, `/actualites`, `/annuaire`, `/emploi` (menu mobile + ajustements responsive des sections).
-- En attente pour la suite: autres pages du site (on continue après).
+**Sur quoi on travaille actuellement**
+-changement de la mise en forme des cartes de la page actualités il faut qu'il y ait trois cartes de comme dans la page emploi et de la meme taille

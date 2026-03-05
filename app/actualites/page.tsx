@@ -19,7 +19,7 @@ export default function ActualitesPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const heroRef = useRef<HTMLElement | null>(null)
   const heroTitleRef = useRef<HTMLHeadingElement | null>(null)
-  const articlesPerPage = 8
+  const articlesPerPage = 6
 
   const filteredArticles =
     selectedCategory === "Tous"
@@ -223,7 +223,7 @@ export default function ActualitesPage() {
       {/* Articles Grid */}
       <section className="py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {currentArticles.map((article) => (
               <Link key={article.id} href={`/actualites/${article.id}`}>
                 <Card className="overflow-hidden hover:shadow-lg transition-shadow group h-full cursor-pointer">

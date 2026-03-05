@@ -19,7 +19,7 @@ type AlumniWithJoins = AlumniProfile & {
   users?: { email: string } | null
 }
 
-const PAGE_SIZE = 9
+const PAGE_SIZE = 6
 
 
 function shuffle<T>(items: T[]): T[] {
@@ -398,9 +398,9 @@ export default function AnnuairePage() {
                 </p>
               </div>
 
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
                 {displayedAlumni.map((member) => (
-                  <Card key={member.id} className="hover:shadow-lg transition-shadow group">
+                  <Card key={member.id} className="h-full hover:shadow-lg transition-shadow group">
                     <CardContent className="pt-6">
                       <div className="flex flex-col items-center text-center mb-4">
                         <div className="w-24 h-24 rounded-full overflow-hidden bg-muted mb-1">
