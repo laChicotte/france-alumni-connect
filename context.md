@@ -23,5 +23,5 @@ Ici on travaille étape par étape et selon des règles c'est à dire:
 - Le composant global `components/navigation.tsx` est masqué uniquement sur `/` et `/a-propos`, sans erreur Hooks.
 - Responsivité (desktop, tablette, mobile) des pages publiques.
 - Déjà fait: `/`, `/a-propos`, `/actualites`, `/annuaire`, `/emploi` (menu mobile + ajustements responsive des sections).
-**Sur quoi on travaille actuellement**
 -changement de la mise en forme des cartes de la page actualités il faut qu'il y ait trois cartes de comme dans la page emploi et de la meme taille
+**Sur quoi on travaille actuellement**
