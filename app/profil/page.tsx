@@ -203,7 +203,6 @@ export default function ProfilPage() {
           photo_url: nextPhotoUrl,
           bio: formData.bio || null,
           linkedin_url: formData.linkedin_url || null,
-          visible_annuaire: formData.visible_annuaire,
           updated_at: new Date().toISOString(),
         })
         .eq('user_id', user.id)
@@ -699,14 +698,11 @@ export default function ProfilPage() {
                               ? 'Votre profil est visible par les autres membres'
                               : 'Votre profil est masqué de l\'annuaire'}
                           </p>
+                          <p className="text-xs text-muted-foreground mt-1">
+                            La visibilité de l&apos;annuaire est gérée par l&apos;administration.
+                          </p>
                         </div>
                       </div>
-                      {isEditing && (
-                        <Switch
-                          checked={formData.visible_annuaire ?? true}
-                          onCheckedChange={(checked) => setFormData({...formData, visible_annuaire: checked})}
-                        />
-                      )}
                     </div>
                   </>
                 )}

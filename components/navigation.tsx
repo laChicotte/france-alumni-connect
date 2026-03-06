@@ -175,7 +175,7 @@ export function Navigation() {
                       </Avatar>
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent className="w-56" align="end" forceMount>
+                  <DropdownMenuContent className="z-[140] mt-2 w-56" align="end" sideOffset={8} forceMount>
                     <DropdownMenuLabel className="font-normal">
                       <div className="flex flex-col space-y-1">
                         <div className="flex items-center gap-2">
