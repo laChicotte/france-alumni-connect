@@ -158,7 +158,8 @@ export default function HomePage() {
           <div className="hidden md:flex items-center gap-6 text-white">
             <Link href="/a-propos" className="text-base font-semibold">à propos</Link>
             <Link href="/actualites" className="text-base font-semibold">actualités</Link>
-            <Link href="/emploi" className="text-base font-semibold">emploi</Link>
+            <Link href="https://talent-diaspora.fr/" target="_blank" rel="noopener noreferrer" className="text-base font-semibold">emploi</Link>
+            <Link href="/formation" className="text-base font-semibold">formation</Link>
             <Link href="/annuaire" className="text-base font-semibold">annuaire</Link>
             {isAuthenticated ? (
               <Link href="/profil" className="inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-[#f48988]">
@@ -191,8 +192,11 @@ export default function HomePage() {
           <Link onClick={() => setIsMobileMenuOpen(false)} href="/actualites" className="rounded-md border border-white/50 px-3 py-2 text-center text-xs font-semibold text-white">
             actualités
           </Link>
-          <Link onClick={() => setIsMobileMenuOpen(false)} href="/emploi" className="rounded-md border border-white/50 px-3 py-2 text-center text-xs font-semibold text-white">
+          <Link onClick={() => setIsMobileMenuOpen(false)} href="https://talent-diaspora.fr/" target="_blank" rel="noopener noreferrer" className="rounded-md border border-white/50 px-3 py-2 text-center text-xs font-semibold text-white">
             emploi
+          </Link>
+          <Link onClick={() => setIsMobileMenuOpen(false)} href="/formation" className="rounded-md border border-white/50 px-3 py-2 text-center text-xs font-semibold text-white">
+            formation
           </Link>
           <Link onClick={() => setIsMobileMenuOpen(false)} href="/annuaire" className="rounded-md border border-white/50 px-3 py-2 text-center text-xs font-semibold text-white">
             annuaire

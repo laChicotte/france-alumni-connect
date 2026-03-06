@@ -80,7 +80,8 @@ export function Navigation() {
   const navItems = [
     { href: "/a-propos", label: "à propos" },
     { href: "/actualites", label: "actualités" },
-    { href: "/emploi", label: "emploi" },
+    { href: "https://talent-diaspora.fr/", label: "emploi" },
+    { href: "/formation", label: "formation" },
     { href: "/annuaire", label: "annuaire" },
   ]
 
@@ -129,10 +130,13 @@ export function Navigation() {
           <div className="hidden md:flex items-center gap-6 pr-6">
             {navItems.map((item) => {
               const isActive = pathname.startsWith(item.href)
+              const isExternal = item.href.startsWith("http")
               return (
                 <Link
                   key={item.href}
                   href={item.href}
+                  target={isExternal ? "_blank" : undefined}
+                  rel={isExternal ? "noopener noreferrer" : undefined}
                   className={
                     `px-3 py-2 text-base font-normal transition-colors ` +
                     (isActive
@@ -262,10 +266,13 @@ export function Navigation() {
           <div className="md:hidden py-4 space-y-2">
             {navItems.map((item) => {
               const isActive = pathname.startsWith(item.href)
+              const isExternal = item.href.startsWith("http")
               return (
                 <Link
                   key={item.href}
                   href={item.href}
+                  target={isExternal ? "_blank" : undefined}
+                  rel={isExternal ? "noopener noreferrer" : undefined}
                   className={
                     `block px-4 py-3 text-base transition-colors ` +
                     (isActive

@@ -288,7 +288,8 @@ export default function AnnuairePage() {
           <div className={`hidden md:flex items-center gap-6 ${menuSolid ? "text-[#3558A2]" : "text-white"}`}>
             <Link href="/a-propos" className="text-base font-semibold">à propos</Link>
             <Link href="/actualites" className="text-base font-semibold">actualités</Link>
-            <Link href="/emploi" className="text-base font-semibold">emploi</Link>
+            <Link href="https://talent-diaspora.fr/" target="_blank" rel="noopener noreferrer" className="text-base font-semibold">emploi</Link>
+            <Link href="/formation" className="text-base font-semibold">formation</Link>
             <Link href="/annuaire" className="text-base font-semibold">annuaire</Link>
             {isAuthenticated ? (
               <Link
@@ -351,12 +352,23 @@ export default function AnnuairePage() {
             </Link>
             <Link
               onClick={() => setIsMobileMenuOpen(false)}
-              href="/emploi"
+              href="https://talent-diaspora.fr/"
+              target="_blank"
+              rel="noopener noreferrer"
               className={`rounded-md border px-3 py-2 text-center text-xs font-semibold ${
                 menuSolid ? "border-[#3558A2]/40 text-[#3558A2]" : "border-white/50 text-white"
               }`}
             >
               emploi
+            </Link>
+            <Link
+              onClick={() => setIsMobileMenuOpen(false)}
+              href="/formation"
+              className={`rounded-md border px-3 py-2 text-center text-xs font-semibold ${
+                menuSolid ? "border-[#3558A2]/40 text-[#3558A2]" : "border-white/50 text-white"
+              }`}
+            >
+              formation
             </Link>
             <Link
               onClick={() => setIsMobileMenuOpen(false)}
