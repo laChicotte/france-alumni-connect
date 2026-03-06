@@ -77,6 +77,63 @@ USING (
 );
 
 -- ================================================
+-- 3. CRÉER LE BUCKET "alumni-photos"
+-- ================================================
+
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'alumni-photos',
+  'alumni-photos',
+  true,  -- Public pour affichage direct dans l'annuaire/menu/profil
+  3145728,  -- 3MB max
+  ARRAY['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+)
+ON CONFLICT (id) DO NOTHING;
+
+-- ================================================
+-- 4. POLICIES POUR LE BUCKET "alumni-photos"
+-- ================================================
+
+-- SELECT: lecture publique des photos
+DROP POLICY IF EXISTS "Anyone can view alumni photos" ON storage.objects;
+CREATE POLICY "Anyone can view alumni photos"
+ON storage.objects FOR SELECT
+TO public
+USING (
+  bucket_id = 'alumni-photos'
+);
+
+-- INSERT: utilisateur connecté peut uploader dans son dossier
+DROP POLICY IF EXISTS "Users can upload own alumni photo" ON storage.objects;
+CREATE POLICY "Users can upload own alumni photo"
+ON storage.objects FOR INSERT
+TO authenticated
+WITH CHECK (
+  bucket_id = 'alumni-photos'
+  AND (storage.foldername(name))[1] = auth.uid()::text
+);
+
+-- UPDATE: utilisateur connecté peut modifier ses photos
+DROP POLICY IF EXISTS "Users can update own alumni photo" ON storage.objects;
+CREATE POLICY "Users can update own alumni photo"
+ON storage.objects FOR UPDATE
+TO authenticated
+USING (
+  bucket_id = 'alumni-photos'
+  AND (storage.foldername(name))[1] = auth.uid()::text
+);
+
+-- DELETE: utilisateur connecté peut supprimer ses photos
+DROP POLICY IF EXISTS "Users can delete own alumni photo" ON storage.objects;
+CREATE POLICY "Users can delete own alumni photo"
+ON storage.objects FOR DELETE
+TO authenticated
+USING (
+  bucket_id = 'alumni-photos'
+  AND (storage.foldername(name))[1] = auth.uid()::text
+);
+
+-- ================================================
 -- VÉRIFICATION
 -- ================================================
 SELECT
@@ -84,5 +141,5 @@ SELECT
   name as policy_name,
   definition
 FROM storage.policies
-WHERE bucket_id = 'diplomes'
+WHERE bucket_id IN ('diplomes', 'alumni-photos')
 ORDER BY name;

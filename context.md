@@ -24,4 +24,13 @@ Ici on travaille étape par étape et selon des règles c'est à dire:
 - Responsivité (desktop, tablette, mobile) des pages publiques.
 - Déjà fait: `/`, `/a-propos`, `/actualites`, `/annuaire`, `/emploi` (menu mobile + ajustements responsive des sections).
 -changement de la mise en forme des cartes de la page actualités il faut qu'il y ait trois cartes de comme dans la page emploi et de la meme taille
+- Pagination ajustée à 6 éléments par page sur `actualites` et `annuaire`.
+- Photos alumni:
+  - Upload photo de profil ajouté dans le formulaire d'inscription (optionnel) + sauvegarde dans `alumni_profiles.photo_url`.
+  - Modification de photo ajoutée dans la page profil alumni (upload vers storage + mise à jour `photo_url`).
+  - Nettoyage automatique: suppression de l'ancienne photo lors du remplacement depuis le profil.
+- Supabase mis à jour:
+  - Bucket `alumni-photos` + policies ajoutés dans `supabase/FINAL_STORAGE.sql`.
+  - Documentation alignée dans `supabase/README_SUPABASE.md`.
 **Sur quoi on travaille actuellement**
+On continue les ajustements côté profil alumni (photo et affichage dans le menu si besoin).

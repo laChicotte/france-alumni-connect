@@ -18,6 +18,7 @@ Pour configurer Supabase de zéro, exécutez les scripts dans cet ordre :
 
 ### 4. **FINAL_STORAGE.sql**
 - Créer le bucket `diplomes`
+- Créer le bucket `alumni-photos`
 - Créer les policies de sécurité pour le storage
 
 ### 5. **FINAL_SEEDERS.sql**
@@ -48,6 +49,14 @@ Ces scripts ne modifient rien, ils permettent de lister ce qui existe :
 - Taille max : **5MB**
 - Formats acceptés : **PDF, JPG, PNG**
 - Stocké dans le bucket `diplomes` avec le path `{user_id}/diplome_{timestamp}.{ext}`
+
+### Upload photo de profil
+- **Optionnel** lors de l'inscription
+- Modifiable depuis la page profil
+- Taille max : **3MB**
+- Formats acceptés : **JPG, PNG, WEBP**
+- Stocké dans le bucket `alumni-photos` avec le path `{user_id}/photo_{timestamp}.{ext}`
+- URL sauvegardée dans `alumni_profiles.photo_url`
 
 ### Statuts des utilisateurs
 - `en_attente` : Compte créé, en attente de validation admin
@@ -86,7 +95,9 @@ Après avoir exécuté les scripts, vérifier :
 - [ ] Triggers créés sur : `users`, `alumni_profiles`, `articles`, `evenements`, `emplois`, `partenaires`
 - [ ] RLS activé sur toutes les tables principales
 - [ ] Bucket `diplomes` créé avec policies
+- [ ] Bucket `alumni-photos` créé avec policies
 - [ ] Tables `secteurs` et `statuts_professionnels` peuplées
 - [ ] Tester l'inscription d'un nouvel alumni
 - [ ] Vérifier que le diplôme s'upload correctement
+- [ ] Vérifier que la photo de profil s'upload correctement
 - [ ] Vérifier que le profil s'affiche après validation admin

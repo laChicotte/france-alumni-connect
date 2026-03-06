@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseAdmin } from '@/lib/supabase-admin'
+import type { Database } from '@/types/database.types'
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 const ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png']
+const MAX_PHOTO_SIZE = 3 * 1024 * 1024 // 3MB
+const ALLOWED_PHOTO_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
 
 export async function POST(request: NextRequest) {
   try {
@@ -16,6 +19,7 @@ export async function POST(request: NextRequest) {
     const universite = formData.get('universite') as string
     const anneePromotion = formData.get('annee_promotion') as string
     const diplomeFile = formData.get('diplome') as File
+    const photoFile = formData.get('photo') as File | null
 
     if (!email || !password || !prenom || !nom || !telephone || !universite || !anneePromotion || !diplomeFile?.size) {
       return NextResponse.json(
@@ -43,6 +47,22 @@ export async function POST(request: NextRequest) {
         { error: 'Format de fichier non autorisé (PDF, JPG, PNG uniquement)' },
         { status: 400 }
       )
+    }
+
+    if (photoFile?.size) {
+      if (photoFile.size > MAX_PHOTO_SIZE) {
+        return NextResponse.json(
+          { error: 'La photo est trop volumineuse (max 3MB)' },
+          { status: 400 }
+        )
+      }
+
+      if (!ALLOWED_PHOTO_TYPES.includes(photoFile.type)) {
+        return NextResponse.json(
+          { error: 'Format photo non autorisé (JPG, PNG, WEBP uniquement)' },
+          { status: 400 }
+        )
+      }
     }
 
     const supabase = createSupabaseAdmin()
@@ -93,14 +113,18 @@ export async function POST(request: NextRequest) {
     const userId = authData.user.id
 
     // 2. Insert dans users
-    const { error: userError } = await supabase.from('users').insert({
+    const userToInsert: Database['public']['Tables']['users']['Insert'] = {
       id: userId,
       email,
       nom,
       prenom,
       role: 'alumni',
       status: 'en_attente',
-    })
+    }
+
+    // Supabase type inference can resolve to never in API routes; cast keeps strict payload typing.
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: userError } = await (supabase.from('users') as any).insert(userToInsert)
 
     if (userError) {
       console.error('Erreur insert users:', userError)
@@ -137,8 +161,40 @@ export async function POST(request: NextRequest) {
     const { data: urlData } = supabase.storage.from('diplomes').getPublicUrl(fileName)
     const diplomeUrl = urlData.publicUrl
 
-    // 4. Insert dans alumni_profiles
-    const { error: profileError } = await supabase.from('alumni_profiles').insert({
+    // 4. Upload photo de profil (optionnelle)
+    let photoUrl: string | null = null
+    let photoPath: string | null = null
+
+    if (photoFile?.size) {
+      const photoExt = photoFile.name.split('.').pop()?.toLowerCase() || 'jpg'
+      photoPath = `${userId}/photo_${Date.now()}.${photoExt}`
+      const photoArrayBuffer = await photoFile.arrayBuffer()
+      const photoBuffer = Buffer.from(photoArrayBuffer)
+
+      const { error: photoUploadError } = await supabase.storage
+        .from('alumni-photos')
+        .upload(photoPath, photoBuffer, {
+          contentType: photoFile.type,
+          upsert: true,
+        })
+
+      if (photoUploadError) {
+        console.error('Erreur upload photo profil:', photoUploadError)
+        await supabase.storage.from('diplomes').remove([fileName])
+        await supabase.from('users').delete().eq('id', userId)
+        await supabase.auth.admin.deleteUser(userId)
+        return NextResponse.json(
+          { error: 'Erreur lors de l\'upload de la photo de profil. Veuillez réessayer.' },
+          { status: 500 }
+        )
+      }
+
+      const { data: photoUrlData } = supabase.storage.from('alumni-photos').getPublicUrl(photoPath)
+      photoUrl = photoUrlData.publicUrl
+    }
+
+    // 5. Insert dans alumni_profiles
+    const profileToInsert: Database['public']['Tables']['alumni_profiles']['Insert'] = {
       user_id: userId,
       nom,
       prenom,
@@ -150,11 +206,18 @@ export async function POST(request: NextRequest) {
       formation_domaine: 'Non renseigné',
       visible_annuaire: true,
       document_diplome_url: diplomeUrl,
-    })
+      photo_url: photoUrl,
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const { error: profileError } = await (supabase.from('alumni_profiles') as any).insert(profileToInsert)
 
     if (profileError) {
       console.error('Erreur insert alumni_profiles:', profileError)
       await supabase.storage.from('diplomes').remove([fileName])
+      if (photoPath) {
+        await supabase.storage.from('alumni-photos').remove([photoPath])
+      }
       await supabase.from('users').delete().eq('id', userId)
       await supabase.auth.admin.deleteUser(userId)
       return NextResponse.json(

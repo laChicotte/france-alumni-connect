@@ -29,6 +29,7 @@ export default function InscriptionPage() {
     terms: false,
   })
   const [diplomeFile, setDiplomeFile] = useState<File | null>(null)
+  const [photoFile, setPhotoFile] = useState<File | null>(null)
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target
@@ -75,6 +76,12 @@ export default function InscriptionPage() {
       return
     }
 
+    if (photoFile && photoFile.size > 3 * 1024 * 1024) {
+      setError("La photo est trop volumineuse (max 3MB)")
+      setIsLoading(false)
+      return
+    }
+
     try {
       const body = new FormData()
       body.append('email', formData.email)
@@ -85,6 +92,9 @@ export default function InscriptionPage() {
       body.append('universite', formData.universite)
       body.append('annee_promotion', formData.annee_promotion)
       body.append('diplome', diplomeFile)
+      if (photoFile) {
+        body.append('photo', photoFile)
+      }
 
       const res = await fetch('/api/inscription', {
         method: 'POST',
@@ -246,6 +256,20 @@ export default function InscriptionPage() {
                   required
                 />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="photo">Photo de profil (JPG, PNG, WEBP) - optionnel</Label>
+              <Input
+                id="photo"
+                type="file"
+                accept=".jpg,.jpeg,.png,.webp"
+                onChange={(e) => setPhotoFile(e.target.files?.[0] || null)}
+                className="file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-[#3558A2] file:text-white hover:file:bg-[#3558A2]/90"
+              />
+              <p className="text-xs text-muted-foreground">
+                Ajoutez une photo de profil (max 3MB)
+              </p>
             </div>
 
             <div className="space-y-2">

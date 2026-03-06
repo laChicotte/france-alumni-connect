@@ -25,6 +25,17 @@ const DIPLOME_OPTIONS: { value: DiplomeType; label: string }[] = [
   { value: 'autre', label: 'Autre' },
 ]
 
+function extractAlumniPhotoPath(photoUrl: string | null | undefined): string | null {
+  if (!photoUrl) return null
+
+  const marker = '/storage/v1/object/public/alumni-photos/'
+  const markerIndex = photoUrl.indexOf(marker)
+  if (markerIndex === -1) return null
+
+  const path = photoUrl.slice(markerIndex + marker.length)
+  return path || null
+}
+
 export default function ProfilPage() {
   const [user, setUser] = useState<any>(null)
   const [alumniProfile, setAlumniProfile] = useState<AlumniProfile | null>(null)
@@ -34,6 +45,8 @@ export default function ProfilPage() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState<string | null>(null)
   const [formData, setFormData] = useState<Partial<AlumniProfile>>({})
+  const [photoFile, setPhotoFile] = useState<File | null>(null)
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null)
 
   // Options pour les selects
   const [secteurs, setSecteurs] = useState<Secteur[]>([])
@@ -129,6 +142,46 @@ export default function ProfilPage() {
     setSuccess(null)
 
     try {
+      const previousPhotoPath = extractAlumniPhotoPath(formData.photo_url || null)
+      let nextPhotoUrl = formData.photo_url || null
+      let uploadedPhotoPath: string | null = null
+
+      if (photoFile) {
+        const maxPhotoSize = 3 * 1024 * 1024
+        const allowedPhotoTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+
+        if (photoFile.size > maxPhotoSize) {
+          setError('La photo est trop volumineuse (max 3MB)')
+          setIsSaving(false)
+          return
+        }
+
+        if (!allowedPhotoTypes.includes(photoFile.type)) {
+          setError('Format photo non autorisé (JPG, PNG, WEBP uniquement)')
+          setIsSaving(false)
+          return
+        }
+
+        const photoExt = photoFile.name.split('.').pop()?.toLowerCase() || 'jpg'
+        uploadedPhotoPath = `${user.id}/photo_${Date.now()}.${photoExt}`
+        const { error: photoUploadError } = await supabase.storage
+          .from('alumni-photos')
+          .upload(uploadedPhotoPath, photoFile, {
+            contentType: photoFile.type,
+            upsert: true,
+          })
+
+        if (photoUploadError) {
+          console.error('Erreur upload photo:', photoUploadError)
+          setError('Erreur lors de l\'upload de la photo')
+          setIsSaving(false)
+          return
+        }
+
+        const { data: photoUrlData } = supabase.storage.from('alumni-photos').getPublicUrl(uploadedPhotoPath)
+        nextPhotoUrl = photoUrlData.publicUrl
+      }
+
       // Convertir 'none' en null pour les champs optionnels
       const secteurId = formData.secteur_id === 'none' ? null : (formData.secteur_id || null)
       const statutId = formData.statut_professionnel_id === 'none' ? null : (formData.statut_professionnel_id || null)
@@ -147,6 +200,7 @@ export default function ProfilPage() {
           statut_professionnel_id: statutId,
           entreprise: formData.entreprise || null,
           poste_actuel: formData.poste_actuel || null,
+          photo_url: nextPhotoUrl,
           bio: formData.bio || null,
           linkedin_url: formData.linkedin_url || null,
           visible_annuaire: formData.visible_annuaire,
@@ -160,6 +214,9 @@ export default function ProfilPage() {
         console.error('Erreur mise à jour:', JSON.stringify(updateError, null, 2))
         const errorMessage = updateError.message || updateError.details || 'Erreur lors de la mise à jour du profil'
         setError(errorMessage)
+        if (uploadedPhotoPath) {
+          await supabase.storage.from('alumni-photos').remove([uploadedPhotoPath])
+        }
         setIsSaving(false)
         return
       }
@@ -167,6 +224,36 @@ export default function ProfilPage() {
       // Mettre à jour les états locaux
       setAlumniProfile(data)
       setFormData(data)
+      setPhotoFile(null)
+      if (photoPreview) {
+        URL.revokeObjectURL(photoPreview)
+      }
+      setPhotoPreview(null)
+
+      // Si une nouvelle photo a été enregistrée, supprimer l'ancienne du bucket.
+      if (uploadedPhotoPath && previousPhotoPath && previousPhotoPath !== uploadedPhotoPath) {
+        const { error: oldPhotoDeleteError } = await supabase.storage
+          .from('alumni-photos')
+          .remove([previousPhotoPath])
+
+        if (oldPhotoDeleteError) {
+          // Non bloquant: la sauvegarde du profil a déjà réussi.
+          console.warn('Suppression ancienne photo échouée:', oldPhotoDeleteError)
+        }
+      }
+
+      // Mettre à jour le localStorage pour synchroniser l'avatar dans la navigation.
+      const storedUser = localStorage.getItem('user')
+      if (storedUser) {
+        const parsedStoredUser = JSON.parse(storedUser)
+        localStorage.setItem(
+          'user',
+          JSON.stringify({
+            ...parsedStoredUser,
+            photo_url: data.photo_url || null,
+          })
+        )
+      }
 
       setSuccess('Profil mis à jour avec succès')
       setIsEditing(false)
@@ -180,6 +267,11 @@ export default function ProfilPage() {
 
   const handleCancel = () => {
     setFormData(alumniProfile || {})
+    setPhotoFile(null)
+    if (photoPreview) {
+      URL.revokeObjectURL(photoPreview)
+    }
+    setPhotoPreview(null)
     setIsEditing(false)
     setError(null)
   }
@@ -252,11 +344,35 @@ export default function ProfilPage() {
               <CardContent className="pt-6">
                 <div className="text-center mb-6">
                   <Avatar className="w-24 h-24 mx-auto mb-4">
-                    <AvatarImage src={formData.photo_url || undefined} alt={displayName} />
+                    <AvatarImage src={photoPreview || formData.photo_url || undefined} alt={displayName} />
                     <AvatarFallback className="bg-gradient-to-br from-gray-600 to-gray-800 text-white text-xl font-bold">
                       {displayName ? displayName.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2) : 'FA'}
                     </AvatarFallback>
                   </Avatar>
+                  {isAlumni && isEditing && (
+                    <div className="mb-4 text-left">
+                      <Label htmlFor="photo" className="mb-1 block text-sm">Photo de profil (optionnel)</Label>
+                      <Input
+                        id="photo"
+                        type="file"
+                        accept=".jpg,.jpeg,.png,.webp"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0] || null
+                          setPhotoFile(file)
+                          if (photoPreview) {
+                            URL.revokeObjectURL(photoPreview)
+                          }
+                          if (file) {
+                            setPhotoPreview(URL.createObjectURL(file))
+                          } else {
+                            setPhotoPreview(null)
+                          }
+                        }}
+                        className="file:mr-4 file:py-2 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-[#3558A2] file:text-white hover:file:bg-[#3558A2]/90"
+                      />
+                      <p className="mt-1 text-xs text-muted-foreground">JPG, PNG, WEBP - max 3MB</p>
+                    </div>
+                  )}
                   <h2 className="font-serif text-xl font-bold mb-1">{displayName}</h2>
                   <Badge className="bg-[#3558A2] hover:bg-[#3558A2]/90">
                     {user.role === 'admin' ? 'Administrateur' : user.role === 'moderateur' ? 'Modérateur' : 'Alumni'}
