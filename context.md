@@ -32,5 +32,16 @@ Ici on travaille étape par étape et selon des règles c'est à dire:
 - Supabase mis à jour:
   - Bucket `alumni-photos` + policies ajoutés dans `supabase/FINAL_STORAGE.sql`.
   - Documentation alignée dans `supabase/README_SUPABASE.md`.
+- Le menu local des pages custom (`/`, `/a-propos`, `/actualites`, `/annuaire`, `/emploi`) affiche maintenant la photo de profil si l'utilisateur est connecté (fallback icône si photo absente).
+- Le menu dropdown du profil est corrigé (z-index) pour ne plus être caché sous la barre de navigation.
+- Dans la page profil alumni:
+  - Le champ visibilité annuaire est visible mais non modifiable par l'alumni (gestion admin uniquement).
+  - Le champ `genre` (Homme/Femme/Autre) est ajouté et modifiable.
+- À l'inscription alumni:
+  - Le champ `genre` est ajouté et envoyé à l'API.
+  - L'API `/api/inscription` valide et enregistre `genre`.
+- Le schéma TypeScript (`types/database.types.ts`) est aligné avec `genre` sur `alumni_profiles`.
+- Les stats annuaire utilisent les données réelles disponibles en base avec fallback sur les anciennes valeurs si la donnée n'est pas disponible.
+- Les 3 cartes alumni de la page d'accueil utilisent des profils réels via l'API preview avec fallback sur les anciennes cartes locales.
 **Sur quoi on travaille actuellement**
-On va mettre à jour les stats disponibles dans annuaires (notament le camenbert, le nombre d'alumni, ce qui est disponible en base)
+

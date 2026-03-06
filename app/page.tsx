@@ -10,6 +10,15 @@ import { useEffect, useRef, useState } from "react"
 const HERO_WORDS = ["ALUMNI", "CONNECT"]
 const WORD_DURATION_MS = 11000
 
+type HomeFeaturedAlumni = {
+  id: number | string
+  name: string
+  photo: string | null
+  company: string
+  formation: string
+  university: string
+}
+
 export default function HomePage() {
   const heroRef = useRef<HTMLDivElement | null>(null)
   const badgeRef = useRef<HTMLDivElement | null>(null)
@@ -19,7 +28,15 @@ export default function HomePage() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [userPhotoUrl, setUserPhotoUrl] = useState<string | null>(null)
   const featuredArticles = articles.slice(0, 3)
-  const featuredAlumni = alumniMembers.slice(-3)
+  const fallbackFeaturedAlumni: HomeFeaturedAlumni[] = alumniMembers.slice(-3).map((member) => ({
+    id: member.id,
+    name: member.name,
+    photo: member.photo || null,
+    company: member.company || "—",
+    formation: member.formation || "—",
+    university: member.university || "—",
+  }))
+  const [featuredAlumni, setFeaturedAlumni] = useState<HomeFeaturedAlumni[]>(fallbackFeaturedAlumni)
   const upcomingEvents = articles.filter((a) => a.category === "Événements").slice(0, 2)
 
   useEffect(() => {
@@ -77,6 +94,44 @@ export default function HomePage() {
     }, WORD_DURATION_MS)
 
     return () => window.clearInterval(interval)
+  }, [])
+
+  useEffect(() => {
+    const loadFeaturedAlumni = async () => {
+      try {
+        const res = await fetch("/api/annuaire/public-preview", { cache: "no-store" })
+        const data = await res.json().catch(() => ({ profiles: [] }))
+        if (!res.ok || !Array.isArray(data?.profiles) || data.profiles.length === 0) {
+          return
+        }
+
+        const mapped: HomeFeaturedAlumni[] = data.profiles.slice(0, 3).map((profile: {
+          id: string
+          nom: string
+          prenom: string
+          photo_url: string | null
+          entreprise: string | null
+          poste_actuel: string | null
+          formation_domaine: string | null
+          universite: string | null
+        }) => ({
+          id: profile.id,
+          name: `${profile.prenom || ""} ${profile.nom || ""}`.trim(),
+          photo: profile.photo_url,
+          company: profile.entreprise || profile.poste_actuel || "—",
+          formation: profile.formation_domaine || "—",
+          university: profile.universite || "—",
+        }))
+
+        if (mapped.length > 0) {
+          setFeaturedAlumni(mapped)
+        }
+      } catch {
+        // Fallback silencieux sur les données locales
+      }
+    }
+
+    loadFeaturedAlumni()
   }, [])
 
   return (
