@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseAdmin } from '@/lib/supabase-admin'
-import type { Database } from '@/types/database.types'
+import type { Database, GenreType } from '@/types/database.types'
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 const ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png']
 const MAX_PHOTO_SIZE = 3 * 1024 * 1024 // 3MB
 const ALLOWED_PHOTO_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+const ALLOWED_GENRES: GenreType[] = ['Homme', 'Femme', 'Autre']
 
 export async function POST(request: NextRequest) {
   try {
@@ -15,15 +16,23 @@ export async function POST(request: NextRequest) {
     const password = formData.get('password') as string
     const prenom = formData.get('prenom') as string
     const nom = formData.get('nom') as string
+    const genre = formData.get('genre') as string
     const telephone = formData.get('telephone') as string
     const universite = formData.get('universite') as string
     const anneePromotion = formData.get('annee_promotion') as string
     const diplomeFile = formData.get('diplome') as File
     const photoFile = formData.get('photo') as File | null
 
-    if (!email || !password || !prenom || !nom || !telephone || !universite || !anneePromotion || !diplomeFile?.size) {
+    if (!email || !password || !prenom || !nom || !genre || !telephone || !universite || !anneePromotion || !diplomeFile?.size) {
       return NextResponse.json(
         { error: 'Tous les champs obligatoires doivent être renseignés, y compris le diplôme.' },
+        { status: 400 }
+      )
+    }
+
+    if (!ALLOWED_GENRES.includes(genre as GenreType)) {
+      return NextResponse.json(
+        { error: 'Genre invalide. Valeurs autorisées: Homme, Femme, Autre.' },
         { status: 400 }
       )
     }
@@ -77,6 +86,7 @@ export async function POST(request: NextRequest) {
         role: 'alumni',
         prenom,
         nom,
+        genre,
         telephone,
         universite,
         annee_promotion: annee,
@@ -198,6 +208,7 @@ export async function POST(request: NextRequest) {
       user_id: userId,
       nom,
       prenom,
+      genre: genre as GenreType,
       telephone,
       ville: 'Conakry',
       universite,

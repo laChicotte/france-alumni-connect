@@ -33,4 +33,4 @@ Ici on travaille étape par étape et selon des règles c'est à dire:
   - Bucket `alumni-photos` + policies ajoutés dans `supabase/FINAL_STORAGE.sql`.
   - Documentation alignée dans `supabase/README_SUPABASE.md`.
 **Sur quoi on travaille actuellement**
-On continue les ajustements côté profil alumni (photo et affichage dans le menu si besoin).
+On va mettre à jour les stats disponibles dans annuaires (notament le camenbert, le nombre d'alumni, ce qui est disponible en base)

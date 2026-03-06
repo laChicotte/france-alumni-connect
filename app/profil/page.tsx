@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { User, Mail, Phone, MapPin, Building, GraduationCap, Edit2, Save, X, Loader2, Linkedin, CheckCircle, AlertCircle, FileText, Eye, EyeOff, Lock } from "lucide-react"
 import { supabase } from "@/lib/supabase"
-import { AlumniProfile, Secteur, StatutProfessionnel, DiplomeType } from "@/types/database.types"
+import { AlumniProfile, Secteur, StatutProfessionnel, DiplomeType, GenreType } from "@/types/database.types"
 
 const DIPLOME_OPTIONS: { value: DiplomeType; label: string }[] = [
   { value: 'licence', label: 'Licence' },
@@ -24,6 +24,7 @@ const DIPLOME_OPTIONS: { value: DiplomeType; label: string }[] = [
   { value: 'ingenieur', label: 'Ingénieur' },
   { value: 'autre', label: 'Autre' },
 ]
+const GENRE_OPTIONS: GenreType[] = ['Homme', 'Femme', 'Autre']
 
 function extractAlumniPhotoPath(photoUrl: string | null | undefined): string | null {
   if (!photoUrl) return null
@@ -195,6 +196,7 @@ export default function ProfilPage() {
           universite: formData.universite,
           annee_promotion: formData.annee_promotion,
           diplome: formData.diplome,
+          genre: (formData.genre as GenreType) || 'Autre',
           formation_domaine: formData.formation_domaine,
           secteur_id: secteurId,
           statut_professionnel_id: statutId,
@@ -514,6 +516,29 @@ export default function ProfilPage() {
                         disabled={!isEditing}
                         placeholder="Conakry, Guinée"
                       />
+                    </div>
+
+                    <div>
+                      <Label htmlFor="genre" className="mb-0.5 block">Genre</Label>
+                      {isEditing ? (
+                        <Select
+                          value={(formData.genre as GenreType) || 'Autre'}
+                          onValueChange={(value) => setFormData({ ...formData, genre: value as GenreType })}
+                        >
+                          <SelectTrigger>
+                            <SelectValue placeholder="Sélectionnez un genre" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {GENRE_OPTIONS.map((option) => (
+                              <SelectItem key={option} value={option}>
+                                {option}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      ) : (
+                        <Input value={(formData.genre as GenreType) || 'Autre'} disabled />
+                      )}
                     </div>
 
                     {/* Formation */}

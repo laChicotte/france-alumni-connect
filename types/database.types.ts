@@ -1,6 +1,7 @@
 export type UserRole = 'admin' | 'moderateur' | 'alumni'
 export type UserStatus = 'en_attente' | 'actif' | 'banni'
 export type DiplomeType = 'licence' | 'master' | 'doctorat' | 'mba' | 'ingenieur' | 'autre'
+export type GenreType = 'Homme' | 'Femme' | 'Autre'
 export type ArticleStatus = 'brouillon' | 'publie'
 export type JobType = 'cdi' | 'cdd' | 'stage' | 'freelance' | 'alternance'
 
@@ -47,6 +48,7 @@ export interface Database {
           user_id: string
           nom: string
           prenom: string
+          genre: GenreType
           photo_url: string | null
           telephone: string
           ville: string
@@ -70,6 +72,7 @@ export interface Database {
           user_id: string
           nom: string
           prenom: string
+          genre?: GenreType
           photo_url?: string | null
           telephone: string
           ville: string
@@ -92,6 +95,7 @@ export interface Database {
           user_id?: string
           nom?: string
           prenom?: string
+          genre?: GenreType
           photo_url?: string | null
           telephone?: string
           ville?: string

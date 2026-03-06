@@ -23,6 +23,7 @@ export default function InscriptionPage() {
     confirmPassword: "",
     prenom: "",
     nom: "",
+    genre: "Autre",
     telephone: "",
     universite: "",
     annee_promotion: "",
@@ -31,7 +32,7 @@ export default function InscriptionPage() {
   const [diplomeFile, setDiplomeFile] = useState<File | null>(null)
   const [photoFile, setPhotoFile] = useState<File | null>(null)
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { id, value } = e.target
     setFormData(prev => ({ ...prev, [id]: value }))
   }
@@ -88,6 +89,7 @@ export default function InscriptionPage() {
       body.append('password', formData.password)
       body.append('prenom', formData.prenom)
       body.append('nom', formData.nom)
+      body.append('genre', formData.genre)
       body.append('telephone', formData.telephone)
       body.append('universite', formData.universite)
       body.append('annee_promotion', formData.annee_promotion)
@@ -185,6 +187,21 @@ export default function InscriptionPage() {
                   required
                 />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="genre">Genre *</Label>
+              <select
+                id="genre"
+                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                value={formData.genre}
+                onChange={handleInputChange}
+                required
+              >
+                <option value="Homme">Homme</option>
+                <option value="Femme">Femme</option>
+                <option value="Autre">Autre</option>
+              </select>
             </div>
 
             <div className="space-y-2">

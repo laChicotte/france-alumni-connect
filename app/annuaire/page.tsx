@@ -18,8 +18,21 @@ type AlumniWithJoins = AlumniProfile & {
   statuts_professionnels?: { libelle: string } | null
   users?: { email: string } | null
 }
+type StatsItem = { name: string; value: number }
+type AnnuaireStats = {
+  totalAlumni: number
+  sectorData: StatsItem[]
+  genderData: StatsItem[]
+  statusData: StatsItem[]
+}
 
 const PAGE_SIZE = 6
+const DEFAULT_STATS: AnnuaireStats = {
+  totalAlumni: 0,
+  sectorData: [],
+  genderData: [],
+  statusData: [],
+}
 
 
 function shuffle<T>(items: T[]): T[] {
@@ -45,6 +58,7 @@ export default function AnnuairePage() {
   const [menuSolid, setMenuSolid] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [userPhotoUrl, setUserPhotoUrl] = useState<string | null>(null)
+  const [stats, setStats] = useState<AnnuaireStats>(DEFAULT_STATS)
   const heroRef = useRef<HTMLElement | null>(null)
   const heroTitleRef = useRef<HTMLHeadingElement | null>(null)
   useEffect(() => {
@@ -62,6 +76,27 @@ export default function AnnuairePage() {
         setUserPhotoUrl(null)
       }
     }
+  }, [])
+
+  useEffect(() => {
+    const loadStats = async () => {
+      try {
+        const res = await fetch("/api/annuaire/stats", { cache: "no-store" })
+        const data = await res.json().catch(() => null)
+        if (!res.ok || !data) return
+
+        setStats({
+          totalAlumni: Number(data.totalAlumni) || 0,
+          sectorData: Array.isArray(data.sectorData) ? data.sectorData : [],
+          genderData: Array.isArray(data.genderData) ? data.genderData : [],
+          statusData: Array.isArray(data.statusData) ? data.statusData : [],
+        })
+      } catch (error) {
+        console.error("Erreur chargement stats annuaire:", error)
+      }
+    }
+
+    loadStats()
   }, [])
 
   useEffect(() => {
@@ -167,8 +202,8 @@ export default function AnnuairePage() {
     return filteredAlumni.slice(start, start + PAGE_SIZE)
   }, [filteredAlumni, isAuthenticated, currentPage])
 
-  // Statistiques (section statique - on y reviendra plus tard)
-  const stats = useMemo(() => {
+  // Base historique (comme avant) - utilisée en fallback si les stats DB ne sont pas disponibles
+  const staticStats = useMemo(() => {
     const totalAlumni = alumniMembers.length
     const sectorCount: Record<string, number> = {}
     alumniMembers.forEach((member) => {
@@ -195,6 +230,22 @@ export default function AnnuairePage() {
       statusData,
     }
   }, [])
+
+  const effectiveStats = useMemo(() => ({
+    totalAlumni: stats.totalAlumni > 0 ? stats.totalAlumni : staticStats.totalAlumni,
+    sectorData: stats.sectorData.length > 0 ? stats.sectorData : staticStats.sectorData,
+    genderData: stats.genderData.length > 0 ? stats.genderData : staticStats.genderData,
+    statusData: stats.statusData.length > 0 ? stats.statusData : staticStats.statusData,
+  }), [stats, staticStats])
+
+  const genderSummary = useMemo(() => {
+    const getValue = (label: string) => effectiveStats.genderData.find((item) => item.name === label)?.value || 0
+    return {
+      homme: getValue("Homme"),
+      femme: getValue("Femme"),
+      autre: getValue("Autre"),
+    }
+  }, [effectiveStats.genderData])
 
   const COLORS = ["#3558A2", "#FCD116", "#6B7280", "#9CA3AF", "#ea292c", "#3558A2", "#FCD116", "#6B7280"]
 
@@ -612,7 +663,7 @@ export default function AnnuairePage() {
         </DialogContent>
       </Dialog>
 
-      {/* Nos Alumni en Chiffres - section statique (on y reviendra plus tard) */}
+      {/* Nos Alumni en Chiffres - données réelles avec fallback historique */}
       <section className="py-4 bg-[#ffe8e4]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-6 sm:mb-5">
@@ -629,7 +680,7 @@ export default function AnnuairePage() {
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">{stats.totalAlumni.toLocaleString()}</div>
+                <div className="text-3xl font-bold">{effectiveStats.totalAlumni.toLocaleString()}</div>
                 <p className="text-xs text-muted-foreground mt-1">Membres actifs</p>
               </CardContent>
             </Card>
@@ -640,9 +691,9 @@ export default function AnnuairePage() {
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">{stats.genderData[0].value}</div>
+                <div className="text-3xl font-bold">{genderSummary.homme}</div>
                 <p className="text-xs text-muted-foreground mt-1">
-                  Homme: {stats.genderData[0].value} | Femme: {stats.genderData[1].value}
+                  Homme: {genderSummary.homme} | Femme: {genderSummary.femme} | Autre: {genderSummary.autre}
                 </p>
               </CardContent>
             </Card>
@@ -680,7 +731,7 @@ export default function AnnuairePage() {
                   config={{ value: { label: "Nombre" } }}
                   className="h-[200px] sm:h-[240px] md:h-[300px] w-full"
                 >
-                  <BarChart data={stats.statusData} layout="vertical">
+                  <BarChart data={effectiveStats.statusData} layout="vertical">
                     <XAxis type="number" />
                     <YAxis dataKey="name" type="category" width={60} tick={{ fontSize: 10 }} />
                     <ChartTooltip content={<ChartTooltipContent />} />
@@ -701,7 +752,7 @@ export default function AnnuairePage() {
                 >
                   <PieChart>
                     <Pie
-                      data={stats.genderData}
+                      data={effectiveStats.genderData}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
@@ -710,7 +761,7 @@ export default function AnnuairePage() {
                       fill="#8884d8"
                       dataKey="value"
                     >
-                      {stats.genderData.map((entry, index) => (
+                      {effectiveStats.genderData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
@@ -730,7 +781,7 @@ export default function AnnuairePage() {
                 config={{ value: { label: "Nombre" } }}
                 className="h-[200px] sm:h-[240px] md:h-[300px] w-full"
               >
-                <BarChart data={stats.sectorData} layout="vertical">
+                <BarChart data={effectiveStats.sectorData} layout="vertical">
                   <XAxis type="number" />
                   <YAxis dataKey="name" type="category" width={70} tick={{ fontSize: 10 }} />
                   <ChartTooltip content={<ChartTooltipContent />} />

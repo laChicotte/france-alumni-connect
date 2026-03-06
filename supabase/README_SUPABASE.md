@@ -58,6 +58,12 @@ Ces scripts ne modifient rien, ils permettent de lister ce qui existe :
 - Stocké dans le bucket `alumni-photos` avec le path `{user_id}/photo_{timestamp}.{ext}`
 - URL sauvegardée dans `alumni_profiles.photo_url`
 
+### Champ genre (alumni_profiles)
+- Colonne: `alumni_profiles.genre`
+- Valeurs autorisées: `Homme`, `Femme`, `Autre`
+- Valeur par défaut: `Autre`
+- Colonne non nulle (`NOT NULL`)
+
 ### Statuts des utilisateurs
 - `en_attente` : Compte créé, en attente de validation admin
 - `actif` : Compte validé par un admin
@@ -100,4 +106,5 @@ Après avoir exécuté les scripts, vérifier :
 - [ ] Tester l'inscription d'un nouvel alumni
 - [ ] Vérifier que le diplôme s'upload correctement
 - [ ] Vérifier que la photo de profil s'upload correctement
+- [ ] Vérifier que `genre` est bien renseigné à l'inscription et modifiable dans le profil alumni
 - [ ] Vérifier que le profil s'affiche après validation admin
