@@ -17,6 +17,8 @@ export default function ActualitesPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [menuSolid, setMenuSolid] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [userPhotoUrl, setUserPhotoUrl] = useState<string | null>(null)
   const heroRef = useRef<HTMLElement | null>(null)
   const heroTitleRef = useRef<HTMLHeadingElement | null>(null)
   const articlesPerPage = 6
@@ -35,6 +37,20 @@ export default function ActualitesPage() {
   useEffect(() => {
     document.body.classList.add("hide-global-nav")
     return () => document.body.classList.remove("hide-global-nav")
+  }, [])
+
+  useEffect(() => {
+    const authStatus = localStorage.getItem("isAuthenticated")
+    const userData = localStorage.getItem("user")
+    if (authStatus === "true" && userData) {
+      setIsAuthenticated(true)
+      try {
+        const parsedUser = JSON.parse(userData)
+        setUserPhotoUrl(parsedUser.photo_url || null)
+      } catch {
+        setUserPhotoUrl(null)
+      }
+    }
   }, [])
 
   useEffect(() => {
@@ -102,14 +118,29 @@ export default function ActualitesPage() {
             <Link href="/actualites" className="text-base font-semibold">actualités</Link>
             <Link href="/emploi" className="text-base font-semibold">emploi</Link>
             <Link href="/annuaire" className="text-base font-semibold">annuaire</Link>
-            <Link
-              href="/connexion"
-              className={`inline-flex h-8 w-8 items-center justify-center rounded-full border ${
-                menuSolid ? "border-[#3558A2]" : "border-[#f48988]"
-              }`}
-            >
-              <User className={`h-4 w-4 ${menuSolid ? "text-[#3558A2]" : "text-[#f48988]"}`} />
-            </Link>
+            {isAuthenticated ? (
+              <Link
+                href="/profil"
+                className={`inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border ${
+                  menuSolid ? "border-[#3558A2]" : "border-[#f48988]"
+                }`}
+              >
+                {userPhotoUrl ? (
+                  <img src={userPhotoUrl} alt="Photo de profil" className="h-full w-full object-cover" />
+                ) : (
+                  <User className={`h-4 w-4 ${menuSolid ? "text-[#3558A2]" : "text-[#f48988]"}`} />
+                )}
+              </Link>
+            ) : (
+              <Link
+                href="/connexion"
+                className={`inline-flex h-8 w-8 items-center justify-center rounded-full border ${
+                  menuSolid ? "border-[#3558A2]" : "border-[#f48988]"
+                }`}
+              >
+                <User className={`h-4 w-4 ${menuSolid ? "text-[#3558A2]" : "text-[#f48988]"}`} />
+              </Link>
+            )}
           </div>
           <button
             type="button"
@@ -164,15 +195,27 @@ export default function ActualitesPage() {
             >
               annuaire
             </Link>
-            <Link
-              onClick={() => setIsMobileMenuOpen(false)}
-              href="/connexion"
-              className={`col-span-2 rounded-md border px-3 py-2 text-center text-xs font-semibold ${
-                menuSolid ? "border-[#3558A2]/40 text-[#3558A2]" : "border-[#f48988] text-[#f48988]"
-              }`}
-            >
-              connexion
-            </Link>
+            {isAuthenticated ? (
+              <Link
+                onClick={() => setIsMobileMenuOpen(false)}
+                href="/profil"
+                className={`col-span-2 rounded-md border px-3 py-2 text-center text-xs font-semibold ${
+                  menuSolid ? "border-[#3558A2]/40 text-[#3558A2]" : "border-[#f48988] text-[#f48988]"
+                }`}
+              >
+                profil
+              </Link>
+            ) : (
+              <Link
+                onClick={() => setIsMobileMenuOpen(false)}
+                href="/connexion"
+                className={`col-span-2 rounded-md border px-3 py-2 text-center text-xs font-semibold ${
+                  menuSolid ? "border-[#3558A2]/40 text-[#3558A2]" : "border-[#f48988] text-[#f48988]"
+                }`}
+              >
+                connexion
+              </Link>
+            )}
           </div>
         )}
       </div>
