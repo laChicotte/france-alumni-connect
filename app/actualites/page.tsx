@@ -4,29 +4,47 @@ import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { articles } from "@/lib/fake-data"
-import type { Article } from "@/lib/fake-data"
-import { Calendar, User, ChevronLeft, ChevronRight, Menu, X } from "lucide-react"
+import { Calendar, User, ChevronLeft, ChevronRight, Menu, X, Loader2, Shield } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 
+type FeedItem = {
+  id: string
+  title: string
+  image: string
+  category: string
+  author: string
+  date: string
+  href: string
+}
+
 export default function ActualitesPage() {
-  type BaseCategory = Article["category"]
-  type ArticleCategory = BaseCategory | "Tous"
-  const baseCategories: BaseCategory[] = Array.from(new Set(articles.map((a) => a.category)))
-  const categories: ArticleCategory[] = ["Tous", ...baseCategories]
-  const [selectedCategory, setSelectedCategory] = useState<ArticleCategory>("Tous")
+  const fallbackItems: FeedItem[] = articles.map((article) => ({
+    id: article.id,
+    title: article.title,
+    image: article.image || "/placeholder.svg",
+    category: article.category,
+    author: article.author,
+    date: article.date,
+    href: `/actualites/${article.id}`,
+  }))
+  const [feedItems, setFeedItems] = useState<FeedItem[]>(fallbackItems)
+  const [selectedCategory, setSelectedCategory] = useState<string>("Tous")
   const [currentPage, setCurrentPage] = useState(1)
+  const [isLoadingFeed, setIsLoadingFeed] = useState(true)
   const [menuSolid, setMenuSolid] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [userPhotoUrl, setUserPhotoUrl] = useState<string | null>(null)
+  const [userRole, setUserRole] = useState<string>("")
   const heroRef = useRef<HTMLElement | null>(null)
   const heroTitleRef = useRef<HTMLHeadingElement | null>(null)
   const articlesPerPage = 6
+  const categories = ["Tous", ...Array.from(new Set(feedItems.map((item) => item.category)))]
 
   const filteredArticles =
     selectedCategory === "Tous"
-      ? articles
-      : articles.filter((article) => article.category === selectedCategory)
+      ? feedItems
+      : feedItems.filter((item) => item.category === selectedCategory)
 
   // Pagination
   const totalPages = Math.ceil(filteredArticles.length / articlesPerPage)
@@ -47,11 +65,36 @@ export default function ActualitesPage() {
       try {
         const parsedUser = JSON.parse(userData)
         setUserPhotoUrl(parsedUser.photo_url || null)
+        setUserRole(parsedUser.role || "")
       } catch {
         setUserPhotoUrl(null)
+        setUserRole("")
       }
     }
   }, [])
+  const isAdminOrModerator = userRole === "admin" || userRole === "moderateur"
+
+  useEffect(() => {
+    const loadFeed = async () => {
+      try {
+        const res = await fetch("/api/actualites/feed", { cache: "no-store" })
+        const data = await res.json().catch(() => null)
+        if (res.ok && Array.isArray(data?.items) && data.items.length > 0) {
+          setFeedItems(data.items as FeedItem[])
+        }
+      } catch {
+        // fallback silencieux vers les données locales
+      } finally {
+        setIsLoadingFeed(false)
+      }
+    }
+
+    loadFeed()
+  }, [])
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [selectedCategory])
 
   useEffect(() => {
     const onScroll = () => {
@@ -119,6 +162,12 @@ export default function ActualitesPage() {
             <Link href="https://talent-diaspora.fr/" target="_blank" rel="noopener noreferrer" className="text-base font-semibold">emploi</Link>
             <Link href="/formation" className="text-base font-semibold">formation</Link>
             <Link href="/annuaire" className="text-base font-semibold">annuaire</Link>
+            {isAuthenticated && isAdminOrModerator && (
+              <Link href="/admin" className={`inline-flex items-center gap-1.5 text-base font-semibold ${menuSolid ? "text-[#3558A2]" : "text-[#fcd116]"}`}>
+                <Shield className="h-4 w-4" />
+                Admin
+              </Link>
+            )}
             {isAuthenticated ? (
               <Link
                 href="/profil"
@@ -207,6 +256,18 @@ export default function ActualitesPage() {
             >
               annuaire
             </Link>
+            {isAuthenticated && isAdminOrModerator && (
+              <Link
+                onClick={() => setIsMobileMenuOpen(false)}
+                href="/admin"
+                className={`col-span-2 inline-flex items-center justify-center gap-1.5 rounded-md border px-3 py-2 text-center text-xs font-semibold ${
+                  menuSolid ? "border-[#3558A2]/40 text-[#3558A2]" : "border-[#fcd116] text-[#fcd116]"
+                }`}
+              >
+                <Shield className="h-4 w-4" />
+                Admin
+              </Link>
+            )}
             {isAuthenticated ? (
               <Link
                 onClick={() => setIsMobileMenuOpen(false)}
@@ -263,10 +324,7 @@ export default function ActualitesPage() {
                       ? "bg-[#3558A2] hover:bg-[#3558A2]/90"
                       : "hover:bg-[#3558A2] hover:text-white"
                 }
-                onClick={() => {
-                  setSelectedCategory(category)
-                  setCurrentPage(1)
-                }}
+                onClick={() => setSelectedCategory(category)}
               >
                 {category}
               </Button>
@@ -278,42 +336,47 @@ export default function ActualitesPage() {
       {/* Articles Grid */}
       <section className="py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {currentArticles.map((article) => (
-              <Link key={article.id} href={`/actualites/${article.id}`}>
-                <Card className="overflow-hidden hover:shadow-lg transition-shadow group h-full cursor-pointer">
-                  <div className="relative overflow-hidden">
-                    <img
-                      src={article.image || "/placeholder.svg"}
-                      alt={article.title}
-                      className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
-                    />
-                    <div className="absolute top-4 left-4">
-                      <span className="inline-block px-3 py-1 bg-[#3558A2] text-white text-xs font-semibold rounded-full">
-                        {article.category}
-                      </span>
-                    </div>
-                  </div>
-                  <CardContent className="pt-2">
-                    <h3 className="font-serif text-lg font-bold mb-3 line-clamp-2 group-hover:text-[#3558A2] transition-colors">
-                      {article.title}
-                    </h3>
-                    {/* <p className="text-muted-foreground text-sm mb-4 line-clamp-3 leading-relaxed">{article.excerpt}</p> */}
-                    <div className="flex items-center justify-between text-sm text-muted-foreground">
-                      <div className="flex items-center gap-1">
-                        <Calendar className="h-4 w-4" />
-                        <span>{article.date}</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <User className="h-4 w-4" />
-                        <span>{article.author}</span>
+          {isLoadingFeed ? (
+            <div className="flex justify-center py-16">
+              <Loader2 className="h-8 w-8 animate-spin text-[#3558A2]" />
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {currentArticles.map((article) => (
+                <Link key={article.id} href={article.href}>
+                  <Card className="overflow-hidden hover:shadow-lg transition-shadow group h-full cursor-pointer">
+                    <div className="relative overflow-hidden">
+                      <img
+                        src={article.image || "/placeholder.svg"}
+                        alt={article.title}
+                        className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      <div className="absolute top-4 left-4">
+                        <span className="inline-block px-3 py-1 bg-[#3558A2] text-white text-xs font-semibold rounded-full">
+                          {article.category}
+                        </span>
                       </div>
                     </div>
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
+                    <CardContent className="pt-2">
+                      <h3 className="font-serif text-lg font-bold mb-3 line-clamp-2 group-hover:text-[#3558A2] transition-colors">
+                        {article.title}
+                      </h3>
+                      <div className="flex items-center justify-between text-sm text-muted-foreground">
+                        <div className="flex items-center gap-1">
+                          <Calendar className="h-4 w-4" />
+                          <span>{article.date}</span>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <User className="h-4 w-4" />
+                          <span>{article.author}</span>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          )}
 
           {/* Pagination */}
           {totalPages > 1 && (

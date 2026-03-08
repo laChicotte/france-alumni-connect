@@ -2,13 +2,14 @@
 
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
-import { User, Menu, X } from "lucide-react"
+import { User, Menu, X, Shield } from "lucide-react"
 
 export default function FormationPage() {
   const [menuSolid, setMenuSolid] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [userPhotoUrl, setUserPhotoUrl] = useState<string | null>(null)
+  const [userRole, setUserRole] = useState<string>("")
   const heroRef = useRef<HTMLElement | null>(null)
   const heroTitleRef = useRef<HTMLHeadingElement | null>(null)
 
@@ -25,11 +26,14 @@ export default function FormationPage() {
       try {
         const parsedUser = JSON.parse(userData)
         setUserPhotoUrl(parsedUser.photo_url || null)
+        setUserRole(parsedUser.role || "")
       } catch {
         setUserPhotoUrl(null)
+        setUserRole("")
       }
     }
   }, [])
+  const isAdminOrModerator = userRole === "admin" || userRole === "moderateur"
 
   useEffect(() => {
     const onScroll = () => {
@@ -95,6 +99,12 @@ export default function FormationPage() {
             <Link href="https://talent-diaspora.fr/" target="_blank" rel="noopener noreferrer" className="text-base font-semibold">emploi</Link>
             <Link href="/formation" className="text-base font-semibold">formation</Link>
             <Link href="/annuaire" className="text-base font-semibold">annuaire</Link>
+            {isAuthenticated && isAdminOrModerator && (
+              <Link href="/admin" className={`inline-flex items-center gap-1.5 text-base font-semibold ${menuSolid ? "text-[#3558A2]" : "text-[#fcd116]"}`}>
+                <Shield className="h-4 w-4" />
+                Admin
+              </Link>
+            )}
             {isAuthenticated ? (
               <Link
                 href="/profil"
@@ -151,6 +161,12 @@ export default function FormationPage() {
             <Link onClick={() => setIsMobileMenuOpen(false)} href="/annuaire" className={`col-span-2 rounded-md border px-3 py-2 text-center text-xs font-semibold ${menuSolid ? "border-[#3558A2]/40 text-[#3558A2]" : "border-white/50 text-white"}`}>
               annuaire
             </Link>
+            {isAuthenticated && isAdminOrModerator && (
+              <Link onClick={() => setIsMobileMenuOpen(false)} href="/admin" className={`col-span-2 inline-flex items-center justify-center gap-1.5 rounded-md border px-3 py-2 text-center text-xs font-semibold ${menuSolid ? "border-[#3558A2]/40 text-[#3558A2]" : "border-[#fcd116] text-[#fcd116]"}`}>
+                <Shield className="h-4 w-4" />
+                Admin
+              </Link>
+            )}
           </div>
         )}
       </div>

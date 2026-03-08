@@ -147,7 +147,7 @@ export default function ArticlePage() {
           <img
             src={article.image || "/placeholder.svg"}
             alt={article.title}
-            className="mb-8 w-full rounded-lg border object-cover"
+            className="mb-8 mx-auto block h-auto max-h-96 w-auto min-w-[220px] max-w-full rounded-lg border object-contain md:min-w-[400px]"
           />
 
           <ArticleContentRenderer html={article.content} />
@@ -156,7 +156,7 @@ export default function ArticlePage() {
             <div className="mt-8">
               <h3 className="mb-3 text-lg font-semibold">Médias</h3>
               <div className="overflow-x-auto pb-2">
-                <div className="flex gap-4 snap-x snap-mandatory">
+                <div className="mx-auto flex w-max gap-4 snap-x snap-mandatory">
                   {article.media.map((item) => (
                     <div key={item.id} className="min-w-[260px] max-w-[320px] shrink-0 snap-start">
                       {item.media_type === "image" ? (

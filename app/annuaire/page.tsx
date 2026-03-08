@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { supabase } from "@/lib/supabase"
 import { alumniMembers } from "@/lib/fake-data"
-import { Search, Filter, GraduationCap, Briefcase, MapPin, Mail, Users, TrendingUp, Globe, Target, Loader2, User, Menu, X } from "lucide-react"
+import { Search, Filter, GraduationCap, Briefcase, MapPin, Mail, Users, TrendingUp, Globe, Target, Loader2, User, Menu, X, Shield } from "lucide-react"
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis } from "recharts"
 import type { AlumniProfile } from "@/types/database.types"
 
@@ -58,6 +58,7 @@ export default function AnnuairePage() {
   const [menuSolid, setMenuSolid] = useState(false)
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [userPhotoUrl, setUserPhotoUrl] = useState<string | null>(null)
+  const [userRole, setUserRole] = useState<string>("")
   const [stats, setStats] = useState<AnnuaireStats>(DEFAULT_STATS)
   const heroRef = useRef<HTMLElement | null>(null)
   const heroTitleRef = useRef<HTMLHeadingElement | null>(null)
@@ -72,11 +73,14 @@ export default function AnnuairePage() {
       try {
         const parsedUser = JSON.parse(userData)
         setUserPhotoUrl(parsedUser.photo_url || null)
+        setUserRole(parsedUser.role || "")
       } catch {
         setUserPhotoUrl(null)
+        setUserRole("")
       }
     }
   }, [])
+  const isAdminOrModerator = userRole === "admin" || userRole === "moderateur"
 
   useEffect(() => {
     const loadStats = async () => {
@@ -291,6 +295,12 @@ export default function AnnuairePage() {
             <Link href="https://talent-diaspora.fr/" target="_blank" rel="noopener noreferrer" className="text-base font-semibold">emploi</Link>
             <Link href="/formation" className="text-base font-semibold">formation</Link>
             <Link href="/annuaire" className="text-base font-semibold">annuaire</Link>
+            {isAuthenticated && isAdminOrModerator && (
+              <Link href="/admin" className={`inline-flex items-center gap-1.5 text-base font-semibold ${menuSolid ? "text-[#3558A2]" : "text-[#fcd116]"}`}>
+                <Shield className="h-4 w-4" />
+                Admin
+              </Link>
+            )}
             {isAuthenticated ? (
               <Link
                 href="/profil"
@@ -379,6 +389,18 @@ export default function AnnuairePage() {
             >
               annuaire
             </Link>
+            {isAuthenticated && isAdminOrModerator && (
+              <Link
+                onClick={() => setIsMobileMenuOpen(false)}
+                href="/admin"
+                className={`col-span-2 inline-flex items-center justify-center gap-1.5 rounded-md border px-3 py-2 text-center text-xs font-semibold ${
+                  menuSolid ? "border-[#3558A2]/40 text-[#3558A2]" : "border-[#fcd116] text-[#fcd116]"
+                }`}
+              >
+                <Shield className="h-4 w-4" />
+                Admin
+              </Link>
+            )}
             {isAuthenticated ? (
               <Link
                 onClick={() => setIsMobileMenuOpen(false)}

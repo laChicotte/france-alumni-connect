@@ -4,7 +4,7 @@ import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from "@/components/ui/carousel"
 import { teamMembers, partners } from "@/lib/fake-data"
-import { Users, Heart, Globe, Award, User, Menu, X } from "lucide-react"
+import { Users, Heart, Globe, Award, User, Menu, X, Shield } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 import type { CarouselApi } from "@/components/ui/carousel"
 
@@ -18,6 +18,7 @@ export default function AboutPage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [userPhotoUrl, setUserPhotoUrl] = useState<string | null>(null)
+  const [userRole, setUserRole] = useState<string>("")
   const valuesRef = useRef<HTMLElement | null>(null)
   const objectivesRef = useRef<HTMLElement | null>(null)
   const partnersRef = useRef<HTMLElement | null>(null)
@@ -40,11 +41,14 @@ export default function AboutPage() {
       try {
         const parsedUser = JSON.parse(userData)
         setUserPhotoUrl(parsedUser.photo_url || null)
+        setUserRole(parsedUser.role || "")
       } catch {
         setUserPhotoUrl(null)
+        setUserRole("")
       }
     }
   }, [])
+  const isAdminOrModerator = userRole === "admin" || userRole === "moderateur"
 
   useEffect(() => {
     const onScroll = () => {
@@ -105,6 +109,12 @@ export default function AboutPage() {
               <Link href="https://talent-diaspora.fr/" target="_blank" rel="noopener noreferrer" className="text-base font-semibold">emploi</Link>
               <Link href="/formation" className="text-base font-semibold">formation</Link>
               <Link href="/annuaire" className="text-base font-semibold">annuaire</Link>
+              {isAuthenticated && isAdminOrModerator && (
+                <Link href="/admin" className="inline-flex items-center gap-1.5 text-base font-semibold text-[#fcd116]">
+                  <Shield className="h-4 w-4" />
+                  Admin
+                </Link>
+              )}
               {isAuthenticated ? (
                 <Link href="/profil" className="inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-[#f48988]">
                   {userPhotoUrl ? (
@@ -145,6 +155,12 @@ export default function AboutPage() {
               <Link onClick={() => setIsMobileMenuOpen(false)} href="/annuaire" className="rounded-md border border-white/50 px-3 py-2 text-center text-xs font-semibold text-white">
                 annuaire
               </Link>
+              {isAuthenticated && isAdminOrModerator && (
+                <Link onClick={() => setIsMobileMenuOpen(false)} href="/admin" className="col-span-2 inline-flex items-center justify-center gap-1.5 rounded-md border border-[#fcd116] px-3 py-2 text-center text-xs font-semibold text-[#fcd116]">
+                  <Shield className="h-4 w-4" />
+                  Admin
+                </Link>
+              )}
               {isAuthenticated ? (
                 <Link onClick={() => setIsMobileMenuOpen(false)} href="/profil" className="col-span-2 rounded-md border border-[#f48988] px-3 py-2 text-center text-xs font-semibold text-[#f48988]">
                   profil
