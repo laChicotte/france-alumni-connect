@@ -71,4 +71,4 @@ Ici on travaille étape par étape et selon des règles c'est à dire:
   - La page détail publique d'un article est alignée sur le rendu "Aperçu final lecteur" du backoffice (logo en haut gauche, titre centré, auteur+date, extrait, couverture, contenu riche, médias de fin en carrousel horizontal).
   - La largeur d'affichage de la page détail article a été augmentée pour un rendu plus confortable.
   **Ce qu'on va faire tout de suite'**
-  On va essayer de brancher la page actualités (articles et évements)
+  On va mettre gerer le backend des partenaires, et modifier la photo apropos et formation, annuaire et autres
