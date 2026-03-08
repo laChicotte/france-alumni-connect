@@ -134,6 +134,134 @@ USING (
 );
 
 -- ================================================
+-- 5. CRÉER LE BUCKET "articles-media"
+-- ================================================
+
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'articles-media',
+  'articles-media',
+  true,  -- Public pour affichage des couvertures + médias d'articles
+  10485760,  -- 10MB max
+  ARRAY['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'video/mp4', 'video/webm']
+)
+ON CONFLICT (id) DO NOTHING;
+
+-- ================================================
+-- 6. POLICIES POUR LE BUCKET "articles-media"
+-- ================================================
+
+-- SELECT: lecture publique des médias d'articles
+DROP POLICY IF EXISTS "Anyone can view article media" ON storage.objects;
+CREATE POLICY "Anyone can view article media"
+ON storage.objects FOR SELECT
+TO public
+USING (
+  bucket_id = 'articles-media'
+);
+
+-- INSERT: utilisateur authentifié peut uploader dans son dossier
+DROP POLICY IF EXISTS "Users can upload own article media" ON storage.objects;
+CREATE POLICY "Users can upload own article media"
+ON storage.objects FOR INSERT
+TO authenticated
+WITH CHECK (
+  bucket_id = 'articles-media'
+  AND (storage.foldername(name))[1] = auth.uid()::text
+);
+
+-- UPDATE: utilisateur authentifié peut modifier ses fichiers
+DROP POLICY IF EXISTS "Users can update own article media" ON storage.objects;
+CREATE POLICY "Users can update own article media"
+ON storage.objects FOR UPDATE
+TO authenticated
+USING (
+  bucket_id = 'articles-media'
+  AND (storage.foldername(name))[1] = auth.uid()::text
+);
+
+-- DELETE: propriétaire ou admin
+DROP POLICY IF EXISTS "Users can delete own article media or admin" ON storage.objects;
+CREATE POLICY "Users can delete own article media or admin"
+ON storage.objects FOR DELETE
+TO authenticated
+USING (
+  bucket_id = 'articles-media'
+  AND (
+    (storage.foldername(name))[1] = auth.uid()::text
+    OR EXISTS (
+      SELECT 1 FROM public.users u
+      WHERE u.id = auth.uid()
+      AND u.role = 'admin'
+    )
+  )
+);
+
+-- ================================================
+-- 7. CRÉER LE BUCKET "evenements-media"
+-- ================================================
+
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'evenements-media',
+  'evenements-media',
+  true,  -- Public pour affichage direct des images événements
+  5242880,  -- 5MB max
+  ARRAY['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+)
+ON CONFLICT (id) DO NOTHING;
+
+-- ================================================
+-- 8. POLICIES POUR LE BUCKET "evenements-media"
+-- ================================================
+
+-- SELECT: lecture publique des médias événements
+DROP POLICY IF EXISTS "Anyone can view evenements media" ON storage.objects;
+CREATE POLICY "Anyone can view evenements media"
+ON storage.objects FOR SELECT
+TO public
+USING (
+  bucket_id = 'evenements-media'
+);
+
+-- INSERT: utilisateur authentifié peut uploader dans son dossier
+DROP POLICY IF EXISTS "Users can upload own evenements media" ON storage.objects;
+CREATE POLICY "Users can upload own evenements media"
+ON storage.objects FOR INSERT
+TO authenticated
+WITH CHECK (
+  bucket_id = 'evenements-media'
+  AND (storage.foldername(name))[1] = auth.uid()::text
+);
+
+-- UPDATE: utilisateur authentifié peut modifier ses fichiers
+DROP POLICY IF EXISTS "Users can update own evenements media" ON storage.objects;
+CREATE POLICY "Users can update own evenements media"
+ON storage.objects FOR UPDATE
+TO authenticated
+USING (
+  bucket_id = 'evenements-media'
+  AND (storage.foldername(name))[1] = auth.uid()::text
+);
+
+-- DELETE: propriétaire ou admin
+DROP POLICY IF EXISTS "Users can delete own evenements media or admin" ON storage.objects;
+CREATE POLICY "Users can delete own evenements media or admin"
+ON storage.objects FOR DELETE
+TO authenticated
+USING (
+  bucket_id = 'evenements-media'
+  AND (
+    (storage.foldername(name))[1] = auth.uid()::text
+    OR EXISTS (
+      SELECT 1 FROM public.users u
+      WHERE u.id = auth.uid()
+      AND u.role = 'admin'
+    )
+  )
+);
+
+-- ================================================
 -- VÉRIFICATION
 -- ================================================
 SELECT
@@ -141,5 +269,5 @@ SELECT
   name as policy_name,
   definition
 FROM storage.policies
-WHERE bucket_id IN ('diplomes', 'alumni-photos')
+WHERE bucket_id IN ('diplomes', 'alumni-photos', 'articles-media', 'evenements-media')
 ORDER BY name;

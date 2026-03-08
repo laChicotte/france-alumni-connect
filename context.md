@@ -5,6 +5,7 @@ Ici on travaille étape par étape et selon des règles c'est à dire:
 -Si je te pose une question et que tu dois modifier un fichier existant tu m'avertis d'abord en m'expliquant le pourquoi et à quoi ca va servir et seulement après validation tu pourra avancer
 -Concernant supabase, si on doit ajouter de nouvelles règles tu les proposes d'abord dans le chat je vais les executer essayer si ca marche je vais te dire on va les mettre avec les autres si ca ne marche pas je te dirai tu vas me donner les instructions pour annuler ce qu'on a fait.
 -Tjrs dans supabase si on retire ou annule certaines règles tu dois me le dire aussi pour qu'on les retire des fichiers dans ./supabase/ pour ne faire de conflits plutard
+-avant tout modification dans ./supabase/ ou contex.md l'ordre doit venir explicitement de moi et c'est non negociable
 **Ce qui marche pour le moment et qu'on ne touche pas**
 - La page de login et sa logique : on ne touche et on me previent avec grande attention avant de faire quoi que ce soit dessus
 - L'affichage, l'approbation, et la suppression d'un user depuis l'interface admin
@@ -44,4 +45,19 @@ Ici on travaille étape par étape et selon des règles c'est à dire:
 - Les stats annuaire utilisent les données réelles disponibles en base avec fallback sur les anciennes valeurs si la donnée n'est pas disponible.
 - Les 3 cartes alumni de la page d'accueil utilisent des profils réels via l'API preview avec fallback sur les anciennes cartes locales.
 **Sur quoi on travaille actuellement**
-
+- Module Articles (admin) terminé côté base + backoffice:
+  - Refonte `articles` (champ `image_couverture_url`, `status`, `date_publication`) et ajout table `article_media`.
+  - RLS `articles`/`article_media` alignées: admin = tout, modérateur = ses contenus, lecture publiée pour les utilisateurs connectés.
+  - Bucket storage `articles-media` ajouté avec policies dédiées.
+  - Backoffice articles refait en pages dédiées:
+    - `/admin/articles` = liste + actions
+    - `/admin/articles/nouveau` et `/admin/articles/[id]/modifier` = éditeur riche plein écran.
+  - Éditeur riche modernisé (icônes type Word): H1/H2/H3, gras, italique, souligné, puces, numérotation, citation, alignements gauche/centre/droite/justifié, lien.
+  - Aperçu "lecteur final" intégré (logo en haut gauche, titre centré, auteur+date, extrait, couverture, contenu, médias de fin en carrousel horizontal).
+  - Zones édition/aperçu scrollables pour les articles longs.
+- Module Événements (simple) en place:
+  - Admin `/admin/evenements` en vue cartes avec actions: créer, modifier, marquer "terminé", supprimer.
+  - Page publique `/evenements` ajoutée avec cartes et bouton `S'inscrire`.
+  - API d'inscription: `/api/evenements/inscription`.
+  - Inscriptions sécurisées en base: anti-doublon + contrôle capacité (`places_max`).
+  - Photo événement via upload fichier (optionnelle) dans bucket `evenements-media` (plus d'URL manuelle dans le formulaire admin).

@@ -43,3 +43,35 @@ BEGIN
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
+-- ================================================
+-- 3. FONCTION CHECK_EVENT_CAPACITY (inscriptions)
+-- ================================================
+CREATE OR REPLACE FUNCTION public.check_event_capacity()
+RETURNS trigger AS $$
+DECLARE
+  v_places_max integer;
+  v_current_count integer;
+BEGIN
+  SELECT e.places_max
+  INTO v_places_max
+  FROM public.evenements e
+  WHERE e.id = NEW.evenement_id;
+
+  -- Si places_max est NULL => inscriptions illimitées
+  IF v_places_max IS NULL THEN
+    RETURN NEW;
+  END IF;
+
+  SELECT count(*)
+  INTO v_current_count
+  FROM public.inscriptions_evenements ie
+  WHERE ie.evenement_id = NEW.evenement_id;
+
+  IF v_current_count >= v_places_max THEN
+    RAISE EXCEPTION 'Cet événement est complet';
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;

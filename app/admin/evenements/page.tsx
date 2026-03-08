@@ -8,26 +8,19 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
-import { Switch } from "@/components/ui/switch"
-import {
-  Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
-} from "@/components/ui/table"
-import {
-  DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog"
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
-import { Search, MoreHorizontal, Plus, Pencil, Trash2, Archive, Power, Users, Loader2 } from "lucide-react"
+import { Search, Plus, Pencil, Trash2, Archive, Loader2, CalendarDays, MapPin, Clock3 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import type { Evenement, TypeEvenement } from "@/types/database.types"
 
 interface EvenementWithType extends Evenement {
   types_evenements?: { libelle: string } | null
-  _count?: { inscriptions_evenements: number }
+  inscriptions_count?: number
 }
 
 export default function EvenementsPage() {
@@ -41,6 +34,8 @@ export default function EvenementsPage() {
   const [dialogAction, setDialogAction] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [currentUser, setCurrentUser] = useState<any>(null)
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null)
 
   const [formData, setFormData] = useState({
     titre: "", slug: "", date: "", heure: "", lieu: "", type_evenement_id: "",
@@ -56,11 +51,23 @@ export default function EvenementsPage() {
 
   const fetchEvenements = async () => {
     setIsLoading(true)
-    const { data, error } = await supabase
+    const { data, error } = await (supabase
       .from('evenements')
-      .select('*, types_evenements(libelle)')
-      .order('date', { ascending: false })
-    if (!error) setEvenements(data || [])
+      .select('*, types_evenements(libelle)') as any)
+      .order('date', { ascending: true })
+    if (!error) {
+      const events = (data || []) as EvenementWithType[]
+      const withCounts = await Promise.all(
+        events.map(async (event) => {
+          const { count } = await (supabase
+            .from("inscriptions_evenements") as any)
+            .select("*", { count: "exact", head: true })
+            .eq("evenement_id", event.id)
+          return { ...event, inscriptions_count: count || 0 }
+        })
+      )
+      setEvenements(withCounts)
+    }
     setIsLoading(false)
   }
 
@@ -73,45 +80,87 @@ export default function EvenementsPage() {
     return titre.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')
   }
 
+  const uploadEventImage = async (file: File) => {
+    const ext = file.name.split(".").pop()?.toLowerCase() || "jpg"
+    const path = `${currentUser?.id || "unknown"}/event_${Date.now()}.${ext}`
+    const { data, error } = await supabase.storage
+      .from("evenements-media")
+      .upload(path, file, {
+        contentType: file.type,
+        upsert: true,
+      })
+
+    if (error || !data) throw error || new Error("Upload image événement échoué")
+    const { data: publicData } = supabase.storage.from("evenements-media").getPublicUrl(data.path)
+    return publicData.publicUrl
+  }
+
+  const handleImageSelect = (file: File | null) => {
+    setImageFile(file)
+    if (!file) {
+      setImagePreviewUrl(formData.image_url || null)
+      return
+    }
+    setImagePreviewUrl(URL.createObjectURL(file))
+  }
+
   const handleCreate = async () => {
     setIsSubmitting(true)
-    const { error } = await supabase.from('evenements').insert({
-      ...formData,
-      slug: formData.slug || generateSlug(formData.titre),
-      places_max: formData.places_max ? parseInt(formData.places_max) : null,
-      organisateur_id: currentUser?.id
-    })
-    if (!error) { fetchEvenements(); setDialogAction(null); resetForm() }
+    try {
+      let imageUrl = formData.image_url || ""
+      if (imageFile) {
+        imageUrl = await uploadEventImage(imageFile)
+      }
+      if (!imageUrl) {
+        imageUrl = "/placeholder.svg"
+      }
+
+      const { error } = await (supabase.from('evenements') as any).insert({
+        ...formData,
+        image_url: imageUrl,
+        slug: formData.slug || generateSlug(formData.titre),
+        places_max: formData.places_max ? parseInt(formData.places_max) : null,
+        organisateur_id: currentUser?.id
+      })
+      if (!error) { fetchEvenements(); setDialogAction(null); resetForm() }
+    } catch (error) {
+      console.error("Erreur création événement:", error)
+    }
     setIsSubmitting(false)
   }
 
   const handleUpdate = async () => {
     if (!selectedEvent) return
     setIsSubmitting(true)
-    const { error } = await supabase.from('evenements').update({
-      ...formData,
-      slug: formData.slug || generateSlug(formData.titre),
-      places_max: formData.places_max ? parseInt(formData.places_max) : null
-    }).eq('id', selectedEvent.id)
-    if (!error) { fetchEvenements(); setDialogAction(null); resetForm() }
+    try {
+      let imageUrl = formData.image_url || selectedEvent.image_url || "/placeholder.svg"
+      if (imageFile) {
+        imageUrl = await uploadEventImage(imageFile)
+      }
+
+      const { error } = await (supabase.from('evenements') as any).update({
+        ...formData,
+        image_url: imageUrl,
+        slug: formData.slug || generateSlug(formData.titre),
+        places_max: formData.places_max ? parseInt(formData.places_max) : null
+      }).eq('id', selectedEvent.id)
+      if (!error) { fetchEvenements(); setDialogAction(null); resetForm() }
+    } catch (error) {
+      console.error("Erreur update événement:", error)
+    }
     setIsSubmitting(false)
   }
 
   const handleDelete = async () => {
     if (!selectedEvent) return
     setIsSubmitting(true)
-    const { error } = await supabase.from('evenements').delete().eq('id', selectedEvent.id)
+    const { error } = await (supabase.from('evenements') as any).delete().eq('id', selectedEvent.id)
     if (!error) { fetchEvenements(); setDialogAction(null); setSelectedEvent(null) }
     setIsSubmitting(false)
   }
 
-  const handleArchive = async (event: EvenementWithType) => {
-    await supabase.from('evenements').update({ archive: !event.archive }).eq('id', event.id)
-    fetchEvenements()
-  }
-
-  const handleToggleActif = async (event: EvenementWithType) => {
-    await supabase.from('evenements').update({ actif: !event.actif }).eq('id', event.id)
+  const handleMarkTerminated = async (event: EvenementWithType) => {
+    await (supabase.from('evenements') as any).update({ archive: true, actif: false }).eq('id', event.id)
     fetchEvenements()
   }
 
@@ -120,6 +169,8 @@ export default function EvenementsPage() {
       titre: "", slug: "", date: "", heure: "", lieu: "", type_evenement_id: "",
       description: "", image_url: "", places_max: "", lien_visio: "", actif: true, archive: false
     })
+    setImageFile(null)
+    setImagePreviewUrl(null)
     setSelectedEvent(null)
   }
 
@@ -132,13 +183,15 @@ export default function EvenementsPage() {
       places_max: event.places_max?.toString() || "", lien_visio: event.lien_visio || "",
       actif: event.actif, archive: event.archive
     })
+    setImageFile(null)
+    setImagePreviewUrl(event.image_url || null)
     setDialogAction('edit')
   }
 
   const filteredEvents = evenements.filter(e => {
     const matchesSearch = e.titre.toLowerCase().includes(searchTerm.toLowerCase()) || e.lieu.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesType = filterType === 'all' || e.type_evenement_id === filterType
-    const matchesArchive = filterArchive === 'all' || (filterArchive === 'archive' ? e.archive : !e.archive)
+    const matchesArchive = filterArchive === 'all' || (filterArchive === 'termine' ? e.archive : !e.archive)
     return matchesSearch && matchesType && matchesArchive
   })
 
@@ -173,8 +226,8 @@ export default function EvenementsPage() {
               <SelectTrigger className="w-full sm:w-[150px]"><SelectValue placeholder="Statut" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">Tous</SelectItem>
-                <SelectItem value="actif">Actifs</SelectItem>
-                <SelectItem value="archive">Archivés</SelectItem>
+                <SelectItem value="actif">Ouverts</SelectItem>
+                <SelectItem value="termine">Terminés</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -182,66 +235,62 @@ export default function EvenementsPage() {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle>Liste des événements ({filteredEvents.length})</CardTitle></CardHeader>
+        <CardHeader><CardTitle>Événements ({filteredEvents.length})</CardTitle></CardHeader>
         <CardContent>
           {isLoading ? (
             <div className="flex justify-center py-8"><Loader2 className="h-8 w-8 animate-spin text-gray-400" /></div>
+          ) : filteredEvents.length === 0 ? (
+            <p className="text-center py-8 text-gray-500">Aucun événement trouvé</p>
           ) : (
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Événement</TableHead>
-                  <TableHead>Type</TableHead>
-                  <TableHead>Date</TableHead>
-                  <TableHead>Lieu</TableHead>
-                  <TableHead>Statut</TableHead>
-                  <TableHead className="text-right">Actions</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {filteredEvents.length === 0 ? (
-                  <TableRow><TableCell colSpan={6} className="text-center py-8 text-gray-500">Aucun événement trouvé</TableCell></TableRow>
-                ) : (
-                  filteredEvents.map((event) => (
-                    <TableRow key={event.id} className={event.archive ? 'opacity-50' : ''}>
-                      <TableCell className="font-medium">{event.titre}</TableCell>
-                      <TableCell>{event.types_evenements?.libelle || '-'}</TableCell>
-                      <TableCell>{new Date(event.date).toLocaleDateString('fr-FR')} à {event.heure}</TableCell>
-                      <TableCell>{event.lieu}</TableCell>
-                      <TableCell>
-                        {event.archive ? (
-                          <Badge variant="outline">Archivé</Badge>
-                        ) : event.actif ? (
-                          <Badge className="bg-green-100 text-green-700 hover:bg-green-100">Actif</Badge>
-                        ) : (
-                          <Badge variant="outline">Inactif</Badge>
-                        )}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild><Button variant="ghost" size="icon"><MoreHorizontal className="h-4 w-4" /></Button></DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => openEditDialog(event)}><Pencil className="mr-2 h-4 w-4" /> Modifier</DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleToggleActif(event)}>
-                              <Power className="mr-2 h-4 w-4" /> {event.actif ? 'Désactiver' : 'Activer'}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleArchive(event)}>
-                              <Archive className="mr-2 h-4 w-4" /> {event.archive ? 'Désarchiver' : 'Archiver'}
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-red-600" onClick={() => { setSelectedEvent(event); setDialogAction('delete') }}>
-                              <Trash2 className="mr-2 h-4 w-4" /> Supprimer
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                )}
-              </TableBody>
-            </Table>
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+              {filteredEvents.map((event) => (
+                <Card key={event.id} className={event.archive ? "opacity-70 border-dashed" : ""}>
+                  <img src={event.image_url || "/placeholder.svg"} alt={event.titre} className="h-40 w-full object-cover rounded-t-lg" />
+                  <CardContent className="pt-4 space-y-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <Badge variant="outline">{event.types_evenements?.libelle || "Événement"}</Badge>
+                      {event.archive ? (
+                        <Badge variant="secondary">Terminé</Badge>
+                      ) : (
+                        <Badge className="bg-green-100 text-green-700 hover:bg-green-100">Ouvert</Badge>
+                      )}
+                    </div>
+
+                    <h3 className="font-semibold text-lg line-clamp-2">{event.titre}</h3>
+                    <p className="text-sm text-muted-foreground line-clamp-3">{event.description}</p>
+
+                    <div className="space-y-1 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-2"><CalendarDays className="h-4 w-4 text-[#3558A2]" />{new Date(event.date).toLocaleDateString('fr-FR')}</div>
+                      <div className="flex items-center gap-2"><Clock3 className="h-4 w-4 text-[#3558A2]" />{event.heure}</div>
+                      <div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-[#3558A2]" />{event.lieu}</div>
+                    </div>
+
+                    <p className="text-xs text-muted-foreground">
+                      Inscriptions: {event.inscriptions_count || 0}
+                      {event.places_max ? ` / ${event.places_max}` : " (illimité)"}
+                    </p>
+
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      <Button variant="outline" size="sm" onClick={() => openEditDialog(event)}>
+                        <Pencil className="mr-2 h-4 w-4" /> Modifier
+                      </Button>
+                      {!event.archive && (
+                        <Button variant="outline" size="sm" onClick={() => handleMarkTerminated(event)}>
+                          <Archive className="mr-2 h-4 w-4" /> Marquer terminé
+                        </Button>
+                      )}
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => { setSelectedEvent(event); setDialogAction('delete') }}
+                      >
+                        <Trash2 className="mr-2 h-4 w-4" /> Supprimer
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           )}
         </CardContent>
       </Card>
@@ -293,23 +342,34 @@ export default function EvenementsPage() {
               </div>
             </div>
             <div className="space-y-2">
-              <Label>Image URL *</Label>
-              <Input value={formData.image_url} onChange={(e) => setFormData({ ...formData, image_url: e.target.value })} placeholder="https://..." />
+              <Label>Photo événement (optionnel)</Label>
+              <Input
+                type="file"
+                accept="image/png,image/jpeg,image/jpg,image/webp"
+                onChange={(e) => handleImageSelect(e.target.files?.[0] || null)}
+              />
+              {imagePreviewUrl && (
+                <img
+                  src={imagePreviewUrl}
+                  alt="Aperçu photo événement"
+                  className="w-full max-h-48 rounded-md border object-cover"
+                />
+              )}
             </div>
             <div className="space-y-2">
               <Label>Description *</Label>
               <Textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={4} />
             </div>
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <Switch checked={formData.actif} onCheckedChange={(v) => setFormData({ ...formData, actif: v })} />
-                <Label>Événement actif</Label>
-              </div>
-            </div>
+            <p className="text-sm text-muted-foreground">
+              Les nouveaux événements sont créés comme ouverts. Vous pourrez ensuite les marquer "terminés".
+            </p>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => { setDialogAction(null); resetForm() }}>Annuler</Button>
-            <Button onClick={dialogAction === 'create' ? handleCreate : handleUpdate} disabled={isSubmitting || !formData.titre || !formData.date || !formData.heure || !formData.lieu || !formData.description || !formData.image_url}>
+            <Button
+              onClick={dialogAction === 'create' ? handleCreate : handleUpdate}
+              disabled={isSubmitting || !formData.titre || !formData.date || !formData.heure || !formData.lieu || !formData.description}
+            >
               {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : (dialogAction === 'create' ? 'Créer' : 'Enregistrer')}
             </Button>
           </DialogFooter>

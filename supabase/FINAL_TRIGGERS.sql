@@ -52,6 +52,14 @@ CREATE TRIGGER update_partenaires_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at();
 
+-- Table: inscriptions_evenements
+-- Vérifie la capacité max avant inscription
+DROP TRIGGER IF EXISTS trg_check_event_capacity ON inscriptions_evenements;
+CREATE TRIGGER trg_check_event_capacity
+  BEFORE INSERT ON inscriptions_evenements
+  FOR EACH ROW
+  EXECUTE FUNCTION check_event_capacity();
+
 -- ================================================
 -- NOTE IMPORTANTE:
 -- Il n'y a PAS de trigger sur auth.users

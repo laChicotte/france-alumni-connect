@@ -3,6 +3,7 @@ export type UserStatus = 'en_attente' | 'actif' | 'banni'
 export type DiplomeType = 'licence' | 'master' | 'doctorat' | 'mba' | 'ingenieur' | 'autre'
 export type GenreType = 'Homme' | 'Femme' | 'Autre'
 export type ArticleStatus = 'brouillon' | 'publie'
+export type ArticleMediaType = 'image' | 'video'
 export type JobType = 'cdi' | 'cdd' | 'stage' | 'freelance' | 'alternance'
 
 export interface Database {
@@ -121,8 +122,7 @@ export interface Database {
           slug: string
           extrait: string | null
           contenu: string
-          image_url: string | null
-          tags: string | null
+          image_couverture_url: string
           categorie_id: string | null
           auteur_id: string | null
           status: ArticleStatus
@@ -137,8 +137,7 @@ export interface Database {
           slug: string
           extrait?: string | null
           contenu: string
-          image_url?: string | null
-          tags?: string | null
+          image_couverture_url: string
           categorie_id?: string | null
           auteur_id?: string | null
           status?: ArticleStatus
@@ -152,14 +151,37 @@ export interface Database {
           slug?: string
           extrait?: string | null
           contenu?: string
-          image_url?: string | null
-          tags?: string | null
+          image_couverture_url?: string
           categorie_id?: string | null
           auteur_id?: string | null
           status?: ArticleStatus
           date_publication?: string | null
           vues?: number
           updated_at?: string
+        }
+      }
+      article_media: {
+        Row: {
+          id: string
+          article_id: string
+          media_type: ArticleMediaType
+          media_url: string
+          ordre: number
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          article_id: string
+          media_type: ArticleMediaType
+          media_url: string
+          ordre?: number
+          created_at?: string
+        }
+        Update: {
+          article_id?: string
+          media_type?: ArticleMediaType
+          media_url?: string
+          ordre?: number
         }
       }
       emplois: {
@@ -413,6 +435,7 @@ export interface Database {
 export type User = Database['public']['Tables']['users']['Row']
 export type AlumniProfile = Database['public']['Tables']['alumni_profiles']['Row']
 export type Article = Database['public']['Tables']['articles']['Row']
+export type ArticleMedia = Database['public']['Tables']['article_media']['Row']
 export type Emploi = Database['public']['Tables']['emplois']['Row']
 export type Evenement = Database['public']['Tables']['evenements']['Row']
 export type InscriptionEvenement = Database['public']['Tables']['inscriptions_evenements']['Row']
