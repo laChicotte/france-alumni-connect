@@ -44,7 +44,6 @@ Ici on travaille étape par étape et selon des règles c'est à dire:
 - Le schéma TypeScript (`types/database.types.ts`) est aligné avec `genre` sur `alumni_profiles`.
 - Les stats annuaire utilisent les données réelles disponibles en base avec fallback sur les anciennes valeurs si la donnée n'est pas disponible.
 - Les 3 cartes alumni de la page d'accueil utilisent des profils réels via l'API preview avec fallback sur les anciennes cartes locales.
-**Sur quoi on travaille actuellement**
 - Module Articles (admin) terminé côté base + backoffice:
   - Refonte `articles` (champ `image_couverture_url`, `status`, `date_publication`) et ajout table `article_media`.
   - RLS `articles`/`article_media` alignées: admin = tout, modérateur = ses contenus, lecture publiée pour les utilisateurs connectés.
@@ -61,3 +60,15 @@ Ici on travaille étape par étape et selon des règles c'est à dire:
   - API d'inscription: `/api/evenements/inscription`.
   - Inscriptions sécurisées en base: anti-doublon + contrôle capacité (`places_max`).
   - Photo événement via upload fichier (optionnelle) dans bucket `evenements-media` (plus d'URL manuelle dans le formulaire admin).
+- La page d'accueil a été dynamisée avec des données réelles:
+  - Articles: les cartes existantes affichent les 3 derniers articles.
+  - Événements: la section affiche 2 événements (priorité aux non terminés, puis terminés si besoin).
+- NB respecté:
+  - Aucun changement de design sur les cartes existantes.
+  - Seules les informations affichées ont été mises à jour.
+- Ajustements validés sur les articles publics (home + détail):
+  - Depuis la home, cliquer sur une carte article ouvre directement la page détail de cet article (`/actualites/[id]`), même si l'utilisateur n'est pas connecté.
+  - La page détail publique d'un article est alignée sur le rendu "Aperçu final lecteur" du backoffice (logo en haut gauche, titre centré, auteur+date, extrait, couverture, contenu riche, médias de fin en carrousel horizontal).
+  - La largeur d'affichage de la page détail article a été augmentée pour un rendu plus confortable.
+  **Ce qu'on va faire tout de suite'**
+  On va essayer de brancher la page actualités (articles et évements)

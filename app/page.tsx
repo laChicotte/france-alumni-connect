@@ -19,6 +19,23 @@ type HomeFeaturedAlumni = {
   university: string
 }
 
+type HomeFeaturedArticle = {
+  id: string | number
+  title: string
+  image: string
+  category: string
+  author: string
+  date: string
+}
+
+type HomeUpcomingEvent = {
+  id: string | number
+  title: string
+  date: string
+  time: string
+  place: string
+}
+
 export default function HomePage() {
   const heroRef = useRef<HTMLDivElement | null>(null)
   const badgeRef = useRef<HTMLDivElement | null>(null)
@@ -27,7 +44,15 @@ export default function HomePage() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [userPhotoUrl, setUserPhotoUrl] = useState<string | null>(null)
-  const featuredArticles = articles.slice(0, 3)
+  const fallbackFeaturedArticles: HomeFeaturedArticle[] = articles.slice(0, 3).map((article) => ({
+    id: article.id,
+    title: article.title,
+    image: article.image || "/placeholder.svg",
+    category: article.category,
+    author: article.author,
+    date: article.date,
+  }))
+  const [featuredArticles, setFeaturedArticles] = useState<HomeFeaturedArticle[]>(fallbackFeaturedArticles)
   const fallbackFeaturedAlumni: HomeFeaturedAlumni[] = alumniMembers.slice(-3).map((member) => ({
     id: member.id,
     name: member.name,
@@ -37,7 +62,17 @@ export default function HomePage() {
     university: member.university || "—",
   }))
   const [featuredAlumni, setFeaturedAlumni] = useState<HomeFeaturedAlumni[]>(fallbackFeaturedAlumni)
-  const upcomingEvents = articles.filter((a) => a.category === "Événements").slice(0, 2)
+  const fallbackUpcomingEvents: HomeUpcomingEvent[] = articles
+    .filter((a) => a.category === "Événements")
+    .slice(0, 2)
+    .map((event) => ({
+      id: event.id,
+      title: event.title,
+      date: event.date,
+      time: "—",
+      place: "—",
+    }))
+  const [upcomingEvents, setUpcomingEvents] = useState<HomeUpcomingEvent[]>(fallbackUpcomingEvents)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -132,6 +167,27 @@ export default function HomePage() {
     }
 
     loadFeaturedAlumni()
+  }, [])
+
+  useEffect(() => {
+    const loadHomeHighlights = async () => {
+      try {
+        const res = await fetch("/api/home/highlights", { cache: "no-store" })
+        const data = await res.json().catch(() => null)
+        if (!res.ok || !data) return
+
+        if (Array.isArray(data.articles) && data.articles.length > 0) {
+          setFeaturedArticles(data.articles as HomeFeaturedArticle[])
+        }
+        if (Array.isArray(data.events) && data.events.length > 0) {
+          setUpcomingEvents(data.events as HomeUpcomingEvent[])
+        }
+      } catch {
+        // fallback silencieux
+      }
+    }
+
+    loadHomeHighlights()
   }, [])
 
   return (
@@ -349,18 +405,20 @@ export default function HomePage() {
                             </div>
                             <div className="flex items-center gap-2">
                               <Clock className="h-3 w-3" />
-                              <span>—</span>
+                              <span>{event.time}</span>
                             </div>
                             <div className="flex items-center gap-2">
                               <MapPinIcon className="h-3 w-3" />
-                              <span className="line-clamp-1">—</span>
+                              <span className="line-clamp-1">{event.place}</span>
                             </div>
                           </div>
                           <div className="mt-1 flex items-center justify-between">
                             <span className="text-xs text-muted-foreground">&nbsp;</span>
-                            <Button size="sm" variant="outline" className="text-xs h-6 px-2">
+                            <Link href="/evenements">
+                              <Button size="sm" variant="outline" className="text-xs h-6 px-2">
                               S'inscrire
-                            </Button>
+                              </Button>
+                            </Link>
                           </div>
                         </div>
                       </div>
