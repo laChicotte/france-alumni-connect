@@ -54,6 +54,10 @@ export default function UtilisateursPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   // État pour le formulaire d'ajout admin/moderateur
+  const [currentPage, setCurrentPage] = useState(1)
+  const PAGE_SIZE = 5
+
+  // État pour le formulaire d'ajout admin/moderateur
   const [showAddDialog, setShowAddDialog] = useState(false)
   const [addError, setAddError] = useState<string | null>(null)
   const [newUser, setNewUser] = useState({
@@ -122,7 +126,8 @@ export default function UtilisateursPage() {
     try {
       // Appeler la fonction RPC qui supprime complètement l'utilisateur
       // (auth.users + users + alumni_profiles)
-      const { error } = await supabase.rpc('delete_user_completely', {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase as any).rpc('delete_user_completely', {
         user_id_to_delete: user.id
       })
 
@@ -225,6 +230,10 @@ export default function UtilisateursPage() {
     return matchesSearch && matchesStatus && matchesRole
   })
 
+  const totalPages = Math.max(1, Math.ceil(filteredUsers.length / PAGE_SIZE))
+  const safePage = Math.min(currentPage, totalPages)
+  const paginatedUsers = filteredUsers.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE)
+
   const getStatusBadge = (status: string) => {
     switch (status) {
       case 'actif':
@@ -253,9 +262,9 @@ export default function UtilisateursPage() {
 
   return (
     <AdminWrapper>
-      <div className="p-6">
+      <div className="p-1">
         {/* Header */}
-        <div className="flex justify-between items-start mb-8">
+        <div className="flex justify-between items-start mb-2">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Utilisateurs</h1>
             <p className="text-gray-500">Gérez les comptes utilisateurs de la plateforme</p>
@@ -267,19 +276,19 @@ export default function UtilisateursPage() {
         </div>
 
       {/* Filters */}
-      <Card className="mb-6">
-        <CardContent className="pt-6">
+      <Card>
+        <CardContent className="pt-1">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
                 placeholder="Rechercher par nom ou email..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => { setSearchTerm(e.target.value); setCurrentPage(1) }}
                 className="pl-10"
               />
             </div>
-            <Select value={filterStatus} onValueChange={setFilterStatus}>
+            <Select value={filterStatus} onValueChange={(v) => { setFilterStatus(v); setCurrentPage(1) }}>
               <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder="Statut" />
               </SelectTrigger>
@@ -290,7 +299,7 @@ export default function UtilisateursPage() {
                 <SelectItem value="banni">Banni</SelectItem>
               </SelectContent>
             </Select>
-            <Select value={filterRole} onValueChange={setFilterRole}>
+            <Select value={filterRole} onValueChange={(v) => { setFilterRole(v); setCurrentPage(1) }}>
               <SelectTrigger className="w-full sm:w-[180px]">
                 <SelectValue placeholder="Rôle" />
               </SelectTrigger>
@@ -316,6 +325,7 @@ export default function UtilisateursPage() {
               <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
             </div>
           ) : (
+            <div style={{ minHeight: '320px' }}>
             <Table>
               <TableHeader>
                 <TableRow>
@@ -328,14 +338,14 @@ export default function UtilisateursPage() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {filteredUsers.length === 0 ? (
+                {paginatedUsers.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="text-center py-8 text-gray-500">
                       Aucun utilisateur trouvé
                     </TableCell>
                   </TableRow>
                 ) : (
-                  filteredUsers.map((user) => (
+                  paginatedUsers.map((user) => (
                     <TableRow key={user.id}>
                       <TableCell className="font-medium">
                         {user.prenom && user.nom
@@ -421,7 +431,66 @@ export default function UtilisateursPage() {
                 )}
               </TableBody>
             </Table>
+            </div>
           )}
+
+          {/* Pagination */}
+          <div className="flex items-center justify-between mt-4 pt-4 border-t">
+            <span className="text-sm text-gray-500">
+              {filteredUsers.length === 0
+                ? "0 résultat"
+                : `${(safePage - 1) * PAGE_SIZE + 1}–${Math.min(safePage * PAGE_SIZE, filteredUsers.length)} sur ${filteredUsers.length} utilisateur${filteredUsers.length > 1 ? 's' : ''}`
+              }
+            </span>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setCurrentPage(1)}
+                disabled={safePage === 1}
+              >
+                <span className="text-xs font-bold">«</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={safePage === 1}
+              >
+                <span className="text-xs font-bold">‹</span>
+              </Button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                <Button
+                  key={page}
+                  size="icon"
+                  className={`h-8 w-8 text-xs ${page === safePage ? 'bg-[#3558A2] text-white hover:bg-[#3558A2]/90' : 'bg-white text-gray-700 border border-gray-200 hover:bg-gray-50'}`}
+                  onClick={() => setCurrentPage(page)}
+                >
+                  {page}
+                </Button>
+              ))}
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={safePage === totalPages}
+              >
+                <span className="text-xs font-bold">›</span>
+              </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => setCurrentPage(totalPages)}
+                disabled={safePage === totalPages}
+              >
+                <span className="text-xs font-bold">»</span>
+              </Button>
+            </div>
+          </div>
         </CardContent>
       </Card>
 
