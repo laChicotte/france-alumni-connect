@@ -83,5 +83,10 @@ Ici on travaille étape par étape et selon des règles c'est à dire:
   - RLS table `partenaires` alignées: `admin` et `moderateur` ont les mêmes droits de gestion.
   - Page publique `/a-propos` section partenaires branchée à la base via API (`/api/partenaires/public`) avec fallback local.
   - Affichage partenaires en animation horizontale continue (marquee fluide infinie).
-**Prochaine étape proposée**
+- Création admin/modérateur depuis le backoffice corrigée:
+  - Nouvelle API `/api/admin/creer-utilisateur` avec service role (même pattern que l'inscription alumni).
+  - `auth.admin.createUser()` avec `email_confirm: true` + insert direct dans `public.users` avec le bon rôle et `status: 'actif'`.
+  - Rollback automatique (suppression auth) si l'insert dans `public.users` échoue.
+  - `handleAddUser` dans `/admin/utilisateurs` appelle désormais cette API au lieu de faire des appels directs Supabase côté client (qui échouaient à cause des RLS).
+**Prochaine étape pour plutard**
 - Continuer les ajustements visuels (images/hero) sur `a-propos`, `formation`, `annuaire` et autres pages publiques selon validation.

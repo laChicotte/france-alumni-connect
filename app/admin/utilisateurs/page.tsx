@@ -164,67 +164,24 @@ export default function UtilisateursPage() {
     }
 
     try {
-      // 1. Créer l'utilisateur avec Supabase Auth
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: newUser.email,
-        password: newUser.password,
-        options: {
-          data: {
-            nom: newUser.nom,
-            prenom: newUser.prenom,
-          }
-        }
-      })
-
-      if (authError) {
-        if (authError.message.includes("already registered")) {
-          setAddError("Un compte existe déjà avec cette adresse email")
-        } else if (authError.message.includes("rate limit")) {
-          setAddError("Trop de tentatives. Veuillez réessayer dans quelques minutes.")
-        } else {
-          setAddError(authError.message)
-        }
-        setIsSubmitting(false)
-        return
-      }
-
-      if (!authData.user) {
-        setAddError("Erreur lors de la création du compte")
-        setIsSubmitting(false)
-        return
-      }
-
-      // Attendre que le trigger crée l'entrée dans users
-      await new Promise(resolve => setTimeout(resolve, 1000))
-
-      // 2. Mettre à jour le rôle et le statut (le trigger crée avec role='alumni' et status='en_attente')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error: updateError } = await (supabase.from('users') as any)
-        .update({
-          role: newUser.role,
-          status: 'actif',
-          nom: newUser.nom,
-          prenom: newUser.prenom
-        })
-        .eq('id', authData.user.id)
-
-      if (updateError) {
-        console.error('Erreur mise à jour:', updateError)
-        // Si le trigger n'a pas créé l'utilisateur, on l'insère manuellement
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { error: insertError } = await (supabase.from('users') as any).insert({
-          id: authData.user.id,
+      const response = await fetch('/api/admin/creer-utilisateur', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           email: newUser.email,
+          password: newUser.password,
           nom: newUser.nom,
           prenom: newUser.prenom,
           role: newUser.role,
-          status: 'actif'
-        })
+        }),
+      })
 
-        if (insertError) {
-          console.error('Erreur insertion:', insertError)
-          setAddError("L'utilisateur a été créé mais son profil n'a pas pu être configuré")
-        }
+      const result = await response.json()
+
+      if (!response.ok) {
+        setAddError(result.error || "Une erreur est survenue")
+        setIsSubmitting(false)
+        return
       }
 
       // Succès
