@@ -262,6 +262,75 @@ USING (
 );
 
 -- ================================================
+-- 9. CRÉER LE BUCKET "logo-partenaire"
+-- ================================================
+
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'logo-partenaire',
+  'logo-partenaire',
+  true,  -- Public pour affichage direct dans la section partenaires
+  3145728,  -- 3MB max
+  ARRAY['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/svg+xml']
+)
+ON CONFLICT (id) DO NOTHING;
+
+-- ================================================
+-- 10. POLICIES POUR LE BUCKET "logo-partenaire"
+-- ================================================
+
+-- SELECT: lecture publique des logos partenaires
+DROP POLICY IF EXISTS "Anyone can view partenaires logos" ON storage.objects;
+CREATE POLICY "Anyone can view partenaires logos"
+ON storage.objects FOR SELECT
+TO public
+USING (
+  bucket_id = 'logo-partenaire'
+);
+
+-- INSERT: admin et modérateur (mêmes droits)
+DROP POLICY IF EXISTS "Admins and moderators can upload partenaires logos" ON storage.objects;
+CREATE POLICY "Admins and moderators can upload partenaires logos"
+ON storage.objects FOR INSERT
+TO authenticated
+WITH CHECK (
+  bucket_id = 'logo-partenaire'
+  AND EXISTS (
+    SELECT 1 FROM public.users u
+    WHERE u.id = auth.uid()
+    AND u.role IN ('admin', 'moderateur')
+  )
+);
+
+-- UPDATE: admin et modérateur (mêmes droits)
+DROP POLICY IF EXISTS "Admins and moderators can update partenaires logos" ON storage.objects;
+CREATE POLICY "Admins and moderators can update partenaires logos"
+ON storage.objects FOR UPDATE
+TO authenticated
+USING (
+  bucket_id = 'logo-partenaire'
+  AND EXISTS (
+    SELECT 1 FROM public.users u
+    WHERE u.id = auth.uid()
+    AND u.role IN ('admin', 'moderateur')
+  )
+);
+
+-- DELETE: admin et modérateur (mêmes droits)
+DROP POLICY IF EXISTS "Admins and moderators can delete partenaires logos" ON storage.objects;
+CREATE POLICY "Admins and moderators can delete partenaires logos"
+ON storage.objects FOR DELETE
+TO authenticated
+USING (
+  bucket_id = 'logo-partenaire'
+  AND EXISTS (
+    SELECT 1 FROM public.users u
+    WHERE u.id = auth.uid()
+    AND u.role IN ('admin', 'moderateur')
+  )
+);
+
+-- ================================================
 -- VÉRIFICATION
 -- ================================================
 SELECT
@@ -269,5 +338,5 @@ SELECT
   name as policy_name,
   definition
 FROM storage.policies
-WHERE bucket_id IN ('diplomes', 'alumni-photos', 'articles-media', 'evenements-media')
+WHERE bucket_id IN ('diplomes', 'alumni-photos', 'articles-media', 'evenements-media', 'logo-partenaire')
 ORDER BY name;

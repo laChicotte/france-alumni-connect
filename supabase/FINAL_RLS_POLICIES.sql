@@ -541,42 +541,52 @@ ON partenaires FOR SELECT
 TO authenticated
 USING (true);
 
--- INSERT
+-- INSERT (admin + moderateur: mêmes droits)
 DROP POLICY IF EXISTS "Admins can create partners" ON partenaires;
-CREATE POLICY "Admins can create partners"
+DROP POLICY IF EXISTS "Admins and moderators can create partners" ON partenaires;
+CREATE POLICY "Admins and moderators can create partners"
 ON partenaires FOR INSERT
 TO authenticated
 WITH CHECK (
   EXISTS (
     SELECT 1 FROM users u
     WHERE u.id = auth.uid()
-    AND u.role = 'admin'
+    AND u.role IN ('admin', 'moderateur')
   )
 );
 
--- UPDATE
+-- UPDATE (admin + moderateur: mêmes droits)
 DROP POLICY IF EXISTS "Admins can update partners" ON partenaires;
-CREATE POLICY "Admins can update partners"
+DROP POLICY IF EXISTS "Admins and moderators can update partners" ON partenaires;
+CREATE POLICY "Admins and moderators can update partners"
 ON partenaires FOR UPDATE
 TO authenticated
 USING (
   EXISTS (
     SELECT 1 FROM users u
     WHERE u.id = auth.uid()
-    AND u.role = 'admin'
+    AND u.role IN ('admin', 'moderateur')
+  )
+)
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM users u
+    WHERE u.id = auth.uid()
+    AND u.role IN ('admin', 'moderateur')
   )
 );
 
--- DELETE
+-- DELETE (admin + moderateur: mêmes droits)
 DROP POLICY IF EXISTS "Admins can delete partners" ON partenaires;
-CREATE POLICY "Admins can delete partners"
+DROP POLICY IF EXISTS "Admins and moderators can delete partners" ON partenaires;
+CREATE POLICY "Admins and moderators can delete partners"
 ON partenaires FOR DELETE
 TO authenticated
 USING (
   EXISTS (
     SELECT 1 FROM users u
     WHERE u.id = auth.uid()
-    AND u.role = 'admin'
+    AND u.role IN ('admin', 'moderateur')
   )
 );
 

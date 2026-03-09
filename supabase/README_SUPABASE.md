@@ -21,6 +21,7 @@ Pour configurer Supabase de zéro, exécutez les scripts dans cet ordre :
 - Créer le bucket `alumni-photos`
 - Créer le bucket `articles-media`
 - Créer le bucket `evenements-media`
+- Créer le bucket `logo-partenaire`
 - Créer les policies de sécurité pour le storage
 
 ### 5. **FINAL_SEEDERS.sql**
@@ -73,7 +74,7 @@ Ces scripts ne modifient rien, ils permettent de lister ce qui existe :
 
 ### Rôles
 - `admin` : Accès complet
-- `moderateur` : Peut créer/modifier articles, événements, emplois
+- `moderateur` : Peut créer/modifier articles, événements, emplois et partenaires
 - `alumni` : Utilisateur standard
 
 ### Module Articles (v2 admin)
@@ -100,6 +101,17 @@ Ces scripts ne modifient rien, ils permettent de lister ce qui existe :
   - policies dédiées (inscription/annulation/lecture)
 - Bucket `evenements-media`:
   - image événement en upload (optionnelle côté formulaire admin)
+
+### Module Partenaires
+- Table `partenaires` utilisée pour la section publique "Nos partenaires"
+- Backoffice `/admin/partenaires`:
+  - upload logo depuis formulaire (bucket `logo-partenaire`)
+  - gestion `nom`, `logo_url`, `site_web`, `description`, visibilité (`actif`)
+- RLS `partenaires`:
+  - `admin` et `moderateur` ont les mêmes droits (`SELECT`, `INSERT`, `UPDATE`, `DELETE`)
+- Bucket `logo-partenaire`:
+  - lecture publique
+  - upload / update / delete réservés à `admin` et `moderateur`
 
 ---
 
@@ -131,6 +143,7 @@ Après avoir exécuté les scripts, vérifier :
 - [ ] Bucket `alumni-photos` créé avec policies
 - [ ] Bucket `articles-media` créé avec policies
 - [ ] Bucket `evenements-media` créé avec policies
+- [ ] Bucket `logo-partenaire` créé avec policies
 - [ ] Tables `secteurs` et `statuts_professionnels` peuplées
 - [ ] Tester l'inscription d'un nouvel alumni
 - [ ] Vérifier que le diplôme s'upload correctement
@@ -141,5 +154,6 @@ Après avoir exécuté les scripts, vérifier :
 - [ ] Vérifier qu'on ne peut pas s'inscrire 2 fois au même événement
 - [ ] Vérifier qu'un événement complet bloque les nouvelles inscriptions
 - [ ] Vérifier que la photo événement s'upload correctement (`evenements-media`)
+- [ ] Vérifier que le logo partenaire s'upload correctement (`logo-partenaire`)
 - [ ] Vérifier que `genre` est bien renseigné à l'inscription et modifiable dans le profil alumni
 - [ ] Vérifier que le profil s'affiche après validation admin

@@ -10,13 +10,15 @@ const HERO_MAX_HEIGHT = 400
 const HERO_MIN_HEIGHT = 200
 
 export default function AboutPage() {
+  type PublicPartner = { name: string; logo: string; site_web?: string | null }
   const [heroHeight, setHeroHeight] = useState(HERO_MAX_HEIGHT)
   const [heroTitle, setHeroTitle] = useState("à propos")
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [userPhotoUrl, setUserPhotoUrl] = useState<string | null>(null)
   const [userRole, setUserRole] = useState<string>("")
-  const marqueePartners = [...partners, ...partners]
+  const [publicPartners, setPublicPartners] = useState<PublicPartner[]>(partners)
+  const marqueePartners = [...publicPartners, ...publicPartners]
   const valuesRef = useRef<HTMLElement | null>(null)
   const objectivesRef = useRef<HTMLElement | null>(null)
   const partnersRef = useRef<HTMLElement | null>(null)
@@ -37,6 +39,21 @@ export default function AboutPage() {
     }
   }, [])
   const isAdminOrModerator = userRole === "admin" || userRole === "moderateur"
+
+  useEffect(() => {
+    const loadPartners = async () => {
+      try {
+        const res = await fetch("/api/partenaires/public", { cache: "no-store" })
+        const data = await res.json().catch(() => null)
+        if (!res.ok || !Array.isArray(data?.partners) || data.partners.length === 0) return
+        setPublicPartners(data.partners as PublicPartner[])
+      } catch {
+        // fallback silencieux vers données locales
+      }
+    }
+
+    loadPartners()
+  }, [])
 
   useEffect(() => {
     const onScroll = () => {

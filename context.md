@@ -70,5 +70,18 @@ Ici on travaille étape par étape et selon des règles c'est à dire:
   - Depuis la home, cliquer sur une carte article ouvre directement la page détail de cet article (`/actualites/[id]`), même si l'utilisateur n'est pas connecté.
   - La page détail publique d'un article est alignée sur le rendu "Aperçu final lecteur" du backoffice (logo en haut gauche, titre centré, auteur+date, extrait, couverture, contenu riche, médias de fin en carrousel horizontal).
   - La largeur d'affichage de la page détail article a été augmentée pour un rendu plus confortable.
-  **Ce qu'on va faire tout de suite'**
-  On va mettre gerer le backend des partenaires, et modifier la photo apropos et formation, annuaire et autres
+- Page `actualites` branchée à Supabase:
+  - Flux fusionné Articles + Événements (sans séparation visible côté UI), trié par date d'ajout (`created_at`) pour afficher les contenus dans un seul timeline.
+  - Fallback conservé sur les données locales en cas d'erreur API.
+- Menus publics:
+  - Le bouton `Admin` reste visible en permanence (desktop + mobile) si l'utilisateur connecté est `admin` ou `moderateur`.
+  - L'icône bouclier a été réintégrée à côté du libellé `Admin`.
+- Module Partenaires connecté de bout en bout:
+  - Backoffice `/admin/partenaires` mis à jour avec upload logo depuis formulaire (plus d'URL manuelle obligatoire).
+  - Champs gérés dans le formulaire: `nom`, logo (upload), `site_web`, `description`, visibilité (`actif`).
+  - Bucket storage `logo-partenaire` ajouté pour les logos.
+  - RLS table `partenaires` alignées: `admin` et `moderateur` ont les mêmes droits de gestion.
+  - Page publique `/a-propos` section partenaires branchée à la base via API (`/api/partenaires/public`) avec fallback local.
+  - Affichage partenaires en animation horizontale continue (marquee fluide infinie).
+**Prochaine étape proposée**
+- Continuer les ajustements visuels (images/hero) sur `a-propos`, `formation`, `annuaire` et autres pages publiques selon validation.

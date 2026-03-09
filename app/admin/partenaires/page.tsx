@@ -21,7 +21,6 @@ import {
 import { Search, MoreHorizontal, Plus, Pencil, Trash2, Eye, EyeOff, Loader2 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import type { Partenaire } from "@/types/database.types"
-import Image from "next/image"
 
 export default function PartenairesPage() {
   const [partenaires, setPartenaires] = useState<Partenaire[]>([])
@@ -33,8 +32,10 @@ export default function PartenairesPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const [formData, setFormData] = useState({
-    nom: "", logo_url: "", site_web: "", description: "", ordre: 0, actif: true
+    nom: "", logo_url: "", site_web: "", description: "", actif: true
   })
+  const [logoFile, setLogoFile] = useState<File | null>(null)
+  const [logoPreviewUrl, setLogoPreviewUrl] = useState<string>("")
 
   useEffect(() => {
     fetchPartenaires()
@@ -50,9 +51,38 @@ export default function PartenairesPage() {
     setIsLoading(false)
   }
 
+  const uploadLogoToStorage = async (file: File) => {
+    const fileExt = file.name.split(".").pop() || "png"
+    const safeName = (formData.nom || "partenaire").toLowerCase().replace(/[^a-z0-9]+/g, "-")
+    const path = `${safeName}-${Date.now()}.${fileExt}`
+    const { data, error } = await supabase.storage.from("logo-partenaire").upload(path, file, {
+      upsert: true,
+      contentType: file.type,
+    })
+    if (error || !data) throw error || new Error("Upload logo échoué")
+    const { data: publicData } = supabase.storage.from("logo-partenaire").getPublicUrl(data.path)
+    return publicData.publicUrl
+  }
+
   const handleCreate = async () => {
+    if (!formData.nom || !logoFile) return
     setIsSubmitting(true)
-    const { error } = await supabase.from('partenaires').insert(formData)
+    let uploadedLogoUrl = formData.logo_url
+    try {
+      uploadedLogoUrl = await uploadLogoToStorage(logoFile)
+    } catch (error) {
+      console.error("Erreur upload logo partenaire:", error)
+      setIsSubmitting(false)
+      return
+    }
+    const { error } = await supabase.from('partenaires').insert({
+      nom: formData.nom,
+      logo_url: uploadedLogoUrl,
+      site_web: formData.site_web || null,
+      description: formData.description || null,
+      actif: formData.actif,
+      ordre: partenaires.length + 1,
+    })
     if (!error) { fetchPartenaires(); setDialogAction(null); resetForm() }
     setIsSubmitting(false)
   }
@@ -60,7 +90,26 @@ export default function PartenairesPage() {
   const handleUpdate = async () => {
     if (!selectedPartenaire) return
     setIsSubmitting(true)
-    const { error } = await supabase.from('partenaires').update(formData).eq('id', selectedPartenaire.id)
+    let uploadedLogoUrl = formData.logo_url
+    if (logoFile) {
+      try {
+        uploadedLogoUrl = await uploadLogoToStorage(logoFile)
+      } catch (error) {
+        console.error("Erreur upload logo partenaire:", error)
+        setIsSubmitting(false)
+        return
+      }
+    }
+    const { error } = await supabase
+      .from('partenaires')
+      .update({
+        nom: formData.nom,
+        logo_url: uploadedLogoUrl,
+        site_web: formData.site_web || null,
+        description: formData.description || null,
+        actif: formData.actif
+      })
+      .eq('id', selectedPartenaire.id)
     if (!error) { fetchPartenaires(); setDialogAction(null); resetForm() }
     setIsSubmitting(false)
   }
@@ -79,17 +128,33 @@ export default function PartenairesPage() {
   }
 
   const resetForm = () => {
-    setFormData({ nom: "", logo_url: "", site_web: "", description: "", ordre: 0, actif: true })
+    setFormData({ nom: "", logo_url: "", site_web: "", description: "", actif: true })
+    setLogoFile(null)
+    setLogoPreviewUrl("")
     setSelectedPartenaire(null)
   }
 
   const openEditDialog = (partenaire: Partenaire) => {
     setSelectedPartenaire(partenaire)
     setFormData({
-      nom: partenaire.nom, logo_url: partenaire.logo_url, site_web: partenaire.site_web || "",
-      description: partenaire.description || "", ordre: partenaire.ordre, actif: partenaire.actif
+      nom: partenaire.nom,
+      logo_url: partenaire.logo_url,
+      site_web: partenaire.site_web || "",
+      description: partenaire.description || "",
+      actif: partenaire.actif
     })
+    setLogoFile(null)
+    setLogoPreviewUrl(partenaire.logo_url || "")
     setDialogAction('edit')
+  }
+
+  const handleLogoSelect = (file: File | null) => {
+    setLogoFile(file)
+    if (!file) {
+      setLogoPreviewUrl(formData.logo_url || "")
+      return
+    }
+    setLogoPreviewUrl(URL.createObjectURL(file))
   }
 
   const filteredPartenaires = partenaires.filter(p => {
@@ -142,34 +207,24 @@ export default function PartenairesPage() {
                 <TableRow>
                   <TableHead>Logo</TableHead>
                   <TableHead>Nom</TableHead>
-                  <TableHead>Site web</TableHead>
-                  <TableHead>Ordre</TableHead>
                   <TableHead>Statut</TableHead>
                   <TableHead className="text-right">Actions</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {filteredPartenaires.length === 0 ? (
-                  <TableRow><TableCell colSpan={6} className="text-center py-8 text-gray-500">Aucun partenaire trouvé</TableCell></TableRow>
+                  <TableRow><TableCell colSpan={4} className="text-center py-8 text-gray-500">Aucun partenaire trouvé</TableCell></TableRow>
                 ) : (
                   filteredPartenaires.map((partenaire) => (
                     <TableRow key={partenaire.id} className={!partenaire.actif ? 'opacity-50' : ''}>
                       <TableCell>
                         <div className="w-16 h-10 relative bg-gray-100 rounded overflow-hidden">
                           {partenaire.logo_url && (
-                            <Image src={partenaire.logo_url} alt={partenaire.nom} fill className="object-contain" />
+                            <img src={partenaire.logo_url} alt={partenaire.nom} className="h-full w-full object-contain" />
                           )}
                         </div>
                       </TableCell>
                       <TableCell className="font-medium">{partenaire.nom}</TableCell>
-                      <TableCell>
-                        {partenaire.site_web ? (
-                          <a href={partenaire.site_web} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline text-sm">
-                            {partenaire.site_web}
-                          </a>
-                        ) : '-'}
-                      </TableCell>
-                      <TableCell>{partenaire.ordre}</TableCell>
                       <TableCell>
                         {partenaire.actif ? (
                           <Badge className="bg-green-100 text-green-700 hover:bg-green-100">
@@ -219,31 +274,48 @@ export default function PartenairesPage() {
               <Input value={formData.nom} onChange={(e) => setFormData({ ...formData, nom: e.target.value })} />
             </div>
             <div className="space-y-2">
-              <Label>Logo URL *</Label>
-              <Input value={formData.logo_url} onChange={(e) => setFormData({ ...formData, logo_url: e.target.value })} placeholder="https://..." />
+              <Label>Logo partenaire *</Label>
+              <Input
+                type="file"
+                accept="image/png,image/jpeg,image/jpg,image/webp,image/svg+xml"
+                onChange={(e) => handleLogoSelect(e.target.files?.[0] || null)}
+              />
+              {logoPreviewUrl && (
+                <div className="w-48 h-24 rounded-md border bg-gray-50 p-2">
+                  <img src={logoPreviewUrl} alt="Aperçu logo" className="h-full w-full object-contain" />
+                </div>
+              )}
             </div>
             <div className="space-y-2">
               <Label>Site web</Label>
-              <Input value={formData.site_web} onChange={(e) => setFormData({ ...formData, site_web: e.target.value })} placeholder="https://..." />
+              <Input
+                value={formData.site_web}
+                onChange={(e) => setFormData({ ...formData, site_web: e.target.value })}
+                placeholder="https://..."
+              />
             </div>
             <div className="space-y-2">
               <Label>Description</Label>
-              <Textarea value={formData.description} onChange={(e) => setFormData({ ...formData, description: e.target.value })} rows={3} />
+              <Textarea
+                value={formData.description}
+                onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                rows={3}
+              />
             </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label>Ordre d'affichage</Label>
-                <Input type="number" value={formData.ordre} onChange={(e) => setFormData({ ...formData, ordre: parseInt(e.target.value) || 0 })} />
-              </div>
-              <div className="flex items-center gap-2 pt-6">
-                <Switch checked={formData.actif} onCheckedChange={(v) => setFormData({ ...formData, actif: v })} />
-                <Label>Visible</Label>
-              </div>
+            <div className="flex items-center gap-3 pt-1">
+              <Switch
+                checked={formData.actif}
+                onCheckedChange={(v) => setFormData({ ...formData, actif: v })}
+              />
+              <Label>Visible</Label>
             </div>
           </div>
           <DialogFooter>
             <Button variant="outline" onClick={() => { setDialogAction(null); resetForm() }}>Annuler</Button>
-            <Button onClick={dialogAction === 'create' ? handleCreate : handleUpdate} disabled={isSubmitting || !formData.nom || !formData.logo_url}>
+            <Button
+              onClick={dialogAction === 'create' ? handleCreate : handleUpdate}
+              disabled={isSubmitting || !formData.nom || (!logoFile && !formData.logo_url)}
+            >
               {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : (dialogAction === 'create' ? 'Créer' : 'Enregistrer')}
             </Button>
           </DialogFooter>
