@@ -2,6 +2,23 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseAdmin } from '@/lib/supabase-admin'
 import type { Database, GenreType } from '@/types/database.types'
 
+// Rate limiting : max 5 tentatives par IP par fenêtre de 60s
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
+const RATE_LIMIT_MAX = 5
+const RATE_LIMIT_WINDOW_MS = 60_000
+
+function checkRateLimit(ip: string): boolean {
+  const now = Date.now()
+  const entry = rateLimitMap.get(ip)
+  if (!entry || now > entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS })
+    return true
+  }
+  if (entry.count >= RATE_LIMIT_MAX) return false
+  entry.count++
+  return true
+}
+
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 const ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png']
 const MAX_PHOTO_SIZE = 3 * 1024 * 1024 // 3MB
@@ -9,6 +26,14 @@ const ALLOWED_PHOTO_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp
 const ALLOWED_GENRES: GenreType[] = ['Homme', 'Femme', 'Autre']
 
 export async function POST(request: NextRequest) {
+  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+  if (!checkRateLimit(ip)) {
+    return NextResponse.json(
+      { error: 'Trop de tentatives. Veuillez réessayer dans une minute.' },
+      { status: 429 }
+    )
+  }
+
   try {
     const formData = await request.formData()
 

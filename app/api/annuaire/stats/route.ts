@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { createSupabaseAdmin } from "@/lib/supabase-admin"
 
+export const revalidate = 120 // 2 minutes
+
 type StatsProfile = {
   user_id: string
   ville: string | null
@@ -24,6 +26,7 @@ export async function GET() {
   try {
     const supabase = createSupabaseAdmin()
 
+    // Requête unique : jointure !inner sur users filtre directement les alumni actifs
     const { data: profilesData, error: profilesError } = await supabase
       .from("alumni_profiles")
       .select(`
@@ -32,16 +35,18 @@ export async function GET() {
         photo_url,
         genre,
         secteurs(libelle),
-        statuts_professionnels(libelle)
+        statuts_professionnels(libelle),
+        users!inner(id)
       `)
       .eq("visible_annuaire", true)
+      .eq("users.status", "actif")
 
     if (profilesError) {
       return NextResponse.json({ error: profilesError.message }, { status: 500 })
     }
 
-    const profiles = (profilesData as StatsProfile[]) || []
-    if (profiles.length === 0) {
+    const activeProfiles = (profilesData as unknown as StatsProfile[]) || []
+    if (activeProfiles.length === 0) {
       return NextResponse.json({
         totalAlumni: 0,
         withPhoto: 0,
@@ -51,20 +56,6 @@ export async function GET() {
         statusData: [],
       })
     }
-
-    const userIds = [...new Set(profiles.map((p) => p.user_id))]
-    const { data: activeUsersData, error: usersError } = await supabase
-      .from("users")
-      .select("id")
-      .in("id", userIds)
-      .eq("status", "actif")
-
-    if (usersError) {
-      return NextResponse.json({ error: usersError.message }, { status: 500 })
-    }
-
-    const activeIds = new Set((activeUsersData || []).map((u) => u.id))
-    const activeProfiles = profiles.filter((p) => activeIds.has(p.user_id))
 
     const totalAlumni = activeProfiles.length
     const withPhoto = activeProfiles.filter((p) => !!p.photo_url).length

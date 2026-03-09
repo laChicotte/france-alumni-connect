@@ -164,9 +164,19 @@ export default function UtilisateursPage() {
     }
 
     try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        setAddError("Session expirée. Veuillez vous reconnecter.")
+        setIsSubmitting(false)
+        return
+      }
+
       const response = await fetch('/api/admin/creer-utilisateur', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
         body: JSON.stringify({
           email: newUser.email,
           password: newUser.password,

@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { createSupabaseAdmin } from "@/lib/supabase-admin"
 
+export const revalidate = 120 // 2 minutes
+
 type HomeArticle = {
   id: string
   title: string
@@ -40,7 +42,8 @@ export async function GET() {
       return NextResponse.json({ error: articlesError.message }, { status: 500 })
     }
 
-    const articles: HomeArticle[] = (articlesData || []).map((article) => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const articles: HomeArticle[] = (articlesData || []).map((article: any) => ({
       id: article.id,
       title: article.titre,
       image: article.image_couverture_url || "/placeholder.svg",
@@ -79,7 +82,8 @@ export async function GET() {
       eventsRaw = [...eventsRaw, ...(terminatedData || [])]
     }
 
-    const events: HomeEvent[] = eventsRaw.slice(0, 2).map((event) => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const events: HomeEvent[] = eventsRaw.slice(0, 2).map((event: any) => ({
       id: event.id,
       title: event.titre,
       date: formatDate(event.date),

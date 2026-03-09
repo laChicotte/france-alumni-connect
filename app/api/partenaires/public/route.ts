@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { createSupabaseAdmin } from "@/lib/supabase-admin"
 
+export const revalidate = 300 // 5 minutes
+
 type PublicPartner = {
   name: string
   logo: string
@@ -21,7 +23,8 @@ export async function GET() {
       return NextResponse.json({ error: error.message }, { status: 500 })
     }
 
-    const partners: PublicPartner[] = (data || []).map((item) => ({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const partners: PublicPartner[] = (data || []).map((item: any) => ({
       name: item.nom,
       logo: item.logo_url || "/placeholder.svg",
       site_web: item.site_web || null,

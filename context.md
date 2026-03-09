@@ -88,5 +88,19 @@ Ici on travaille étape par étape et selon des règles c'est à dire:
   - `auth.admin.createUser()` avec `email_confirm: true` + insert direct dans `public.users` avec le bon rôle et `status: 'actif'`.
   - Rollback automatique (suppression auth) si l'insert dans `public.users` échoue.
   - `handleAddUser` dans `/admin/utilisateurs` appelle désormais cette API au lieu de faire des appels directs Supabase côté client (qui échouaient à cause des RLS).
+- Sécurité renforcée:
+  - API `/api/admin/creer-utilisateur` protégée: vérification du Bearer token + rôle `admin` obligatoire avant toute création.
+  - Middleware Next.js (`middleware.ts`) ajouté à la racine: protège toutes les routes `/admin/*` côté serveur, redirige vers `/connexion` si session invalide.
+  - `lib/supabase.ts` migré de `createClient` vers `createBrowserClient` (`@supabase/ssr`) pour que la session soit lisible par le middleware via cookies HTTP. Aucun impact sur les fonctionnalités existantes (même API, 17 fichiers clients inchangés, aucune API route affectée).
+  - Rate limiting en mémoire ajouté sur les APIs sensibles: `/api/inscription` (5 req/min/IP) et `/api/admin/creer-utilisateur` (10 req/min/IP).
+- Performances améliorées:
+  - N+1 queries éliminées sur 5 APIs publiques via jointures Supabase:
+    - `/api/actualites/feed`: 4 requêtes → 2 (jointures `categories_articles` + `users` dans le select articles).
+    - `/api/annuaire/public-preview` et `/api/annuaire/stats`: 2 requêtes → 1 (`users!inner(id)` + filtre `.eq("users.status", "actif")`).
+    - `/api/articles/public/[id]`: 3 requêtes → 1 (jointures `users(nom, prenom)` + `article_media(...)`).
+  - Caching HTTP (`export const revalidate`) activé sur toutes les APIs publiques:
+    - 2 min (120s): `/api/actualites/feed`, `/api/home/highlights`, `/api/annuaire/public-preview`, `/api/annuaire/stats`.
+    - 5 min (300s): `/api/articles/public/[id]`, `/api/partenaires/public`.
+  - Optimisation des images Next.js (`next.config.mjs`): suppression de `unoptimized: true`, formats WebP/AVIF activés, `remotePatterns` configuré pour le bucket Supabase.
 **Prochaine étape pour plutard**
 - Continuer les ajustements visuels (images/hero) sur `a-propos`, `formation`, `annuaire` et autres pages publiques selon validation.

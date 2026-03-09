@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server"
 import { createSupabaseAdmin } from "@/lib/supabase-admin"
 
+export const revalidate = 120 // 2 minutes
+
 const PREVIEW_LIMIT = 6
 
 type PreviewProfile = {
@@ -33,6 +35,7 @@ export async function GET() {
   try {
     const supabase = createSupabaseAdmin()
 
+    // Requête unique : jointure !inner sur users filtre directement les alumni actifs
     const { data: profilesData, error: profilesError } = await supabase
       .from("alumni_profiles")
       .select(`
@@ -49,33 +52,22 @@ export async function GET() {
         poste_actuel,
         bio,
         secteurs(libelle),
-        statuts_professionnels(libelle)
+        statuts_professionnels(libelle),
+        users!inner(id)
       `)
       .eq("visible_annuaire", true)
+      .eq("users.status", "actif")
 
     if (profilesError) {
       return NextResponse.json({ error: profilesError.message }, { status: 500 })
     }
 
-    const profiles = (profilesData as PreviewProfile[]) || []
+    const profiles = (profilesData as unknown as PreviewProfile[]) || []
     if (profiles.length === 0) {
       return NextResponse.json({ profiles: [] })
     }
 
-    const userIds = [...new Set(profiles.map((p) => p.user_id))]
-    const { data: activeUsersData, error: usersError } = await supabase
-      .from("users")
-      .select("id")
-      .in("id", userIds)
-      .eq("status", "actif")
-
-    if (usersError) {
-      return NextResponse.json({ error: usersError.message }, { status: 500 })
-    }
-
-    const activeIds = new Set((activeUsersData || []).map((u) => u.id))
-    const activeProfiles = profiles.filter((p) => activeIds.has(p.user_id))
-    const preview = shuffle(activeProfiles).slice(0, PREVIEW_LIMIT)
+    const preview = shuffle(profiles).slice(0, PREVIEW_LIMIT)
 
     return NextResponse.json({ profiles: preview })
   } catch (error) {
