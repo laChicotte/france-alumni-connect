@@ -219,16 +219,28 @@ export default function HomePage() {
 
         <div
           ref={badgeRef}
-          className="absolute bottom-3 right-3 z-20 max-w-[85vw] rounded-lg bg-white/95 px-2 py-1.5 text-[10px] text-[#1e2a5a] shadow-md sm:bottom-6 sm:right-6 sm:max-w-none sm:px-3 sm:py-2 sm:text-xs"
+          className="absolute bottom-3 right-3 z-20 max-w-[88vw] sm:bottom-6 sm:right-6 sm:max-w-[560px]"
         >
-          <div className="font-semibold">en lien avec</div>
-          <div className="mt-1 flex items-center gap-2">
-            <span
-              className="inline-block h-3 w-5 overflow-hidden rounded-[2px]"
-              aria-hidden="true"
-              style={{ background: "linear-gradient(90deg, #0055A4 0 33%, #FFFFFF 33% 66%, #EF4135 66% 100%)" }}
-            />
-            <span>Ambassade de France en Guinée et en Sierra Leone</span>
+          <div className="flex items-start gap-4 sm:gap-6">
+            <div className="bg-[#ff5f64] px-2.5 py-1.5 text-[11px] font-bold text-white sm:px-3 sm:py-2 sm:text-lg">
+              en lien avec
+            </div>
+            <div className="text-white">
+              <img
+                src="/accueil/flag.jpeg"
+                alt="Ambassade de France"
+                className="mb-1.5 h-4 w-auto object-contain sm:h-6"
+              />
+              <p className="max-w-[260px] text-[11px] font-extrabold uppercase leading-tight tracking-wide sm:max-w-[380px] sm:text-xl">
+                Ambassade
+                <br />
+                de France
+                <br />
+                en Guinée
+                <br />
+                et en Sierra Leone
+              </p>
+            </div>
           </div>
         </div>
       </section>

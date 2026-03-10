@@ -72,7 +72,7 @@ export function Navigation() {
   ]
 
   return (
-    <nav className="sticky top-0 z-[100] w-full bg-white">
+    <nav className="sticky top-0 z-[100] w-full border-b border-[#3558A2]/25 bg-white">
       <div className="w-full">
         <div className="flex h-20 items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Logo */}
