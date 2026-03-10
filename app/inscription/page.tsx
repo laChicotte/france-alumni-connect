@@ -9,13 +9,17 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { AlertCircle, Loader2, CheckCircle } from "lucide-react"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
+import { AlertCircle, Loader2, CheckCircle, ChevronDown, Check } from "lucide-react"
+import { cn } from "@/lib/utils"
 
 export default function InscriptionPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
+  const [isGenreOpen, setIsGenreOpen] = useState(false)
 
   const [formData, setFormData] = useState({
     email: "",
@@ -31,6 +35,7 @@ export default function InscriptionPage() {
   })
   const [diplomeFile, setDiplomeFile] = useState<File | null>(null)
   const [photoFile, setPhotoFile] = useState<File | null>(null)
+  const genreOptions = ["Homme", "Femme", "Autre"] as const
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { id, value } = e.target
@@ -191,17 +196,40 @@ export default function InscriptionPage() {
 
             <div className="space-y-2">
               <Label htmlFor="genre">Genre *</Label>
-              <select
-                id="genre"
-                className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
-                value={formData.genre}
-                onChange={handleInputChange}
-                required
-              >
-                <option value="Homme">Homme</option>
-                <option value="Femme">Femme</option>
-                <option value="Autre">Autre</option>
-              </select>
+              <Popover open={isGenreOpen} onOpenChange={setIsGenreOpen}>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className="inline-flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm"
+                  >
+                    {formData.genre}
+                    <ChevronDown className="h-4 w-4 opacity-70" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] p-0">
+                  <Command>
+                    <CommandInput placeholder="Rechercher un genre..." />
+                    <CommandList className="max-h-48">
+                      <CommandEmpty>Aucun genre trouvé.</CommandEmpty>
+                      <CommandGroup>
+                        {genreOptions.map((option) => (
+                          <CommandItem
+                            key={option}
+                            value={option}
+                            onSelect={() => {
+                              setFormData((prev) => ({ ...prev, genre: option }))
+                              setIsGenreOpen(false)
+                            }}
+                          >
+                            <Check className={cn("h-4 w-4", formData.genre === option ? "opacity-100" : "opacity-0")} />
+                            {option}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
 
             <div className="space-y-2">

@@ -32,7 +32,6 @@ export default function ActualitesPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [isLoadingFeed, setIsLoadingFeed] = useState(true)
   const heroRef = useRef<HTMLElement | null>(null)
-  const heroTitleRef = useRef<HTMLHeadingElement | null>(null)
   const articlesPerPage = 6
   const categories = ["Tous", ...Array.from(new Set(feedItems.map((item) => item.category)))]
 
@@ -72,17 +71,11 @@ export default function ActualitesPage() {
   useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY
-
-      const progress = Math.min(Math.max(y / 900, 0), 1)
-      const translateY = -140 * progress
-      const opacity = 1 - progress
+      const maxTravel = window.innerWidth >= 640 ? 550 : 300
+      const translateY = -Math.min(y, maxTravel)
 
       if (heroRef.current) {
         heroRef.current.style.transform = `translateY(${translateY}px)`
-        heroRef.current.style.opacity = String(opacity)
-      }
-      if (heroTitleRef.current) {
-        heroTitleRef.current.style.opacity = String(opacity)
       }
 
     }
@@ -95,11 +88,11 @@ export default function ActualitesPage() {
   return (
     <div className="min-h-screen">
       {/* Hero image */}
-      <section ref={heroRef} className="fixed left-0 top-20 z-10 h-[300px] w-full overflow-hidden sm:h-[550px]">
+      <section ref={heroRef} className="fixed left-0 top-20 z-10 h-[300px] w-full overflow-hidden will-change-transform sm:h-[550px]">
         <img src="/actualites/actualites.jpg" alt="Actualités" className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-black/20" />
-        <div className="relative z-10 flex h-full max-w-7xl items-end px-4 pb-6 sm:px-6 sm:pb-8 lg:px-8">
-          <h1 ref={heroTitleRef} className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold text-white leading-none">
+        <div className="relative z-10 mx-auto flex h-full w-full max-w-7xl items-end px-4 pb-6 sm:px-6 sm:pb-8 lg:px-8">
+          <h1 className="font-serif text-4xl font-bold leading-none text-white sm:text-6xl lg:text-7xl">
             actualités
           </h1>
         </div>

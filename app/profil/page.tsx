@@ -7,14 +7,16 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { Switch } from "@/components/ui/switch"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { User, Mail, Phone, MapPin, Building, GraduationCap, Edit2, Save, X, Loader2, Linkedin, CheckCircle, AlertCircle, FileText, Eye, EyeOff, Lock } from "lucide-react"
+import { User, Mail, Phone, MapPin, Building, GraduationCap, Edit2, Save, X, Loader2, Linkedin, CheckCircle, AlertCircle, FileText, Eye, EyeOff, Lock, ChevronDown, Check } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { AlumniProfile, Secteur, StatutProfessionnel, DiplomeType, GenreType } from "@/types/database.types"
+import { cn } from "@/lib/utils"
 
 const DIPLOME_OPTIONS: { value: DiplomeType; label: string }[] = [
   { value: 'licence', label: 'Licence' },
@@ -48,6 +50,10 @@ export default function ProfilPage() {
   const [formData, setFormData] = useState<Partial<AlumniProfile>>({})
   const [photoFile, setPhotoFile] = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
+  const [isGenreOpen, setIsGenreOpen] = useState(false)
+  const [isDiplomeOpen, setIsDiplomeOpen] = useState(false)
+  const [isStatutOpen, setIsStatutOpen] = useState(false)
+  const [isSecteurOpen, setIsSecteurOpen] = useState(false)
 
   // Options pour les selects
   const [secteurs, setSecteurs] = useState<Secteur[]>([])
@@ -311,6 +317,10 @@ export default function ProfilPage() {
   }
 
   const isAlumni = user.role === 'alumni'
+  const selectedGenreLabel = ((formData.genre as GenreType) || 'Autre') as string
+  const selectedDiplomeLabel = getDiplomeLabel(formData.diplome)
+  const selectedStatutLabel = getStatutLibelle(formData.statut_professionnel_id || null)
+  const selectedSecteurLabel = getSecteurLibelle(formData.secteur_id || null)
   const displayName = isAlumni
     ? `${formData.prenom || ''} ${formData.nom || ''}`.trim() || user.name
     : user.name
@@ -521,21 +531,37 @@ export default function ProfilPage() {
                     <div>
                       <Label htmlFor="genre" className="mb-0.5 block">Genre</Label>
                       {isEditing ? (
-                        <Select
-                          value={(formData.genre as GenreType) || 'Autre'}
-                          onValueChange={(value) => setFormData({ ...formData, genre: value as GenreType })}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Sélectionnez un genre" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {GENRE_OPTIONS.map((option) => (
-                              <SelectItem key={option} value={option}>
-                                {option}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
+                        <Popover open={isGenreOpen} onOpenChange={setIsGenreOpen}>
+                          <PopoverTrigger asChild>
+                            <button type="button" className="inline-flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm">
+                              {selectedGenreLabel}
+                              <ChevronDown className="h-4 w-4 opacity-70" />
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] p-0">
+                            <Command>
+                              <CommandInput placeholder="Rechercher un genre..." />
+                              <CommandList className="max-h-48">
+                                <CommandEmpty>Aucun genre trouvé.</CommandEmpty>
+                                <CommandGroup>
+                                  {GENRE_OPTIONS.map((option) => (
+                                    <CommandItem
+                                      key={option}
+                                      value={option}
+                                      onSelect={() => {
+                                        setFormData({ ...formData, genre: option as GenreType })
+                                        setIsGenreOpen(false)
+                                      }}
+                                    >
+                                      <Check className={cn("h-4 w-4", selectedGenreLabel === option ? "opacity-100" : "opacity-0")} />
+                                      {option}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
                       ) : (
                         <Input value={(formData.genre as GenreType) || 'Autre'} disabled />
                       )}
@@ -570,21 +596,37 @@ export default function ProfilPage() {
                       <div>
                         <Label htmlFor="diplome" className="mb-0.5 block">Niveau de diplôme</Label>
                         {isEditing ? (
-                          <Select
-                            value={formData.diplome || 'autre'}
-                            onValueChange={(value) => setFormData({...formData, diplome: value as DiplomeType})}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Sélectionnez un niveau" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              {DIPLOME_OPTIONS.map((option) => (
-                                <SelectItem key={option.value} value={option.value}>
-                                  {option.label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                          <Popover open={isDiplomeOpen} onOpenChange={setIsDiplomeOpen}>
+                            <PopoverTrigger asChild>
+                              <button type="button" className="inline-flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm">
+                                {selectedDiplomeLabel}
+                                <ChevronDown className="h-4 w-4 opacity-70" />
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] p-0">
+                              <Command>
+                                <CommandInput placeholder="Rechercher un diplôme..." />
+                                <CommandList className="max-h-56">
+                                  <CommandEmpty>Aucun diplôme trouvé.</CommandEmpty>
+                                  <CommandGroup>
+                                    {DIPLOME_OPTIONS.map((option) => (
+                                      <CommandItem
+                                        key={option.value}
+                                        value={option.label}
+                                        onSelect={() => {
+                                          setFormData({ ...formData, diplome: option.value as DiplomeType })
+                                          setIsDiplomeOpen(false)
+                                        }}
+                                      >
+                                        <Check className={cn("h-4 w-4", formData.diplome === option.value ? "opacity-100" : "opacity-0")} />
+                                        {option.label}
+                                      </CommandItem>
+                                    ))}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
                         ) : (
                           <Input
                             value={getDiplomeLabel(formData.diplome)}
@@ -609,22 +651,47 @@ export default function ProfilPage() {
                       <div>
                         <Label htmlFor="statut_professionnel" className="mb-0.5 block">Statut professionnel</Label>
                         {isEditing ? (
-                          <Select
-                            value={formData.statut_professionnel_id || 'none'}
-                            onValueChange={(value) => setFormData({...formData, statut_professionnel_id: value === 'none' ? null : value})}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Sélectionnez un statut" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="none">Non renseigné</SelectItem>
-                              {statutsPro.map((statut) => (
-                                <SelectItem key={statut.id} value={statut.id}>
-                                  {statut.libelle}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                          <Popover open={isStatutOpen} onOpenChange={setIsStatutOpen}>
+                            <PopoverTrigger asChild>
+                              <button type="button" className="inline-flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm">
+                                {selectedStatutLabel}
+                                <ChevronDown className="h-4 w-4 opacity-70" />
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] p-0">
+                              <Command>
+                                <CommandInput placeholder="Rechercher un statut..." />
+                                <CommandList className="max-h-56">
+                                  <CommandEmpty>Aucun statut trouvé.</CommandEmpty>
+                                  <CommandGroup>
+                                    <CommandItem
+                                      value="Non renseigné"
+                                      onSelect={() => {
+                                        setFormData({ ...formData, statut_professionnel_id: null })
+                                        setIsStatutOpen(false)
+                                      }}
+                                    >
+                                      <Check className={cn("h-4 w-4", !formData.statut_professionnel_id ? "opacity-100" : "opacity-0")} />
+                                      Non renseigné
+                                    </CommandItem>
+                                    {statutsPro.map((statut) => (
+                                      <CommandItem
+                                        key={statut.id}
+                                        value={statut.libelle}
+                                        onSelect={() => {
+                                          setFormData({ ...formData, statut_professionnel_id: statut.id })
+                                          setIsStatutOpen(false)
+                                        }}
+                                      >
+                                        <Check className={cn("h-4 w-4", formData.statut_professionnel_id === statut.id ? "opacity-100" : "opacity-0")} />
+                                        {statut.libelle}
+                                      </CommandItem>
+                                    ))}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
                         ) : (
                           <Input
                             value={getStatutLibelle(formData.statut_professionnel_id || null)}
@@ -635,22 +702,47 @@ export default function ProfilPage() {
                       <div>
                         <Label htmlFor="secteur" className="mb-0.5 block">Secteur d'activité</Label>
                         {isEditing ? (
-                          <Select
-                            value={formData.secteur_id || 'none'}
-                            onValueChange={(value) => setFormData({...formData, secteur_id: value === 'none' ? null : value})}
-                          >
-                            <SelectTrigger>
-                              <SelectValue placeholder="Sélectionnez un secteur" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="none">Non renseigné</SelectItem>
-                              {secteurs.map((secteur) => (
-                                <SelectItem key={secteur.id} value={secteur.id}>
-                                  {secteur.libelle}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                          <Popover open={isSecteurOpen} onOpenChange={setIsSecteurOpen}>
+                            <PopoverTrigger asChild>
+                              <button type="button" className="inline-flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm">
+                                {selectedSecteurLabel}
+                                <ChevronDown className="h-4 w-4 opacity-70" />
+                              </button>
+                            </PopoverTrigger>
+                            <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] p-0">
+                              <Command>
+                                <CommandInput placeholder="Rechercher un secteur..." />
+                                <CommandList className="max-h-56">
+                                  <CommandEmpty>Aucun secteur trouvé.</CommandEmpty>
+                                  <CommandGroup>
+                                    <CommandItem
+                                      value="Non renseigné"
+                                      onSelect={() => {
+                                        setFormData({ ...formData, secteur_id: null })
+                                        setIsSecteurOpen(false)
+                                      }}
+                                    >
+                                      <Check className={cn("h-4 w-4", !formData.secteur_id ? "opacity-100" : "opacity-0")} />
+                                      Non renseigné
+                                    </CommandItem>
+                                    {secteurs.map((secteur) => (
+                                      <CommandItem
+                                        key={secteur.id}
+                                        value={secteur.libelle}
+                                        onSelect={() => {
+                                          setFormData({ ...formData, secteur_id: secteur.id })
+                                          setIsSecteurOpen(false)
+                                        }}
+                                      >
+                                        <Check className={cn("h-4 w-4", formData.secteur_id === secteur.id ? "opacity-100" : "opacity-0")} />
+                                        {secteur.libelle}
+                                      </CommandItem>
+                                    ))}
+                                  </CommandGroup>
+                                </CommandList>
+                              </Command>
+                            </PopoverContent>
+                          </Popover>
                         ) : (
                           <Input
                             value={getSecteurLibelle(formData.secteur_id || null)}

@@ -7,11 +7,14 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { supabase } from "@/lib/supabase"
 import { alumniMembers } from "@/lib/fake-data"
-import { Search, Filter, GraduationCap, Briefcase, MapPin, Mail, Users, TrendingUp, Globe, Target, Loader2 } from "lucide-react"
+import { Search, GraduationCap, Briefcase, MapPin, Mail, Users, TrendingUp, Globe, Target, Loader2, ChevronDown, Check } from "lucide-react"
 import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis } from "recharts"
 import type { AlumniProfile } from "@/types/database.types"
+import { cn } from "@/lib/utils"
 
 type AlumniWithJoins = AlumniProfile & {
   secteurs?: { libelle: string } | null
@@ -54,6 +57,8 @@ export default function AnnuairePage() {
   const [searchQuery, setSearchQuery] = useState("")
   const [filterSecteur, setFilterSecteur] = useState("")
   const [filterVille, setFilterVille] = useState("")
+  const [isSecteurOpen, setIsSecteurOpen] = useState(false)
+  const [isVilleOpen, setIsVilleOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [stats, setStats] = useState<AnnuaireStats>(DEFAULT_STATS)
   const heroRef = useRef<HTMLElement | null>(null)
@@ -143,6 +148,11 @@ export default function AnnuairePage() {
     const set = new Set(alumni.map((a) => a.ville).filter(Boolean))
     return ["", ...Array.from(set).sort()]
   }, [alumni])
+  const selectedSecteurLabel = useMemo(() => {
+    if (!filterSecteur) return "secteur"
+    return secteurs.find((s) => s.id === filterSecteur)?.libelle || "secteur"
+  }, [filterSecteur, secteurs])
+  const selectedVilleLabel = filterVille || "ville"
 
   // Alumni filtrés (visiteur: aperçu fixe sans exploration)
   const filteredAlumni = useMemo(() => {
@@ -227,7 +237,7 @@ export default function AnnuairePage() {
       <section ref={heroRef} className="fixed left-0 top-20 z-10 h-[300px] w-full overflow-hidden will-change-transform sm:h-[550px]">
         <img src="/annuaire/annuaire.jpg" alt="Annuaire" className="absolute inset-0 h-full w-full object-cover" />
         <div className="absolute inset-0 bg-black/20" />
-        <div className="relative z-10 flex h-full max-w-7xl items-end px-4 pb-6 sm:px-6 sm:pb-8 lg:px-8">
+        <div className="relative z-10 mx-auto flex h-full w-full max-w-7xl items-end px-4 pb-6 sm:px-6 sm:pb-8 lg:px-8">
           <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold text-white leading-none">
             annuaire
           </h1>
@@ -238,62 +248,123 @@ export default function AnnuairePage() {
       <div className="h-[380px] sm:h-[630px]" />
 
       {/* Filters */}
-      <section className="py-4 bg-[#ffe8e4] border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-4 flex items-center gap-3 sm:gap-4">
-            <Filter className="h-5 w-5 text-muted-foreground" />
-            <span className="text-sm font-semibold sm:text-base">Recherche & Filtres:</span>
+      <section className="border-b bg-white">
+        <div className="mx-auto w-full max-w-[86rem] px-4 sm:px-6 lg:px-8">
+          <div className="mb-4 flex items-center justify-between gap-4">
+            {isAuthenticated ? (
+              <div className="flex w-full flex-wrap items-center gap-3">
+                <div className="flex w-full items-center rounded-full bg-[#8fb5d0] p-1.5 sm:w-auto">
+                  <div className="flex min-w-0 flex-1 items-center gap-2 px-4 sm:w-80">
+                    <Search className="h-4 w-4 shrink-0 text-white/80" />
+                    <input
+                      type="text"
+                      placeholder="Nom, université, entreprise..."
+                      className="w-full bg-transparent text-sm text-white placeholder:text-white/75 outline-none"
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                    />
+                  </div>
+                  <Button className="h-9 rounded-full bg-[#3558A2] px-5 text-sm font-semibold text-white hover:bg-[#2d4b8c]">
+                    rechercher
+                  </Button>
+                </div>
+
+                <Popover open={isSecteurOpen} onOpenChange={setIsSecteurOpen}>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className="inline-flex h-10 items-center gap-2 rounded-full border border-[#8fb5d0] bg-white px-5 text-sm font-semibold text-[#3558A2]"
+                    >
+                      {selectedSecteurLabel}
+                      <ChevronDown className="h-4 w-4" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent align="start" className="w-[280px] p-0">
+                    <Command>
+                      <CommandInput placeholder="Rechercher un secteur..." />
+                      <CommandList className="max-h-56">
+                        <CommandEmpty>Aucun secteur trouvé.</CommandEmpty>
+                        <CommandGroup>
+                          <CommandItem
+                            onSelect={() => {
+                              setFilterSecteur("")
+                              setIsSecteurOpen(false)
+                            }}
+                          >
+                            <Check className={cn("h-4 w-4", !filterSecteur ? "opacity-100" : "opacity-0")} />
+                            secteur
+                          </CommandItem>
+                          {secteurs.map((s) => (
+                            <CommandItem
+                              key={s.id}
+                              value={s.libelle}
+                              onSelect={() => {
+                                setFilterSecteur(s.id)
+                                setIsSecteurOpen(false)
+                              }}
+                            >
+                              <Check className={cn("h-4 w-4", filterSecteur === s.id ? "opacity-100" : "opacity-0")} />
+                              {s.libelle}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+
+                <Popover open={isVilleOpen} onOpenChange={setIsVilleOpen}>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className="inline-flex h-10 items-center gap-2 rounded-full border border-[#8fb5d0] bg-white px-5 text-sm font-semibold text-[#3558A2]"
+                    >
+                      {selectedVilleLabel}
+                      <ChevronDown className="h-4 w-4" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent align="start" className="w-[280px] p-0">
+                    <Command>
+                      <CommandInput placeholder="Rechercher une ville..." />
+                      <CommandList className="max-h-56">
+                        <CommandEmpty>Aucune ville trouvée.</CommandEmpty>
+                        <CommandGroup>
+                          <CommandItem
+                            onSelect={() => {
+                              setFilterVille("")
+                              setIsVilleOpen(false)
+                            }}
+                          >
+                            <Check className={cn("h-4 w-4", !filterVille ? "opacity-100" : "opacity-0")} />
+                            ville
+                          </CommandItem>
+                          {villes.filter(Boolean).map((ville) => (
+                            <CommandItem
+                              key={ville}
+                              value={ville}
+                              onSelect={() => {
+                                setFilterVille(ville)
+                                setIsVilleOpen(false)
+                              }}
+                            >
+                              <Check className={cn("h-4 w-4", filterVille === ville ? "opacity-100" : "opacity-0")} />
+                              {ville}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              </div>
+            ) : (
+              <div className="text-sm font-semibold sm:text-base">Recherche & Filtres</div>
+            )}
+            <div className="ml-2 hidden h-[2px] w-16 bg-[#f48988] sm:block md:w-28" aria-hidden="true" />
           </div>
 
-          {isAuthenticated ? (
-            <div className="flex flex-col gap-4 lg:flex-row lg:items-end">
-              <div className="bg-white rounded-lg p-1 flex flex-col sm:flex-row gap-2 flex-1">
-                <div className="flex items-center gap-2 px-3 w-full">
-                  <Search className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                  <input
-                    type="text"
-                    placeholder="Nom, université, entreprise..."
-                    className="flex-1 outline-none text-foreground py-2"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                </div>
-              </div>
-
-              <div className="flex w-full flex-col lg:w-auto">
-                <label className="text-sm font-medium mb-1">Secteur d&apos;activité</label>
-                <select
-                  className="bg-white rounded-md border border-input px-3 py-2 text-sm min-w-0 lg:min-w-[180px]"
-                  value={filterSecteur}
-                  onChange={(e) => setFilterSecteur(e.target.value)}
-                >
-                  <option value="">Tous</option>
-                  {secteurs.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.libelle}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="flex w-full flex-col lg:w-auto">
-                <label className="text-sm font-medium mb-1">Ville</label>
-                <select
-                  className="bg-white rounded-md border border-input px-3 py-2 text-sm min-w-0 lg:min-w-[180px]"
-                  value={filterVille}
-                  onChange={(e) => setFilterVille(e.target.value)}
-                >
-                  <option value="">Toutes</option>
-                  {villes.filter(Boolean).map((ville) => (
-                    <option key={ville} value={ville}>
-                      {ville}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          ) : (
-            <div className="bg-white rounded-md border border-input p-3 text-sm text-muted-foreground">
+          {isAuthenticated ? null : (
+            <div className="rounded-md border border-input bg-white p-3 text-sm text-muted-foreground">
               Aperçu public de l&apos;annuaire: profils affichés aléatoirement. Connectez-vous pour accéder à la
               recherche, aux filtres et à l&apos;intégralité des profils.
             </div>
