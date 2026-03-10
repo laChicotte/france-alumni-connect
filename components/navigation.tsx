@@ -20,7 +20,6 @@ import { supabase } from "@/lib/supabase"
 export function Navigation() {
   const [isOpen, setIsOpen] = useState(false)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [isScrolled, setIsScrolled] = useState(false)
   const [user, setUser] = useState({
     name: "",
     email: "",
@@ -32,12 +31,6 @@ export function Navigation() {
   })
   const router = useRouter()
   const pathname = usePathname()
-  const hideForCustomHeroPages = pathname === "/" || pathname === "/a-propos"
-
-  const isHome = pathname === "/"
-  const isAbout = pathname === "/a-propos"
-  const useTransparentHeroNav = isHome || isAbout
-  const useWhiteLogo = true
 
   useEffect(() => {
     // Vérifier l'état de connexion au chargement
@@ -55,13 +48,6 @@ export function Navigation() {
         avatar: parsedUser.photo_url || parsedUser.avatar || ''
       })
     }
-  }, [])
-
-  useEffect(() => {
-    const onScroll = () => setIsScrolled(window.scrollY > 10)
-    onScroll()
-    window.addEventListener("scroll", onScroll, { passive: true })
-    return () => window.removeEventListener("scroll", onScroll)
   }, [])
 
   const handleLogout = async () => {
@@ -85,41 +71,24 @@ export function Navigation() {
     { href: "/annuaire", label: "annuaire" },
   ]
 
-  if (hideForCustomHeroPages) {
-    return null
-  }
-
   return (
-    <nav
-      className={`sticky top-0 z-[100] w-full border-b transition-all duration-300 ${
-        useTransparentHeroNav
-          ? isScrolled
-            ? "bg-[#1e2a5a] border-[#1e2a5a] shadow-[0_8px_24px_rgba(0,0,0,0.25)]"
-            : "bg-transparent border-transparent shadow-none"
-          : "bg-[#3558A2] border-[#2a4680]"
-      }`}
-    >
+    <nav className="sticky top-0 z-[100] w-full bg-white">
       <div className="w-full">
-        <div className="flex justify-between items-center h-20">
+        <div className="flex h-20 items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 pl-2 sm:pl-4">
+          <Link href="/" className="flex items-center gap-3">
             <Image
-              src={useWhiteLogo ? "/logo/logo_alumni_blanc.png" : "/logo/logo_alumni_bleu.png"}
+              src="/logo/logo_alumni_bleu.png"
               alt="Institut Français - France Alumni"
               width={120}
               height={60}
               className="object-contain h-14 w-auto"
             />
             <span
-              className="text-white font-bold text-2xl uppercase tracking-wide hidden sm:block"
+              className="hidden text-2xl font-bold uppercase tracking-wide text-[#3558A2] sm:block"
               style={{
                 letterSpacing: '0.05em',
-                textShadow: `
-                  2px 2px 0 #ea292c,
-                  3px 3px 0 #ea292c,
-                  4px 4px 0 #f48988,
-                  5px 5px 0 #f48988
-                `
+                textShadow: "1px 1px 0 #d9e3ff",
               }}
             >
               France Alumni Connect
@@ -127,9 +96,9 @@ export function Navigation() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-6 pr-6">
+          <div className="hidden items-center gap-6 md:flex">
             {navItems.map((item) => {
-              const isActive = pathname.startsWith(item.href)
+              const isActive = item.href.startsWith("http") ? false : pathname.startsWith(item.href)
               const isExternal = item.href.startsWith("http")
               return (
                 <Link
@@ -137,12 +106,9 @@ export function Navigation() {
                   href={item.href}
                   target={isExternal ? "_blank" : undefined}
                   rel={isExternal ? "noopener noreferrer" : undefined}
-                  className={
-                    `px-3 py-2 text-base font-normal transition-colors ` +
-                    (isActive
-                      ? `text-white font-semibold border-b-2 border-white`
-                      : `text-white/90 hover:text-white hover:border-b-2 hover:border-white/50`)
-                  }
+                  className={`text-base transition-colors ${
+                    isActive ? "font-semibold text-[#3558A2]" : "font-medium text-[#3558A2]/85 hover:text-[#3558A2]"
+                  }`}
                 >
                   {item.label}
                 </Link>
@@ -153,12 +119,7 @@ export function Navigation() {
             {isAuthenticated && isAdminOrModerator && (
               <Link
                 href="/admin"
-                className={
-                  `px-3 py-2 text-base font-normal transition-colors flex items-center gap-1.5 ` +
-                  (pathname.startsWith('/admin')
-                    ? `text-yellow-300 font-semibold border-b-2 border-yellow-300`
-                    : `text-yellow-300/90 hover:text-yellow-300 hover:border-b-2 hover:border-yellow-300/50`)
-                }
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#3558A2] px-3 py-1 text-base font-semibold text-[#3558A2]"
               >
                 <Shield className="h-4 w-4" />
                 Admin
@@ -170,10 +131,10 @@ export function Navigation() {
               {isAuthenticated ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
-                    <Button variant="ghost" className="relative h-8 w-8 rounded-full hover:bg-white/10">
+                    <Button variant="ghost" className="relative h-8 w-8 rounded-full hover:bg-[#3558A2]/10">
                       <Avatar className="h-8 w-8">
                         <AvatarImage src={user.avatar && user.avatar !== '/placeholder.svg' ? user.avatar : undefined} alt={user.name} />
-                        <AvatarFallback className="bg-gradient-to-br from-gray-600 to-gray-800 text-white text-xs font-bold">
+                        <AvatarFallback className="bg-[#3558A2]/10 text-[#3558A2] text-xs font-bold">
                           {user.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'FA'}
                         </AvatarFallback>
                       </Avatar>
@@ -243,9 +204,9 @@ export function Navigation() {
                 </DropdownMenu>
               ) : (
                 <Link href="/connexion" aria-label="Se connecter">
-                  <Button variant="ghost" className="relative h-10 w-10 rounded-full hover:bg-[#ea292c]/10 cursor-pointer">
-                    <Avatar className="h-10 w-10">
-                      <AvatarFallback className="bg-white/20 text-white">
+                  <Button variant="ghost" className="relative h-10 w-10 rounded-full border border-[#3558A2] hover:bg-[#3558A2]/10 cursor-pointer">
+                    <Avatar className="h-9 w-9">
+                      <AvatarFallback className="bg-transparent text-[#3558A2]">
                         <User className="h-5 w-5" />
                       </AvatarFallback>
                     </Avatar>
@@ -256,16 +217,16 @@ export function Navigation() {
           </div>
 
           {/* Mobile menu button */}
-          <Button variant="ghost" size="icon" className="md:hidden text-white hover:bg-white/10 mr-4" onClick={() => setIsOpen(!isOpen)}>
+          <Button variant="ghost" size="icon" className="mr-0 border border-[#3558A2]/40 text-[#3558A2] hover:bg-[#3558A2]/10 md:hidden" onClick={() => setIsOpen(!isOpen)}>
             {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </Button>
         </div>
 
         {/* Mobile Navigation */}
         {isOpen && (
-          <div className="md:hidden py-4 space-y-2">
+          <div className="m-3 grid grid-cols-2 gap-2 rounded-lg border border-[#3558A2]/20 bg-white p-2 md:hidden">
             {navItems.map((item) => {
-              const isActive = pathname.startsWith(item.href)
+              const isActive = item.href.startsWith("http") ? false : pathname.startsWith(item.href)
               const isExternal = item.href.startsWith("http")
               return (
                 <Link
@@ -273,12 +234,11 @@ export function Navigation() {
                   href={item.href}
                   target={isExternal ? "_blank" : undefined}
                   rel={isExternal ? "noopener noreferrer" : undefined}
-                  className={
-                    `block px-4 py-3 text-base transition-colors ` +
-                    (isActive
-                      ? `text-white font-semibold bg-white/10`
-                      : `text-white/90 hover:text-white hover:bg-white/5`)
-                  }
+                  className={`rounded-md border px-3 py-2 text-center text-xs font-semibold transition-colors ${
+                    isActive
+                      ? "border-[#3558A2] bg-[#3558A2]/10 text-[#3558A2]"
+                      : "border-[#3558A2]/30 text-[#3558A2] hover:bg-[#3558A2]/5"
+                  }`}
                   onClick={() => setIsOpen(false)}
                 >
                   {item.label}
@@ -290,12 +250,7 @@ export function Navigation() {
             {isAuthenticated && isAdminOrModerator && (
               <Link
                 href="/admin"
-                className={
-                  `flex items-center gap-2 px-4 py-3 text-base transition-colors ` +
-                  (pathname.startsWith('/admin')
-                    ? `text-yellow-300 font-semibold bg-white/10`
-                    : `text-yellow-300/90 hover:text-yellow-300 hover:bg-white/5`)
-                }
+                className="col-span-2 inline-flex items-center justify-center gap-1.5 rounded-md border border-[#3558A2] px-3 py-2 text-center text-xs font-semibold text-[#3558A2]"
                 onClick={() => setIsOpen(false)}
               >
                 <Shield className="h-5 w-5" />
@@ -304,38 +259,38 @@ export function Navigation() {
             )}
 
             {/* Mobile User Profile */}
-            <div className="px-4 py-2 border-t border-white/20 mt-4">
+            <div className="col-span-2 mt-1 border-t border-[#3558A2]/20 px-2 pt-2">
               {isAuthenticated ? (
                 <div className="space-y-2">
                   <div className="flex items-center gap-3 px-2 py-2">
                     <Avatar className="h-8 w-8">
                       <AvatarImage src={user.avatar && user.avatar !== '/placeholder.svg' ? user.avatar : undefined} alt={user.name} />
-                      <AvatarFallback className="bg-gradient-to-br from-gray-600 to-gray-800 text-white text-xs font-bold">
+                      <AvatarFallback className="bg-[#3558A2]/10 text-[#3558A2] text-xs font-bold">
                         {user.name ? user.name.split(' ').map(n => n[0]).join('').toUpperCase() : 'FA'}
                       </AvatarFallback>
                     </Avatar>
                     <div>
                       <div className="flex items-center gap-2">
-                        <p className="text-sm font-medium text-white">{user.name}</p>
+                        <p className="text-sm font-medium text-[#3558A2]">{user.name}</p>
                         {user.role && (
                           <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-xs font-medium ${
                             user.role === 'admin'
                               ? 'bg-red-500/20 text-red-200'
                               : user.role === 'moderateur'
-                              ? 'bg-green-500/20 text-green-200'
-                              : 'bg-white/20 text-white'
+                              ? 'bg-green-100 text-green-700'
+                              : 'bg-[#3558A2]/10 text-[#3558A2]'
                           }`}>
                             {user.role}
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-white/70">{user.email}</p>
+                      <p className="text-xs text-muted-foreground">{user.email}</p>
                     </div>
                   </div>
                   <div className="space-y-1">
                     <Link
                       href="/profil"
-                      className="flex items-center gap-2 px-2 py-2 text-sm text-white/90 hover:text-white hover:bg-white/5 rounded-md transition-colors"
+                      className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-[#3558A2]/85 hover:bg-[#3558A2]/10 hover:text-[#3558A2] transition-colors"
                       onClick={() => setIsOpen(false)}
                     >
                       <User className="h-4 w-4" />
@@ -343,7 +298,7 @@ export function Navigation() {
                     </Link>
                     <Link
                       href="/parametres"
-                      className="flex items-center gap-2 px-2 py-2 text-sm text-white/90 hover:text-white hover:bg-white/5 rounded-md transition-colors"
+                      className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-[#3558A2]/85 hover:bg-[#3558A2]/10 hover:text-[#3558A2] transition-colors"
                       onClick={() => setIsOpen(false)}
                     >
                       <Settings className="h-4 w-4" />
@@ -351,7 +306,7 @@ export function Navigation() {
                     </Link>
                     <Link
                       href="/notifications"
-                      className="flex items-center gap-2 px-2 py-2 text-sm text-white/90 hover:text-white hover:bg-white/5 rounded-md transition-colors"
+                      className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-[#3558A2]/85 hover:bg-[#3558A2]/10 hover:text-[#3558A2] transition-colors"
                       onClick={() => setIsOpen(false)}
                     >
                       <Bell className="h-4 w-4" />
@@ -362,7 +317,7 @@ export function Navigation() {
                         handleLogout()
                         setIsOpen(false)
                       }}
-                      className="flex items-center gap-2 px-2 py-2 text-sm text-white/90 hover:text-white hover:bg-white/5 rounded-md transition-colors w-full text-left"
+                      className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm text-[#3558A2]/85 hover:bg-[#3558A2]/10 hover:text-[#3558A2] transition-colors"
                     >
                       <LogOut className="h-4 w-4" />
                       Se déconnecter
@@ -376,9 +331,9 @@ export function Navigation() {
                   onClick={() => setIsOpen(false)}
                   aria-label="Se connecter"
                 >
-                  <Button variant="ghost" className="w-full justify-center hover:bg-white/10 cursor-pointer">
+                  <Button variant="ghost" className="w-full justify-center border border-[#3558A2]/30 hover:bg-[#3558A2]/10 cursor-pointer">
                     <Avatar className="h-10 w-10">
-                      <AvatarFallback className="bg-white/20 text-white">
+                      <AvatarFallback className="bg-transparent text-[#3558A2]">
                         <User className="h-5 w-5" />
                       </AvatarFallback>
                     </Avatar>

@@ -1,44 +1,23 @@
 "use client"
 
-import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { teamMembers, partners } from "@/lib/fake-data"
-import { Users, Heart, Globe, Award, User, Menu, X, Shield } from "lucide-react"
+import { Users, Heart, Globe, Award } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 
-const HERO_MAX_HEIGHT = 400
+const HERO_MAX_HEIGHT_MOBILE = 400
+const HERO_MAX_HEIGHT_DESKTOP = 550
 const HERO_MIN_HEIGHT = 200
 
 export default function AboutPage() {
   type PublicPartner = { name: string; logo: string; site_web?: string | null }
-  const [heroHeight, setHeroHeight] = useState(HERO_MAX_HEIGHT)
+  const [heroHeight, setHeroHeight] = useState(HERO_MAX_HEIGHT_MOBILE)
   const [heroTitle, setHeroTitle] = useState("à propos")
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
-  const [userPhotoUrl, setUserPhotoUrl] = useState<string | null>(null)
-  const [userRole, setUserRole] = useState<string>("")
   const [publicPartners, setPublicPartners] = useState<PublicPartner[]>(partners)
   const marqueePartners = [...publicPartners, ...publicPartners]
   const valuesRef = useRef<HTMLElement | null>(null)
   const objectivesRef = useRef<HTMLElement | null>(null)
   const partnersRef = useRef<HTMLElement | null>(null)
-
-  useEffect(() => {
-    const authStatus = localStorage.getItem("isAuthenticated")
-    const userData = localStorage.getItem("user")
-    if (authStatus === "true" && userData) {
-      setIsAuthenticated(true)
-      try {
-        const parsedUser = JSON.parse(userData)
-        setUserPhotoUrl(parsedUser.photo_url || null)
-        setUserRole(parsedUser.role || "")
-      } catch {
-        setUserPhotoUrl(null)
-        setUserRole("")
-      }
-    }
-  }, [])
-  const isAdminOrModerator = userRole === "admin" || userRole === "moderateur"
 
   useEffect(() => {
     const loadPartners = async () => {
@@ -58,7 +37,8 @@ export default function AboutPage() {
   useEffect(() => {
     const onScroll = () => {
       const y = window.scrollY
-      const nextHeight = Math.max(HERO_MIN_HEIGHT, HERO_MAX_HEIGHT - y * 0.5)
+      const maxHeroHeight = window.innerWidth >= 640 ? HERO_MAX_HEIGHT_DESKTOP : HERO_MAX_HEIGHT_MOBILE
+      const nextHeight = Math.max(HERO_MIN_HEIGHT, maxHeroHeight - y * 0.5)
       setHeroHeight(nextHeight)
 
       const triggerY = nextHeight + 80
@@ -86,98 +66,9 @@ export default function AboutPage() {
     <div className="min-h-screen">
       {/* Hero Section */}
       <section
-        className="sticky top-0 z-20 w-full overflow-hidden"
+        className="sticky top-20 z-20 w-full overflow-hidden"
         style={{ height: `${heroHeight}px` }}
       >
-        <div className="absolute left-0 top-0 z-30 w-full px-4 sm:px-6 lg:px-8 py-3">
-          <div className="mx-auto flex max-w-7xl items-center justify-between border-b border-white/80 pb-3">
-            <Link href="/" className="flex items-center gap-4">
-              <img src="/logo/logo_alumni_blanc.png" alt="France Alumni Connect" className="h-10 w-auto object-contain" />
-              <span
-                className="text-white font-bold text-xl uppercase tracking-wide hidden sm:block"
-                style={{
-                  letterSpacing: "0.05em",
-                  textShadow: `
-                    2px 2px 0 #ea292c,
-                    3px 3px 0 #ea292c,
-                    4px 4px 0 #f48988,
-                    5px 5px 0 #f48988
-                  `,
-                }}
-              >
-                France Alumni Connect
-              </span>
-            </Link>
-            <div className="hidden md:flex items-center gap-6 text-white">
-              <Link href="/a-propos" className="text-base font-semibold">à propos</Link>
-              <Link href="/actualites" className="text-base font-semibold">actualités</Link>
-              <Link href="https://talent-diaspora.fr/" target="_blank" rel="noopener noreferrer" className="text-base font-semibold">emploi</Link>
-              <Link href="/formation" className="text-base font-semibold">formation</Link>
-              <Link href="/annuaire" className="text-base font-semibold">annuaire</Link>
-              {isAuthenticated && isAdminOrModerator && (
-                <Link href="/admin" className="inline-flex items-center gap-1.5 text-base font-semibold text-[#fcd116]">
-                  <Shield className="h-4 w-4" />
-                  Admin
-                </Link>
-              )}
-              {isAuthenticated ? (
-                <Link href="/profil" className="inline-flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border border-[#f48988]">
-                  {userPhotoUrl ? (
-                    <img src={userPhotoUrl} alt="Photo de profil" className="h-full w-full object-cover" />
-                  ) : (
-                    <User className="h-4 w-4 text-[#f48988]" />
-                  )}
-                </Link>
-              ) : (
-                <Link href="/connexion" className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-[#f48988]">
-                  <User className="h-4 w-4 text-[#f48988]" />
-                </Link>
-              )}
-            </div>
-            <button
-              type="button"
-              aria-label="Ouvrir le menu"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-white/50 text-white md:hidden"
-              onClick={() => setIsMobileMenuOpen((prev) => !prev)}
-            >
-              {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-            </button>
-          </div>
-          {isMobileMenuOpen && (
-            <div className="mx-auto mt-3 grid max-w-7xl grid-cols-2 gap-2 rounded-lg border border-white/30 bg-[#1e2a5a]/80 p-2 backdrop-blur-sm md:hidden">
-              <Link onClick={() => setIsMobileMenuOpen(false)} href="/a-propos" className="rounded-md border border-white/50 px-3 py-2 text-center text-xs font-semibold text-white">
-                à propos
-              </Link>
-              <Link onClick={() => setIsMobileMenuOpen(false)} href="/actualites" className="rounded-md border border-white/50 px-3 py-2 text-center text-xs font-semibold text-white">
-                actualités
-              </Link>
-              <Link onClick={() => setIsMobileMenuOpen(false)} href="https://talent-diaspora.fr/" target="_blank" rel="noopener noreferrer" className="rounded-md border border-white/50 px-3 py-2 text-center text-xs font-semibold text-white">
-                emploi
-              </Link>
-              <Link onClick={() => setIsMobileMenuOpen(false)} href="/formation" className="rounded-md border border-white/50 px-3 py-2 text-center text-xs font-semibold text-white">
-                formation
-              </Link>
-              <Link onClick={() => setIsMobileMenuOpen(false)} href="/annuaire" className="rounded-md border border-white/50 px-3 py-2 text-center text-xs font-semibold text-white">
-                annuaire
-              </Link>
-              {isAuthenticated && isAdminOrModerator && (
-                <Link onClick={() => setIsMobileMenuOpen(false)} href="/admin" className="col-span-2 inline-flex items-center justify-center gap-1.5 rounded-md border border-[#fcd116] px-3 py-2 text-center text-xs font-semibold text-[#fcd116]">
-                  <Shield className="h-4 w-4" />
-                  Admin
-                </Link>
-              )}
-              {isAuthenticated ? (
-                <Link onClick={() => setIsMobileMenuOpen(false)} href="/profil" className="col-span-2 rounded-md border border-[#f48988] px-3 py-2 text-center text-xs font-semibold text-[#f48988]">
-                  profil
-                </Link>
-              ) : (
-                <Link onClick={() => setIsMobileMenuOpen(false)} href="/connexion" className="col-span-2 rounded-md border border-[#f48988] px-3 py-2 text-center text-xs font-semibold text-[#f48988]">
-                  connexion
-                </Link>
-              )}
-            </div>
-          )}
-        </div>
         <img
           src="/apropos/apropos.jpg"
           alt="France Alumni Guinée"
