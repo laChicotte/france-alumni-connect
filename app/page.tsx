@@ -174,7 +174,7 @@ export default function HomePage() {
   }, [])
 
   return (
-    <div className="min-h-screen bg-[#ffe8e4]">
+    <div className="min-h-screen bg-muted">
       {/* Hero fixe : video visible uniquement dans ALUMNI */}
       <section ref={heroRef} className="fixed left-0 top-20 z-10 h-[320px] w-screen overflow-hidden sm:h-[550px]" style={{ background: "#1e2a5a" }}>
         <div
@@ -427,10 +427,9 @@ export default function HomePage() {
           <div className="rounded-2xl p-6 text-center sm:p-8">
             <h2 className="mb-2 font-serif text-2xl font-bold sm:text-4xl">Prêt à rejoindre notre communauté ?</h2>
             <p className="mx-auto mb-4 max-w-2xl text-base sm:text-lg">
-              Inscrivez-vous dès maintenant pour découvrir les talents du réseau et tisser de nouvelles connexions 
-              au sein de France Alumni Guinée.
+              Inscrivez-vous dès maintenant pour découvrir les talents du réseau et tisser de nouvelles connexions.
             </p>
-            <Button size="lg" className="w-full bg-[#ea292c] font-semibold hover:bg-[#f48988]/90 sm:w-auto">
+            <Button size="lg" className="w-full bg-[#ff5f64] font-semibold hover:bg-[#f48988]/90 sm:w-auto">
               S'inscrire maintenant
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
