@@ -99,10 +99,10 @@ export default function ActualitesPage() {
       </section>
 
       {/* Spacer du hero */}
-      <div className="h-[380px] sm:h-[630px]" />
+      <div className="h-[380px] sm:h-[550px]" />
 
       {/* Categories Filter */}
-      <section className="py-6 bg-[#ffe8e4] border-b">
+      <section className="py-6 border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap gap-3">
             {categories.map((category) => (
@@ -231,9 +231,9 @@ export default function ActualitesPage() {
               <input
                 type="email"
                 placeholder="Votre adresse email"
-                className="flex-1 px-4 py-3 rounded-lg border border-input bg-background"
+                className="h-10 flex-1 rounded-lg border border-input bg-background px-4"
               />
-              <Button className="bg-[#3558A2] hover:bg-[#3558A2]/90">S'abonner</Button>
+              <Button className="h-10 bg-[#3558A2] hover:bg-[#3558A2]/90">S'abonner</Button>
             </div>
           </div>
         </div>

@@ -147,7 +147,7 @@ export default function ArticlePage() {
           <img
             src={article.image || "/placeholder.svg"}
             alt={article.title}
-            className="mb-8 mx-auto block h-auto max-h-96 w-auto min-w-[220px] max-w-full rounded-lg border object-contain md:min-w-[400px]"
+            className="mb-8 mx-auto block h-auto max-h-[520px] w-[80%] rounded-lg border object-cover"
           />
 
           <ArticleContentRenderer html={article.content} />
