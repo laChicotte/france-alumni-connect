@@ -364,9 +364,9 @@ export default function HomePage() {
             </Link>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 py-10">
             {featuredAlumni.map((member) => (
-              <Card key={member.id} className="hover:shadow-lg transition-shadow group">
+              <Card key={member.id} className="group border-2 border-transparent bg-[#ffe8e4] shadow-sm transition-[box-shadow,border-color] hover:border-[#3558A2] hover:shadow-lg">
                 <CardContent className="pt-6">
                   <div className="flex flex-col items-center text-center mb-4">
                     <div className="w-20 h-20 rounded-full overflow-hidden bg-muted mb-4">
