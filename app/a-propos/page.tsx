@@ -84,8 +84,8 @@ export default function AboutPage() {
 
       <section className="py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-4xl">
-            <p className="text-base sm:text-lg text-[#3558A2] leading-relaxed">
+          <div>
+            <p className="text-base text-justify sm:text-lg text-[#3558A2] leading-relaxed">
               France Alumni Guinée, dans le prolongement de <strong>Campus France Guinée</strong>, est une
               communauté dynamique de Guinéennes et Guinéens diplômés de l&apos;enseignement français, rassemblés
               par leur parcours d&apos;études en France et leur engagement pour la coopération, le partage

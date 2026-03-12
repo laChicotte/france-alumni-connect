@@ -4,10 +4,10 @@ import { Facebook, Linkedin, Mail, MapPin, Phone } from "lucide-react"
 export function Footer() {
   return (
     <footer className="bg-[#3558A2] text-white mt-0">
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="grid grid-cols-1 md:grid-cols-[1fr_2fr_1fr] gap-8 items-start">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1.5fr_1fr_auto] gap-8 items-start">
 
-          {/* Brand */}
+          {/* Brand + description */}
           <div>
             <h3 className="font-serif text-lg font-bold mb-3">France Alumni Connect</h3>
             <p className="text-sm text-white/75 leading-relaxed">
@@ -15,33 +15,44 @@ export function Footer() {
             </p>
           </div>
 
-          {/* Contact — colonne centrale plus large */}
+          {/* Contacts */}
           <div>
             <h4 className="font-semibold text-sm uppercase tracking-wider mb-4">Contacts</h4>
             <ul className="space-y-3 text-sm text-white/75">
               <li className="flex items-start gap-2">
-                <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-[#ffffff]" />
+                <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-white" />
                 <span>Institut Français de Guinée, Conakry, Guinée</span>
               </li>
               <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4 shrink-0 text-[#ffffff]" />
+                <Mail className="h-4 w-4 shrink-0 text-white" />
                 <a
                   href="mailto:france.alumni@institutfrancais-guinee.fr"
-                  className="hover:text-[#f48988] transition-colors whitespace-nowrap"
+                  className="hover:text-[#f48988] transition-colors break-all"
                 >
                   france.alumni@institutfrancais-guinee.fr
                 </a>
               </li>
               <li className="flex items-center gap-2">
-                <Phone className="h-4 w-4 shrink-0 text-[#ffffff]" />
-                <a href="tel:+22461145458" className="hover:text-[#f48988] transition-colors">
+                <Phone className="h-4 w-4 shrink-0 text-white" />
+                <a href="tel:+224611454585" className="hover:text-[#f48988] transition-colors">
                   +224 611 45 45 85
                 </a>
               </li>
             </ul>
           </div>
 
-          {/* Social */}
+          {/* Liens rapides */}
+          <div>
+            <h4 className="font-semibold text-sm uppercase tracking-wider mb-4">Liens rapides</h4>
+            <ul className="space-y-2 text-sm text-white/75">
+              <li><Link href="/a-propos" className="hover:text-[#f48988] transition-colors">À propos</Link></li>
+              <li><Link href="/actualites" className="hover:text-[#f48988] transition-colors">Actualités</Link></li>
+              <li><Link href="/formation" className="hover:text-[#f48988] transition-colors">Formation</Link></li>
+              <li><Link href="/annuaire" className="hover:text-[#f48988] transition-colors">Annuaire</Link></li>
+            </ul>
+          </div>
+
+          {/* Réseaux sociaux */}
           <div>
             <h4 className="font-semibold text-sm uppercase tracking-wider mb-4">Suivez-nous</h4>
             <div className="flex gap-3">
@@ -75,7 +86,7 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-white/20 mt-2 pt-2 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-white/60">
+        <div className="border-t border-white/20 mt-8 pt-4 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-white/60">
           <p>&copy; 2025 France Alumni Connect. Tous droits réservés.</p>
           <p>
             Réalisé par{" "}
