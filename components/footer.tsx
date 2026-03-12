@@ -4,7 +4,7 @@ import { Facebook, Linkedin, Mail, MapPin, Phone } from "lucide-react"
 export function Footer() {
   return (
     <footer className="bg-[#3558A2] text-white mt-0">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1.5fr_1fr_auto] gap-8 items-start">
 
           {/* Brand + description */}
@@ -86,7 +86,7 @@ export function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="border-t border-white/20 mt-8 pt-4 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-white/60">
+        <div className="border-t border-white/20 mt-3 pt-4 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-white/60">
           <p>&copy; 2025 France Alumni Connect. Tous droits réservés.</p>
           <p>
             Réalisé par{" "}
