@@ -99,7 +99,7 @@ export default function AboutPage() {
       <section ref={valuesRef} className="py-4 bg-[#ffe8e4]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div>
-            <h2 className="font-serif text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-center">Nos Valeurs</h2>
+            {/* <h2 className="font-serif text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-center">Nos Valeurs</h2> */}
             <div className="grid md:grid-cols-3 gap-4 sm:gap-8">
               <Card className="border-2 hover:border-[#3558A2] transition-colors">
                 <CardContent className="pt-6">
@@ -144,7 +144,7 @@ export default function AboutPage() {
       {/* Objectives */}
       <section ref={objectivesRef} className="py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-serif text-2xl sm:text-4xl font-bold mb-6 sm:mb-8 text-center">Nos Objectifs</h2>
+          {/* <h2 className="font-serif text-2xl sm:text-4xl font-bold mb-6 sm:mb-8 text-center">Nos Objectifs</h2> */}
           <div className="grid lg:grid-cols-2 gap-6 sm:gap-12 items-center">
             {/* Image à gauche */}
             <div className="order-2 lg:order-1">
@@ -225,31 +225,17 @@ export default function AboutPage() {
       </section>
 
       {/* Partners */}
-      <section ref={partnersRef} className="py-4 bg-[#ffe8e4]">
+      <section ref={partnersRef} className="py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center gap-4 mb-2">
-            {/* <div className="flex items-center justify-center w-12 h-12 bg-[#3558A2] text-white rounded-lg">
-              <Globe className="h-6 w-6" />
-            </div> */}
-            <h2 className="font-serif text-2xl sm:text-3xl font-bold">
-              Nos Partenaires
-            </h2>
-          </div>
-
-          <div className="mx-auto max-w-7xl overflow-hidden">
+          <div className="mx-auto max-w-5xl overflow-hidden">
             <div className="partners-marquee-track">
               {marqueePartners.map((partner, index) => (
                 <div key={`${partner.name}-${index}`} className="partners-marquee-item">
-                  <Card className="flex h-full items-center justify-center p-6 transition-shadow hover:shadow-lg">
-                    <div className="text-center">
-                      <img
-                        src={partner.logo || "/placeholder.svg"}
-                        alt={partner.name}
-                        className="mb-2 h-16 w-full object-contain"
-                      />
-                      <p className="text-xs font-medium text-muted-foreground">{partner.name}</p>
-                    </div>
-                  </Card>
+                  <img
+                    src={partner.logo || "/placeholder.svg"}
+                    alt={partner.name}
+                    className="h-24 w-full object-contain opacity-85 transition-opacity duration-200 hover:opacity-100 sm:h-28"
+                  />
                 </div>
               ))}
             </div>
@@ -259,20 +245,20 @@ export default function AboutPage() {
       <style jsx>{`
         .partners-marquee-track {
           display: flex;
-          gap: 1rem;
+          gap: 0.75rem;
           width: max-content;
-          animation: partners-marquee-scroll 40s linear infinite;
+          animation: partners-marquee-scroll 34s linear infinite;
           will-change: transform;
         }
 
         .partners-marquee-item {
-          width: 240px;
+          width: 150px;
           flex: 0 0 auto;
         }
 
         @media (min-width: 768px) {
           .partners-marquee-item {
-            width: 300px;
+            width: 180px;
           }
         }
 
