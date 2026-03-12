@@ -5,16 +5,12 @@ import { teamMembers, partners } from "@/lib/fake-data"
 import { Users, Heart, Globe, Award } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 
-const HERO_MAX_HEIGHT_MOBILE = 400
-const HERO_MAX_HEIGHT_DESKTOP = 550
-const HERO_MIN_HEIGHT = 200
-
 export default function AboutPage() {
   type PublicPartner = { name: string; logo: string; site_web?: string | null }
-  const [heroHeight, setHeroHeight] = useState(HERO_MAX_HEIGHT_MOBILE)
   const [heroTitle, setHeroTitle] = useState("à propos")
   const [publicPartners, setPublicPartners] = useState<PublicPartner[]>(partners)
   const marqueePartners = [...publicPartners, ...publicPartners]
+  const currentTitleRef = useRef("à propos")
   const valuesRef = useRef<HTMLElement | null>(null)
   const objectivesRef = useRef<HTMLElement | null>(null)
   const partnersRef = useRef<HTMLElement | null>(null)
@@ -35,39 +31,43 @@ export default function AboutPage() {
   }, [])
 
   useEffect(() => {
-    const onScroll = () => {
-      const y = window.scrollY
-      const maxHeroHeight = window.innerWidth >= 640 ? HERO_MAX_HEIGHT_DESKTOP : HERO_MAX_HEIGHT_MOBILE
-      const nextHeight = Math.max(HERO_MIN_HEIGHT, maxHeroHeight - y * 0.5)
-      setHeroHeight(nextHeight)
-
-      const triggerY = nextHeight + 80
-      const partnersTop = partnersRef.current?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY
-      const objectivesTop = objectivesRef.current?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY
+    const updateTitle = () => {
+      const probeY = window.innerHeight * 0.38
       const valuesTop = valuesRef.current?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY
+      const objectivesTop = objectivesRef.current?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY
+      const partnersTop = partnersRef.current?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY
+      const footerTop = document.querySelector("footer")?.getBoundingClientRect().top ?? Number.POSITIVE_INFINITY
+      const isFooterStartingToShow = footerTop <= window.innerHeight
 
-      if (partnersTop <= triggerY) {
-        setHeroTitle("nos partenaires")
-      } else if (objectivesTop <= triggerY) {
-        setHeroTitle("nos objectifs")
-      } else if (valuesTop <= triggerY) {
-        setHeroTitle("nos valeurs")
-      } else {
-        setHeroTitle("à propos")
+      const nextTitle =
+        isFooterStartingToShow || partnersTop <= probeY
+          ? "nos partenaires"
+          : objectivesTop <= probeY
+            ? "nos objectifs"
+            : valuesTop <= probeY
+              ? "nos valeurs"
+              : "à propos"
+
+      if (currentTitleRef.current !== nextTitle) {
+        currentTitleRef.current = nextTitle
+        setHeroTitle(nextTitle)
       }
     }
 
-    onScroll()
-    window.addEventListener("scroll", onScroll, { passive: true })
-    return () => window.removeEventListener("scroll", onScroll)
+    updateTitle()
+    window.addEventListener("scroll", updateTitle, { passive: true })
+    window.addEventListener("resize", updateTitle)
+    return () => {
+      window.removeEventListener("scroll", updateTitle)
+      window.removeEventListener("resize", updateTitle)
+    }
   }, [])
 
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
       <section
-        className="sticky top-20 z-20 w-full overflow-hidden"
-        style={{ height: `${heroHeight}px` }}
+        className="sticky top-20 z-20 h-[210px] w-full overflow-hidden sm:h-[270px]"
       >
         <img
           src="/apropos/apropos.jpg"
