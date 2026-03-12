@@ -153,6 +153,7 @@ export default function AnnuairePage() {
     return secteurs.find((s) => s.id === filterSecteur)?.libelle || "secteur"
   }, [filterSecteur, secteurs])
   const selectedVilleLabel = filterVille || "ville"
+  const filtersDisabled = !isAuthenticated
 
   // Alumni filtrés (visiteur: aperçu fixe sans exploration)
   const filteredAlumni = useMemo(() => {
@@ -251,8 +252,7 @@ export default function AnnuairePage() {
       <section className="border-b bg-white">
         <div className="mx-auto w-full max-w-[86rem] px-4 sm:px-6 lg:px-8">
           <div className="mb-4 flex items-center justify-between gap-4">
-            {isAuthenticated ? (
-              <div className="flex w-full flex-wrap items-center gap-3">
+            <div className="flex w-full flex-wrap items-center gap-3">
                 <div className="flex w-full items-center rounded-full bg-[#8fb5d0] p-1.5 sm:w-auto">
                   <div className="flex min-w-0 flex-1 items-center gap-2 px-4 sm:w-80">
                     <Search className="h-4 w-4 shrink-0 text-white/80" />
@@ -262,18 +262,31 @@ export default function AnnuairePage() {
                       className="w-full bg-transparent text-sm text-white placeholder:text-white/75 outline-none"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
+                      disabled={filtersDisabled}
                     />
                   </div>
-                  <Button className="h-9 rounded-full bg-[#3558A2] px-5 text-sm font-semibold text-white hover:bg-[#2d4b8c]">
+                  <Button
+                    className="h-9 rounded-full bg-[#3558A2] px-5 text-sm font-semibold text-white hover:bg-[#2d4b8c]"
+                    disabled={filtersDisabled}
+                  >
                     rechercher
                   </Button>
                 </div>
 
-                <Popover open={isSecteurOpen} onOpenChange={setIsSecteurOpen}>
+                <Popover
+                  open={isSecteurOpen}
+                  onOpenChange={(open) => {
+                    if (!filtersDisabled) setIsSecteurOpen(open)
+                  }}
+                >
                   <PopoverTrigger asChild>
                     <button
                       type="button"
-                      className="inline-flex h-10 items-center gap-2 rounded-full border border-[#8fb5d0] bg-white px-5 text-sm font-semibold text-[#3558A2]"
+                      disabled={filtersDisabled}
+                      className={cn(
+                        "inline-flex h-10 items-center gap-2 rounded-full border border-[#8fb5d0] bg-white px-5 text-sm font-semibold text-[#3558A2]",
+                        filtersDisabled && "cursor-not-allowed opacity-60"
+                      )}
                     >
                       {selectedSecteurLabel}
                       <ChevronDown className="h-4 w-4" />
@@ -313,11 +326,20 @@ export default function AnnuairePage() {
                   </PopoverContent>
                 </Popover>
 
-                <Popover open={isVilleOpen} onOpenChange={setIsVilleOpen}>
+                <Popover
+                  open={isVilleOpen}
+                  onOpenChange={(open) => {
+                    if (!filtersDisabled) setIsVilleOpen(open)
+                  }}
+                >
                   <PopoverTrigger asChild>
                     <button
                       type="button"
-                      className="inline-flex h-10 items-center gap-2 rounded-full border border-[#8fb5d0] bg-white px-5 text-sm font-semibold text-[#3558A2]"
+                      disabled={filtersDisabled}
+                      className={cn(
+                        "inline-flex h-10 items-center gap-2 rounded-full border border-[#8fb5d0] bg-white px-5 text-sm font-semibold text-[#3558A2]",
+                        filtersDisabled && "cursor-not-allowed opacity-60"
+                      )}
                     >
                       {selectedVilleLabel}
                       <ChevronDown className="h-4 w-4" />
@@ -356,24 +378,14 @@ export default function AnnuairePage() {
                     </Command>
                   </PopoverContent>
                 </Popover>
-              </div>
-            ) : (
-              <div className="text-sm font-semibold sm:text-base">Recherche & Filtres</div>
-            )}
+            </div>
             <div className="ml-2 hidden h-[2px] w-16 bg-[#f48988] sm:block md:w-28" aria-hidden="true" />
           </div>
-
-          {isAuthenticated ? null : (
-            <div className="rounded-md border border-input bg-white p-3 text-sm text-muted-foreground">
-              Aperçu public de l&apos;annuaire: profils affichés aléatoirement. Connectez-vous pour accéder à la
-              recherche, aux filtres et à l&apos;intégralité des profils.
-            </div>
-          )}
         </div>
       </section>
 
       {/* Alumni Grid */}
-      <section className="py-4">
+      <section className="py-4 mb-13">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {loading ? (
             <div className="flex justify-center py-16">
@@ -566,7 +578,7 @@ export default function AnnuairePage() {
       </Dialog>
 
       {/* Nos Alumni en Chiffres - données réelles avec fallback historique */}
-      <section className="py-4 bg-[#ffe8e4]">
+      <section className="py-13 bg-[#ffe8e4]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-6 sm:mb-5">
             <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-4">Nos Alumni en Chiffres</h2>
@@ -576,9 +588,9 @@ export default function AnnuairePage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
-            <Card>
+            <Card className="border-2 border-transparent bg-[#ffe8e4] transition-colors hover:border-[#3558A2]">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total Alumni</CardTitle>
+                <CardTitle className="text-sm font-medium text-xl">Total Alumni</CardTitle>
                 <Users className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -587,9 +599,9 @@ export default function AnnuairePage() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-2 border-transparent bg-[#ffe8e4] transition-colors hover:border-[#3558A2]">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Répartition par Genre</CardTitle>
+                <CardTitle className="text-sm font-medium text-xl">Répartition par Genre</CardTitle>
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -600,9 +612,9 @@ export default function AnnuairePage() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-2 border-transparent bg-[#ffe8e4] transition-colors hover:border-[#3558A2]">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Plan de Retour</CardTitle>
+                <CardTitle className="text-sm font-medium text-xl">Plan de Retour</CardTitle>
                 <Target className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
@@ -611,22 +623,22 @@ export default function AnnuairePage() {
               </CardContent>
             </Card>
 
-            <Card>
+            <Card className="border-2 border-transparent bg-[#ffe8e4] transition-colors hover:border-[#3558A2]">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Objectif 2025</CardTitle>
+                <CardTitle className="text-sm font-medium text-xl">Déja en Guinée</CardTitle>
                 <Globe className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-3xl font-bold">684</div>
-                <p className="text-xs text-muted-foreground mt-1">01/01/2025</p>
+                <p className="text-xs text-muted-foreground mt-1">Alumni qui sont déjà en Guinée</p>
               </CardContent>
             </Card>
           </div>
 
           <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 mb-6">
-            <Card className="min-w-0">
+            <Card className="min-w-0 border-2 border-transparent bg-[#ffe8e4] transition-colors hover:border-[#3558A2]">
               <CardHeader>
-                <CardTitle>Statut Professionnel</CardTitle>
+                <CardTitle className="text-sm font-medium text-xl">Statut Professionnel</CardTitle>
               </CardHeader>
               <CardContent className="px-3 sm:px-6 overflow-hidden">
                 <ChartContainer
@@ -643,9 +655,9 @@ export default function AnnuairePage() {
               </CardContent>
             </Card>
 
-            <Card className="min-w-0">
+            <Card className="min-w-0 border-2 border-transparent bg-[#ffe8e4] transition-colors hover:border-[#3558A2]">
               <CardHeader>
-                <CardTitle>Répartition par Genre</CardTitle>
+                <CardTitle className="text-sm font-medium text-xl">Répartition par Genre</CardTitle>
               </CardHeader>
               <CardContent className="px-3 sm:px-6 overflow-hidden">
                 <ChartContainer
@@ -674,9 +686,9 @@ export default function AnnuairePage() {
             </Card>
           </div>
 
-          <Card className="min-w-0">
+          <Card className="min-w-0 border-2 border-transparent bg-[#ffe8e4] transition-colors hover:border-[#3558A2]">
             <CardHeader>
-              <CardTitle>Top Secteurs d&apos;Activité</CardTitle>
+              <CardTitle className="text-sm font-medium text-xl">Top Secteurs d&apos;Activité</CardTitle>
             </CardHeader>
             <CardContent className="px-3 sm:px-6 overflow-hidden">
               <ChartContainer

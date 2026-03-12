@@ -82,7 +82,7 @@ export default function AboutPage() {
         </div>
       </section>
 
-      <section className="py-8">
+      <section className="py-8 mb-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div>
             <p className="text-base text-justify sm:text-lg text-[#3558A2] leading-relaxed">
@@ -96,42 +96,33 @@ export default function AboutPage() {
       </section>
 
       {/* Values */}
-      <section ref={valuesRef} className="py-4 bg-[#ffe8e4]">
+      <section ref={valuesRef} className="py-10 bg-[#ffe8e4] mb-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div>
             {/* <h2 className="font-serif text-2xl sm:text-3xl font-bold mb-6 sm:mb-8 text-center">Nos Valeurs</h2> */}
             <div className="grid md:grid-cols-3 gap-4 sm:gap-8">
-              <Card className="border-2 hover:border-[#3558A2] transition-colors">
-                <CardContent className="pt-6">
-                  <div className="w-12 h-12 bg-[#3558A2]/10 rounded-lg flex items-center justify-center mb-4">
-                    <Users className="h-6 w-6 text-[#3558A2]" />
-                  </div>
-                  <h3 className="font-serif text-xl font-bold mb-3">Solidarité</h3>
-                  <p className="text-muted-foreground leading-relaxed">
+              <Card className="border-2 hover:border-[#3558A2] transition-colors bg-[#ffe8e4]">
+                <CardContent className="pt-2">
+                  <h3 className="font-serif text-2xl font-bold mb-3 text-center">Solidarité</h3>
+                  <p className="text-muted-foreground leading-relaxed text-justify">
                     Nous cultivons l'entraide et le soutien mutuel entre alumni pour favoriser la réussite collective.
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="border-2 hover:border-[#f48988] transition-colors">
-                <CardContent className="pt-6">
-                  <div className="w-12 h-12 bg-[#ffe8e4] rounded-lg flex items-center justify-center mb-4">
-                    <Award className="h-6 w-6 text-[#3558A2]" />
-                  </div>
-                  <h3 className="font-serif text-xl font-bold mb-3">Excellence</h3>
-                  <p className="text-muted-foreground leading-relaxed">
+              <Card className="border-2 hover:border-[#f48988] transition-colors bg-[#ffe8e4]">
+                <CardContent className="pt-2">
+                  <h3 className="font-serif text-2xl font-bold mb-3 text-center">Excellence</h3>
+                  <p className="text-muted-foreground leading-relaxed text-justify">
                     Nous promouvons l'excellence académique et professionnelle dans tous nos domaines d'intervention.
                   </p>
                 </CardContent>
               </Card>
 
-              <Card className="border-2 hover:border-[#3558A2] transition-colors">
-                <CardContent className="pt-6">
-                  <div className="w-12 h-12 bg-[#3558A2]/10 rounded-lg flex items-center justify-center mb-4">
-                    <Heart className="h-6 w-6 text-[#3558A2]" />
-                  </div>
-                  <h3 className="font-serif text-xl font-bold mb-3">Engagement</h3>
-                  <p className="text-muted-foreground leading-relaxed">
+              <Card className="border-2 hover:border-[#3558A2] transition-colors bg-[#ffe8e4]">
+                <CardContent className="pt-2">
+                  <h3 className="font-serif text-2xl font-bold mb-3 text-center">Engagement</h3>
+                  <p className="text-muted-foreground leading-relaxed text-justify">
                     Nous sommes engagés pour le développement durable et l'impact social positif en Guinée.
                   </p>
                 </CardContent>
@@ -142,7 +133,7 @@ export default function AboutPage() {
       </section>
 
       {/* Objectives */}
-      <section ref={objectivesRef} className="py-4">
+      <section ref={objectivesRef} className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* <h2 className="font-serif text-2xl sm:text-4xl font-bold mb-6 sm:mb-8 text-center">Nos Objectifs</h2> */}
           <div className="grid lg:grid-cols-2 gap-6 sm:gap-12 items-center">
@@ -225,7 +216,7 @@ export default function AboutPage() {
       </section>
 
       {/* Partners */}
-      <section ref={partnersRef} className="py-4">
+      <section ref={partnersRef} className="py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-5xl overflow-hidden">
             <div className="partners-marquee-track">

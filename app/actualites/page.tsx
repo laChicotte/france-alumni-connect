@@ -128,7 +128,7 @@ export default function ActualitesPage() {
       </section>
 
       {/* Articles Grid */}
-      <section className="py-6">
+      <section className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {isLoadingFeed ? (
             <div className="flex justify-center py-16">
@@ -220,7 +220,7 @@ export default function ActualitesPage() {
       </section>
 
       {/* Newsletter CTA */}
-      <section className="py-4 bg-[#ffe8e4]">
+      <section className="py-10 bg-[#ffe8e4]">
         <div className="w-full px-2 sm:px-4">
           <div className="max-w-2xl mx-auto text-center">
             <h2 className="font-serif text-3xl font-bold mb-4">Restez informé</h2>
