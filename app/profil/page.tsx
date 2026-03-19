@@ -15,7 +15,7 @@ import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { User, Mail, Phone, MapPin, Building, GraduationCap, Edit2, Save, X, Loader2, Linkedin, CheckCircle, AlertCircle, FileText, Eye, EyeOff, Lock, ChevronDown, Check } from "lucide-react"
 import { supabase } from "@/lib/supabase"
-import { AlumniProfile, Secteur, StatutProfessionnel, DiplomeType, GenreType } from "@/types/database.types"
+import { AlumniProfile, Secteur, StatutProfessionnel, DiplomeType, GenreType, PlanRetourType } from "@/types/database.types"
 import { cn } from "@/lib/utils"
 
 const DIPLOME_OPTIONS: { value: DiplomeType; label: string }[] = [
@@ -27,6 +27,7 @@ const DIPLOME_OPTIONS: { value: DiplomeType; label: string }[] = [
   { value: 'autre', label: 'Autre' },
 ]
 const GENRE_OPTIONS: GenreType[] = ['Homme', 'Femme', 'Autre']
+const PLAN_RETOUR_OPTIONS: PlanRetourType[] = ['Dans 2 ans', 'Dans 5 ans', 'Déjà en Guinée', 'Autre']
 
 function extractAlumniPhotoPath(photoUrl: string | null | undefined): string | null {
   if (!photoUrl) return null
@@ -54,6 +55,7 @@ export default function ProfilPage() {
   const [isDiplomeOpen, setIsDiplomeOpen] = useState(false)
   const [isStatutOpen, setIsStatutOpen] = useState(false)
   const [isSecteurOpen, setIsSecteurOpen] = useState(false)
+  const [isPlanRetourOpen, setIsPlanRetourOpen] = useState(false)
 
   // Options pour les selects
   const [secteurs, setSecteurs] = useState<Secteur[]>([])
@@ -211,6 +213,7 @@ export default function ProfilPage() {
           photo_url: nextPhotoUrl,
           bio: formData.bio || null,
           linkedin_url: formData.linkedin_url || null,
+          plan_retour: (formData.plan_retour as string) || null,
           updated_at: new Date().toISOString(),
         })
         .eq('user_id', user.id)
@@ -321,6 +324,7 @@ export default function ProfilPage() {
   const selectedDiplomeLabel = getDiplomeLabel(formData.diplome)
   const selectedStatutLabel = getStatutLibelle(formData.statut_professionnel_id || null)
   const selectedSecteurLabel = getSecteurLibelle(formData.secteur_id || null)
+  const selectedPlanRetourLabel = (formData.plan_retour as string) || 'Non renseigné'
   const displayName = isAlumni
     ? `${formData.prenom || ''} ${formData.nom || ''}`.trim() || user.name
     : user.name
@@ -800,7 +804,55 @@ export default function ProfilPage() {
                       />
                     </div>
 
-                    {/* Visibilité */}
+                    {/* Plan de retour */}
+                    <div>
+                      <Label htmlFor="plan_retour" className="mb-0.5 block">Plan de retour en Guinée</Label>
+                      {isEditing ? (
+                        <Popover open={isPlanRetourOpen} onOpenChange={setIsPlanRetourOpen}>
+                          <PopoverTrigger asChild>
+                            <button type="button" className="inline-flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm">
+                              {selectedPlanRetourLabel}
+                              <ChevronDown className="h-4 w-4 opacity-70" />
+                            </button>
+                          </PopoverTrigger>
+                          <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] p-0">
+                            <Command>
+                              <CommandList className="max-h-48">
+                                <CommandGroup>
+                                  <CommandItem
+                                    value="Non renseigné"
+                                    onSelect={() => {
+                                      setFormData({ ...formData, plan_retour: null })
+                                      setIsPlanRetourOpen(false)
+                                    }}
+                                  >
+                                    <Check className={cn("h-4 w-4", !formData.plan_retour ? "opacity-100" : "opacity-0")} />
+                                    Non renseigné
+                                  </CommandItem>
+                                  {PLAN_RETOUR_OPTIONS.map((option) => (
+                                    <CommandItem
+                                      key={option}
+                                      value={option}
+                                      onSelect={() => {
+                                        setFormData({ ...formData, plan_retour: option })
+                                        setIsPlanRetourOpen(false)
+                                      }}
+                                    >
+                                      <Check className={cn("h-4 w-4", formData.plan_retour === option ? "opacity-100" : "opacity-0")} />
+                                      {option}
+                                    </CommandItem>
+                                  ))}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+                      ) : (
+                        <Input value={selectedPlanRetourLabel} disabled />
+                      )}
+                    </div>
+
+                            {/* Visibilité */}
                     <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
                       <div className="flex items-center gap-3">
                         {formData.visible_annuaire ? (

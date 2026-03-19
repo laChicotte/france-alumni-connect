@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseAdmin } from '@/lib/supabase-admin'
-import type { Database, GenreType } from '@/types/database.types'
+import type { Database, GenreType, PlanRetourType } from '@/types/database.types'
 
 // Rate limiting : max 5 tentatives par IP par fenêtre de 60s
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
@@ -24,6 +24,7 @@ const ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'
 const MAX_PHOTO_SIZE = 3 * 1024 * 1024 // 3MB
 const ALLOWED_PHOTO_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
 const ALLOWED_GENRES: GenreType[] = ['Homme', 'Femme', 'Autre']
+const ALLOWED_PLAN_RETOUR: PlanRetourType[] = ['Dans 2 ans', 'Dans 5 ans', 'Déjà en Guinée', 'Autre']
 
 export async function POST(request: NextRequest) {
   const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
@@ -42,6 +43,7 @@ export async function POST(request: NextRequest) {
     const prenom = formData.get('prenom') as string
     const nom = formData.get('nom') as string
     const genre = formData.get('genre') as string
+    const planRetour = formData.get('plan_retour') as string | null
     const telephone = formData.get('telephone') as string
     const universite = formData.get('universite') as string
     const anneePromotion = formData.get('annee_promotion') as string
@@ -59,6 +61,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Genre invalide. Valeurs autorisées: Homme, Femme, Autre.' },
         { status: 400 }
+
+    if (planRetour && !ALLOWED_PLAN_RETOUR.includes(planRetour as PlanRetourType)) {
+      return NextResponse.json({ error: 'Plan de retour invalide.' }, { status: 400 })
+    }
       )
     }
 
@@ -243,6 +249,7 @@ export async function POST(request: NextRequest) {
       visible_annuaire: true,
       document_diplome_url: diplomeUrl,
       photo_url: photoUrl,
+      plan_retour: planRetour || null,
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

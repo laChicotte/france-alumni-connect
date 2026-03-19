@@ -102,5 +102,14 @@ Ici on travaille étape par étape et selon des règles c'est à dire:
     - 2 min (120s): `/api/actualites/feed`, `/api/home/highlights`, `/api/annuaire/public-preview`, `/api/annuaire/stats`.
     - 5 min (300s): `/api/articles/public/[id]`, `/api/partenaires/public`.
   - Optimisation des images Next.js (`next.config.mjs`): suppression de `unoptimized: true`, formats WebP/AVIF activés, `remotePatterns` configuré pour le bucket Supabase.
+- Backoffice `/admin/utilisateurs` amélioré:
+  - Pagination ajoutée: 5 utilisateurs par page, hauteur fixe du tableau (320px), boutons «‹ pages ›», compteur `1–5 sur N utilisateurs`.
+  - Filtres et recherche réinitialisent la page courante à 1 automatiquement.
+- Navigation responsive corrigée:
+  - Breakpoint desktop passé de `md` (768px) à `lg` (1024px): les tablettes utilisent désormais le menu hamburger.
+  - Texte "France Alumni Connect" visible à partir de `md` (768px) pour éviter l'espace vide sur tablette.
+- Images optimisées avec `<Image>` de Next.js (remplacement de `<img>`):
+  - Héros: `actualites`, `annuaire`, `emploi`, `formation` — avec `fill` + `priority`.
+  - Logo dans `actualites/[id]` — avec `width/height` fixes.
 **Prochaine étape pour plutard**
-- Continuer les ajustements visuels (images/hero) sur `a-propos`, `formation`, `annuaire` et autres pages publiques selon validation.
+- ajouter le champ plan_retour dans alumnis profiles (qui peux prendre les valeurs suivantes : "Dans 2 ans", "Dans 5 ans", "Déja ne Guinée" et "Autre")

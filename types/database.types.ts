@@ -1,7 +1,7 @@
 export type UserRole = 'admin' | 'moderateur' | 'alumni'
 export type UserStatus = 'en_attente' | 'actif' | 'banni'
 export type DiplomeType = 'licence' | 'master' | 'doctorat' | 'mba' | 'ingenieur' | 'autre'
-export type GenreType = 'Homme' | 'Femme' | 'Autre'
+undefined
 export type ArticleStatus = 'brouillon' | 'publie'
 export type ArticleMediaType = 'image' | 'video'
 export type JobType = 'cdi' | 'cdd' | 'stage' | 'freelance' | 'alternance'
@@ -50,6 +50,7 @@ export interface Database {
           nom: string
           prenom: string
           genre: GenreType
+export type PlanRetourType = 'Dans 2 ans' | 'Dans 5 ans' | 'Déjà en Guinée' | 'Autre'
           photo_url: string | null
           telephone: string
           ville: string
@@ -65,6 +66,7 @@ export interface Database {
           linkedin_url: string | null
           visible_annuaire: boolean
           document_diplome_url: string | null
+          plan_retour: string | null
           created_at: string
           updated_at: string
         }
@@ -89,6 +91,7 @@ export interface Database {
           linkedin_url?: string | null
           visible_annuaire?: boolean
           document_diplome_url?: string | null
+          plan_retour?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -112,6 +115,7 @@ export interface Database {
           linkedin_url?: string | null
           visible_annuaire?: boolean
           document_diplome_url?: string | null
+          plan_retour?: string | null
           updated_at?: string
         }
       }
