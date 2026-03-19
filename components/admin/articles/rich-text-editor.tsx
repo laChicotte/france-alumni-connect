@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useRef } from "react"
 import { EditorContent, useEditor } from "@tiptap/react"
 import StarterKit from "@tiptap/starter-kit"
 import Underline from "@tiptap/extension-underline"
@@ -30,6 +30,7 @@ interface RichTextEditorProps {
 }
 
 export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
+  const isInternalUpdate = useRef(false)
   const editor = useEditor({
     immediatelyRender: false,
     extensions: [
@@ -44,6 +45,7 @@ export function RichTextEditor({ value, onChange }: RichTextEditorProps) {
     ],
     content: value || "<p></p>",
     onUpdate: ({ editor: currentEditor }) => {
+      isInternalUpdate.current = true
       onChange(currentEditor.getHTML())
     },
     editorProps: {

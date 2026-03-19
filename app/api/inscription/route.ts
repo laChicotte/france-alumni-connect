@@ -61,11 +61,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: 'Genre invalide. Valeurs autorisées: Homme, Femme, Autre.' },
         { status: 400 }
+      )
+    }
 
     if (planRetour && !ALLOWED_PLAN_RETOUR.includes(planRetour as PlanRetourType)) {
       return NextResponse.json({ error: 'Plan de retour invalide.' }, { status: 400 })
-    }
-      )
     }
 
     if (password.length < 6) {
