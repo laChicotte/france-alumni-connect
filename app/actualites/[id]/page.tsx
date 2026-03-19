@@ -1,5 +1,7 @@
 "use client"
 
+import Image from "next/image"
+
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
@@ -122,7 +124,7 @@ export default function ArticlePage() {
 
         <div className="mx-auto max-w-6xl border-2 border-[#3558A2] bg-white p-6 md:p-8">
           <div className="mb-6 flex items-start justify-between">
-            <img src="/logo/logo_alumni_bleu.png" alt="France Alumni" className="h-16 w-auto object-contain" />
+            <Image src="/logo/logo_alumni_bleu.png" alt="France Alumni" width={80} height={64} className="h-16 w-auto object-contain" />
           </div>
 
           <h1 className="mb-3 text-center text-3xl font-bold leading-tight text-gray-900">

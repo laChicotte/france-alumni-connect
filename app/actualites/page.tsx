@@ -1,5 +1,7 @@
 "use client"
 
+import Image from "next/image"
+
 import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -89,7 +91,7 @@ export default function ActualitesPage() {
     <div className="min-h-screen">
       {/* Hero image */}
       <section ref={heroRef} className="fixed left-0 top-20 z-10 h-[300px] w-full overflow-hidden will-change-transform sm:h-[550px]">
-        <img src="/actualites/actualites.jpg" alt="Actualités" className="absolute inset-0 h-full w-full object-cover" />
+        <Image src="/actualites/actualites.jpg" alt="Actualités" fill className="object-cover" priority />
         <div className="absolute inset-0 bg-black/20" />
         <div className="relative z-10 mx-auto flex h-full w-full max-w-7xl items-end px-4 pb-6 sm:px-6 sm:pb-8 lg:px-8">
           <h1 className="font-serif text-4xl font-bold leading-none text-white sm:text-6xl lg:text-7xl">

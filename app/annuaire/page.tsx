@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { useEffect, useState, useMemo, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -236,7 +237,7 @@ export default function AnnuairePage() {
     <div className="min-h-screen">
       {/* Hero image */}
       <section ref={heroRef} className="fixed left-0 top-20 z-10 h-[300px] w-full overflow-hidden will-change-transform sm:h-[550px]">
-        <img src="/annuaire/annuaire1.jpg" alt="Annuaire" className="absolute inset-0 h-full w-full object-cover" />
+        <Image src="/annuaire/annuaire1.jpg" alt="Annuaire" fill className="object-cover" priority />
         <div className="absolute inset-0 bg-black/20" />
         <div className="relative z-10 mx-auto flex h-full w-full max-w-7xl items-end px-4 pb-6 sm:px-6 sm:pb-8 lg:px-8">
           <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold text-white leading-none">

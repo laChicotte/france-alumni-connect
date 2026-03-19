@@ -85,7 +85,7 @@ export function Navigation() {
               className="object-contain h-14 w-auto"
             />
             <span
-              className="hidden text-2xl font-bold uppercase tracking-wide text-[#3558A2] sm:block"
+              className="hidden text-2xl font-bold uppercase tracking-wide text-[#3558A2] md:block"
               style={{
                 letterSpacing: '0.05em',
                 textShadow: "1px 1px 0 #d9e3ff",
@@ -96,7 +96,7 @@ export function Navigation() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden items-center gap-6 md:flex">
+          <div className="hidden items-center gap-6 lg:flex">
             {navItems.map((item) => {
               const isActive = item.href.startsWith("http") ? false : pathname.startsWith(item.href)
               const isExternal = item.href.startsWith("http")
@@ -217,14 +217,14 @@ export function Navigation() {
           </div>
 
           {/* Mobile menu button */}
-          <Button variant="ghost" size="icon" className="mr-0 border border-[#3558A2]/40 text-[#3558A2] hover:bg-[#3558A2]/10 md:hidden" onClick={() => setIsOpen(!isOpen)}>
+          <Button variant="ghost" size="icon" className="mr-0 border border-[#3558A2]/40 text-[#3558A2] hover:bg-[#3558A2]/10 lg:hidden" onClick={() => setIsOpen(!isOpen)}>
             {isOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </Button>
         </div>
 
         {/* Mobile Navigation */}
         {isOpen && (
-          <div className="m-3 grid grid-cols-2 gap-2 rounded-lg border border-[#3558A2]/20 bg-white p-2 md:hidden">
+          <div className="m-3 grid grid-cols-2 gap-2 rounded-lg border border-[#3558A2]/20 bg-white p-2 lg:hidden">
             {navItems.map((item) => {
               const isActive = item.href.startsWith("http") ? false : pathname.startsWith(item.href)
               const isExternal = item.href.startsWith("http")
