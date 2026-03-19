@@ -8,6 +8,7 @@ type StatsProfile = {
   ville: string | null
   photo_url: string | null
   genre: "Homme" | "Femme" | "Autre" | null
+  plan_retour: "Dans 2 ans" | "Dans 5 ans" | "Déjà en Guinée" | "Autre" | null
   secteurs?: { libelle: string } | null
   statuts_professionnels?: { libelle: string } | null
 }
@@ -34,6 +35,7 @@ export async function GET() {
         ville,
         photo_url,
         genre,
+        plan_retour,
         secteurs(libelle),
         statuts_professionnels(libelle),
         users!inner(id)
@@ -66,6 +68,8 @@ export async function GET() {
     const genderCounter: Record<string, number> = { Homme: 0, Femme: 0, Autre: 0 }
     const sectorCounter: Record<string, number> = {}
     const statusCounter: Record<string, number> = {}
+    let planRetourCount = 0
+    let dejaEnGuineeCount = 0
 
     activeProfiles.forEach((profile) => {
       const genre = profile.genre || "Autre"
@@ -76,12 +80,21 @@ export async function GET() {
 
       const statut = profile.statuts_professionnels?.libelle || "Non renseigné"
       statusCounter[statut] = (statusCounter[statut] || 0) + 1
+
+      if (profile.plan_retour === "Dans 2 ans" || profile.plan_retour === "Dans 5 ans") {
+        planRetourCount++
+      }
+      if (profile.plan_retour === "Déjà en Guinée") {
+        dejaEnGuineeCount++
+      }
     })
 
     return NextResponse.json({
       totalAlumni,
       withPhoto,
       cityCount,
+      planRetourCount,
+      dejaEnGuineeCount,
       genderData: toSortedChartData(genderCounter),
       sectorData: toSortedChartData(sectorCounter, 5),
       statusData: toSortedChartData(statusCounter, 6),

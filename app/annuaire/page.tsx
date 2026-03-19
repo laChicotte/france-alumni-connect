@@ -28,6 +28,8 @@ type AnnuaireStats = {
   sectorData: StatsItem[]
   genderData: StatsItem[]
   statusData: StatsItem[]
+  planRetourCount: number
+  dejaEnGuineeCount: number
 }
 
 const PAGE_SIZE = 6
@@ -36,6 +38,8 @@ const DEFAULT_STATS: AnnuaireStats = {
   sectorData: [],
   genderData: [],
   statusData: [],
+  planRetourCount: 0,
+  dejaEnGuineeCount: 0,
 }
 
 
@@ -76,6 +80,8 @@ export default function AnnuairePage() {
           sectorData: Array.isArray(data.sectorData) ? data.sectorData : [],
           genderData: Array.isArray(data.genderData) ? data.genderData : [],
           statusData: Array.isArray(data.statusData) ? data.statusData : [],
+          planRetourCount: Number(data.planRetourCount) || 0,
+          dejaEnGuineeCount: Number(data.dejaEnGuineeCount) || 0,
         })
       } catch (error) {
         console.error("Erreur chargement stats annuaire:", error)
@@ -619,18 +625,18 @@ export default function AnnuairePage() {
                 <Target className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">684</div>
+                <div className="text-3xl font-bold">{stats.planRetourCount}</div>
                 <p className="text-xs text-muted-foreground mt-1">Alumni prévoyant de retourner</p>
               </CardContent>
             </Card>
 
             <Card className="border-2 border-transparent bg-[#ffe8e4] transition-colors hover:border-[#3558A2]">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-xl">Déja en Guinée</CardTitle>
+                <CardTitle className="text-sm font-medium text-xl">Déjà en Guinée</CardTitle>
                 <Globe className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-3xl font-bold">684</div>
+                <div className="text-3xl font-bold">{stats.dejaEnGuineeCount}</div>
                 <p className="text-xs text-muted-foreground mt-1">Alumni qui sont déjà en Guinée</p>
               </CardContent>
             </Card>
