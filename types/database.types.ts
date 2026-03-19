@@ -1,7 +1,8 @@
 export type UserRole = 'admin' | 'moderateur' | 'alumni'
 export type UserStatus = 'en_attente' | 'actif' | 'banni'
 export type DiplomeType = 'licence' | 'master' | 'doctorat' | 'mba' | 'ingenieur' | 'autre'
-undefined
+export type GenreType = 'Homme' | 'Femme' | 'Autre'
+export type PlanRetourType = 'Dans 2 ans' | 'Dans 5 ans' | 'Déjà en Guinée' | 'Autre'
 export type ArticleStatus = 'brouillon' | 'publie'
 export type ArticleMediaType = 'image' | 'video'
 export type JobType = 'cdi' | 'cdd' | 'stage' | 'freelance' | 'alternance'
@@ -50,7 +51,6 @@ export interface Database {
           nom: string
           prenom: string
           genre: GenreType
-export type PlanRetourType = 'Dans 2 ans' | 'Dans 5 ans' | 'Déjà en Guinée' | 'Autre'
           photo_url: string | null
           telephone: string
           ville: string

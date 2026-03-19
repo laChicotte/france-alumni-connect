@@ -494,13 +494,13 @@ export default function ProfilPage() {
                 ) : (
                   // Affichage pour alumni
                   <>
-                    {/* Informations non modifiables */}
+                    {/* 1. Informations vérifiées */}
                     <div className="p-4 bg-muted/50 rounded-lg border">
                       <div className="flex items-center gap-2 mb-3 text-muted-foreground">
                         <Lock className="h-4 w-4" />
                         <span className="text-sm font-medium">Informations vérifiées (non modifiables)</span>
                       </div>
-                      <div className="grid md:grid-cols-1 gap-4">
+                      <div className="grid md:grid-cols-2 gap-4">
                         <div>
                           <Label className="mb-0.5 block text-muted-foreground text-xs">Prénom</Label>
                           <p className="font-medium">{formData.prenom || '-'}</p>
@@ -513,346 +513,341 @@ export default function ProfilPage() {
                           <Label className="mb-0.5 block text-muted-foreground text-xs">Email</Label>
                           <p className="font-medium">{user.email}</p>
                         </div>
+                      </div>
+                    </div>
+
+                    {/* 2. Profil personnel */}
+                    <div>
+                      <h3 className="text-sm font-semibold text-[#3558A2] uppercase tracking-wide mb-3 border-b border-[#3558A2]/20 pb-1">Profil personnel</h3>
+                      <div className="space-y-4">
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div>
+                            <Label className="mb-0.5 block">Genre</Label>
+                            {isEditing ? (
+                              <Popover open={isGenreOpen} onOpenChange={setIsGenreOpen}>
+                                <PopoverTrigger asChild>
+                                  <button type="button" className="inline-flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm">
+                                    {selectedGenreLabel}
+                                    <ChevronDown className="h-4 w-4 opacity-70" />
+                                  </button>
+                                </PopoverTrigger>
+                                <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] p-0">
+                                  <Command>
+                                    <CommandInput placeholder="Rechercher un genre..." />
+                                    <CommandList className="max-h-48">
+                                      <CommandEmpty>Aucun genre trouvé.</CommandEmpty>
+                                      <CommandGroup>
+                                        {GENRE_OPTIONS.map((option) => (
+                                          <CommandItem
+                                            key={option}
+                                            value={option}
+                                            onSelect={() => {
+                                              setFormData({ ...formData, genre: option as GenreType })
+                                              setIsGenreOpen(false)
+                                            }}
+                                          >
+                                            <Check className={cn("h-4 w-4", selectedGenreLabel === option ? "opacity-100" : "opacity-0")} />
+                                            {option}
+                                          </CommandItem>
+                                        ))}
+                                      </CommandGroup>
+                                    </CommandList>
+                                  </Command>
+                                </PopoverContent>
+                              </Popover>
+                            ) : (
+                              <Input value={(formData.genre as GenreType) || 'Autre'} disabled />
+                            )}
+                          </div>
+                          <div>
+                            <Label htmlFor="ville" className="mb-0.5 block">Ville de résidence</Label>
+                            <Input
+                              id="ville"
+                              value={formData.ville || ''}
+                              onChange={(e) => setFormData({...formData, ville: e.target.value})}
+                              disabled={!isEditing}
+                              placeholder="Conakry, Guinée"
+                            />
+                          </div>
+                        </div>
                         <div>
-                          <Label className="mb-0.5 block text-muted-foreground text-xs">Téléphone</Label>
-                          <p className="font-medium">{formData.telephone || '-'}</p>
+                          <Label className="mb-0.5 block">Plan de retour en Guinée</Label>
+                          {isEditing ? (
+                            <Popover open={isPlanRetourOpen} onOpenChange={setIsPlanRetourOpen}>
+                              <PopoverTrigger asChild>
+                                <button type="button" className="inline-flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm">
+                                  {selectedPlanRetourLabel}
+                                  <ChevronDown className="h-4 w-4 opacity-70" />
+                                </button>
+                              </PopoverTrigger>
+                              <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] p-0">
+                                <Command>
+                                  <CommandList className="max-h-48">
+                                    <CommandGroup>
+                                      <CommandItem
+                                        value="Non renseigné"
+                                        onSelect={() => {
+                                          setFormData({ ...formData, plan_retour: null })
+                                          setIsPlanRetourOpen(false)
+                                        }}
+                                      >
+                                        <Check className={cn("h-4 w-4", !formData.plan_retour ? "opacity-100" : "opacity-0")} />
+                                        Non renseigné
+                                      </CommandItem>
+                                      {PLAN_RETOUR_OPTIONS.map((option) => (
+                                        <CommandItem
+                                          key={option}
+                                          value={option}
+                                          onSelect={() => {
+                                            setFormData({ ...formData, plan_retour: option })
+                                            setIsPlanRetourOpen(false)
+                                          }}
+                                        >
+                                          <Check className={cn("h-4 w-4", formData.plan_retour === option ? "opacity-100" : "opacity-0")} />
+                                          {option}
+                                        </CommandItem>
+                                      ))}
+                                    </CommandGroup>
+                                  </CommandList>
+                                </Command>
+                              </PopoverContent>
+                            </Popover>
+                          ) : (
+                            <Input value={selectedPlanRetourLabel} disabled />
+                          )}
+                        </div>
+                        <div>
+                          <Label htmlFor="bio" className="mb-0.5 block">Biographie</Label>
+                          <Textarea
+                            id="bio"
+                            rows={4}
+                            value={formData.bio || ''}
+                            onChange={(e) => setFormData({...formData, bio: e.target.value})}
+                            disabled={!isEditing}
+                            placeholder="Parlez-nous de votre parcours et de vos objectifs..."
+                          />
                         </div>
                       </div>
                     </div>
 
-                    {/* Localisation */}
+                    {/* 3. Formation */}
                     <div>
-                      <Label htmlFor="ville" className="mb-0.5 block">Ville de résidence</Label>
-                      <Input
-                        id="ville"
-                        value={formData.ville || ''}
-                        onChange={(e) => setFormData({...formData, ville: e.target.value})}
-                        disabled={!isEditing}
-                        placeholder="Conakry, Guinée"
-                      />
+                      <h3 className="text-sm font-semibold text-[#3558A2] uppercase tracking-wide mb-3 border-b border-[#3558A2]/20 pb-1">Formation</h3>
+                      <div className="space-y-4">
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="universite" className="mb-0.5 block">Université</Label>
+                            <Input
+                              id="universite"
+                              value={formData.universite || ''}
+                              onChange={(e) => setFormData({...formData, universite: e.target.value})}
+                              disabled={!isEditing}
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="annee_promotion" className="mb-0.5 block">Année de promotion</Label>
+                            <Input
+                              id="annee_promotion"
+                              type="number"
+                              value={formData.annee_promotion || ''}
+                              onChange={(e) => setFormData({...formData, annee_promotion: parseInt(e.target.value) || 0})}
+                              disabled={!isEditing}
+                              min="1950"
+                              max={new Date().getFullYear()}
+                            />
+                          </div>
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div>
+                            <Label className="mb-0.5 block">Niveau de diplôme</Label>
+                            {isEditing ? (
+                              <Popover open={isDiplomeOpen} onOpenChange={setIsDiplomeOpen}>
+                                <PopoverTrigger asChild>
+                                  <button type="button" className="inline-flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm">
+                                    {selectedDiplomeLabel}
+                                    <ChevronDown className="h-4 w-4 opacity-70" />
+                                  </button>
+                                </PopoverTrigger>
+                                <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] p-0">
+                                  <Command>
+                                    <CommandInput placeholder="Rechercher un diplôme..." />
+                                    <CommandList className="max-h-56">
+                                      <CommandEmpty>Aucun diplôme trouvé.</CommandEmpty>
+                                      <CommandGroup>
+                                        {DIPLOME_OPTIONS.map((option) => (
+                                          <CommandItem
+                                            key={option.value}
+                                            value={option.label}
+                                            onSelect={() => {
+                                              setFormData({ ...formData, diplome: option.value as DiplomeType })
+                                              setIsDiplomeOpen(false)
+                                            }}
+                                          >
+                                            <Check className={cn("h-4 w-4", formData.diplome === option.value ? "opacity-100" : "opacity-0")} />
+                                            {option.label}
+                                          </CommandItem>
+                                        ))}
+                                      </CommandGroup>
+                                    </CommandList>
+                                  </Command>
+                                </PopoverContent>
+                              </Popover>
+                            ) : (
+                              <Input value={getDiplomeLabel(formData.diplome)} disabled />
+                            )}
+                          </div>
+                          <div>
+                            <Label htmlFor="formation_domaine" className="mb-0.5 block">Domaine de formation</Label>
+                            <Input
+                              id="formation_domaine"
+                              value={formData.formation_domaine || ''}
+                              onChange={(e) => setFormData({...formData, formation_domaine: e.target.value})}
+                              disabled={!isEditing}
+                              placeholder="Informatique, Droit, Médecine..."
+                            />
+                          </div>
+                        </div>
+                      </div>
                     </div>
 
+                    {/* 4. Situation professionnelle */}
                     <div>
-                      <Label htmlFor="genre" className="mb-0.5 block">Genre</Label>
-                      {isEditing ? (
-                        <Popover open={isGenreOpen} onOpenChange={setIsGenreOpen}>
-                          <PopoverTrigger asChild>
-                            <button type="button" className="inline-flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm">
-                              {selectedGenreLabel}
-                              <ChevronDown className="h-4 w-4 opacity-70" />
-                            </button>
-                          </PopoverTrigger>
-                          <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] p-0">
-                            <Command>
-                              <CommandInput placeholder="Rechercher un genre..." />
-                              <CommandList className="max-h-48">
-                                <CommandEmpty>Aucun genre trouvé.</CommandEmpty>
-                                <CommandGroup>
-                                  {GENRE_OPTIONS.map((option) => (
-                                    <CommandItem
-                                      key={option}
-                                      value={option}
-                                      onSelect={() => {
-                                        setFormData({ ...formData, genre: option as GenreType })
-                                        setIsGenreOpen(false)
-                                      }}
-                                    >
-                                      <Check className={cn("h-4 w-4", selectedGenreLabel === option ? "opacity-100" : "opacity-0")} />
-                                      {option}
-                                    </CommandItem>
-                                  ))}
-                                </CommandGroup>
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                      ) : (
-                        <Input value={(formData.genre as GenreType) || 'Autre'} disabled />
-                      )}
-                    </div>
-
-                    {/* Formation */}
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="universite" className="mb-0.5 block">Université</Label>
-                        <Input
-                          id="universite"
-                          value={formData.universite || ''}
-                          onChange={(e) => setFormData({...formData, universite: e.target.value})}
-                          disabled={!isEditing}
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="annee_promotion" className="mb-0.5 block">Année de promotion</Label>
-                        <Input
-                          id="annee_promotion"
-                          type="number"
-                          value={formData.annee_promotion || ''}
-                          onChange={(e) => setFormData({...formData, annee_promotion: parseInt(e.target.value) || 0})}
-                          disabled={!isEditing}
-                          min="1950"
-                          max={new Date().getFullYear()}
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="diplome" className="mb-0.5 block">Niveau de diplôme</Label>
-                        {isEditing ? (
-                          <Popover open={isDiplomeOpen} onOpenChange={setIsDiplomeOpen}>
-                            <PopoverTrigger asChild>
-                              <button type="button" className="inline-flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm">
-                                {selectedDiplomeLabel}
-                                <ChevronDown className="h-4 w-4 opacity-70" />
-                              </button>
-                            </PopoverTrigger>
-                            <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] p-0">
-                              <Command>
-                                <CommandInput placeholder="Rechercher un diplôme..." />
-                                <CommandList className="max-h-56">
-                                  <CommandEmpty>Aucun diplôme trouvé.</CommandEmpty>
-                                  <CommandGroup>
-                                    {DIPLOME_OPTIONS.map((option) => (
-                                      <CommandItem
-                                        key={option.value}
-                                        value={option.label}
-                                        onSelect={() => {
-                                          setFormData({ ...formData, diplome: option.value as DiplomeType })
-                                          setIsDiplomeOpen(false)
-                                        }}
-                                      >
-                                        <Check className={cn("h-4 w-4", formData.diplome === option.value ? "opacity-100" : "opacity-0")} />
-                                        {option.label}
-                                      </CommandItem>
-                                    ))}
-                                  </CommandGroup>
-                                </CommandList>
-                              </Command>
-                            </PopoverContent>
-                          </Popover>
-                        ) : (
+                      <h3 className="text-sm font-semibold text-[#3558A2] uppercase tracking-wide mb-3 border-b border-[#3558A2]/20 pb-1">Situation professionnelle</h3>
+                      <div className="space-y-4">
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div>
+                            <Label className="mb-0.5 block">Statut professionnel</Label>
+                            {isEditing ? (
+                              <Popover open={isStatutOpen} onOpenChange={setIsStatutOpen}>
+                                <PopoverTrigger asChild>
+                                  <button type="button" className="inline-flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm">
+                                    {selectedStatutLabel}
+                                    <ChevronDown className="h-4 w-4 opacity-70" />
+                                  </button>
+                                </PopoverTrigger>
+                                <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] p-0">
+                                  <Command>
+                                    <CommandInput placeholder="Rechercher un statut..." />
+                                    <CommandList className="max-h-56">
+                                      <CommandEmpty>Aucun statut trouvé.</CommandEmpty>
+                                      <CommandGroup>
+                                        <CommandItem
+                                          value="Non renseigné"
+                                          onSelect={() => {
+                                            setFormData({ ...formData, statut_professionnel_id: null })
+                                            setIsStatutOpen(false)
+                                          }}
+                                        >
+                                          <Check className={cn("h-4 w-4", !formData.statut_professionnel_id ? "opacity-100" : "opacity-0")} />
+                                          Non renseigné
+                                        </CommandItem>
+                                        {statutsPro.map((statut) => (
+                                          <CommandItem
+                                            key={statut.id}
+                                            value={statut.libelle}
+                                            onSelect={() => {
+                                              setFormData({ ...formData, statut_professionnel_id: statut.id })
+                                              setIsStatutOpen(false)
+                                            }}
+                                          >
+                                            <Check className={cn("h-4 w-4", formData.statut_professionnel_id === statut.id ? "opacity-100" : "opacity-0")} />
+                                            {statut.libelle}
+                                          </CommandItem>
+                                        ))}
+                                      </CommandGroup>
+                                    </CommandList>
+                                  </Command>
+                                </PopoverContent>
+                              </Popover>
+                            ) : (
+                              <Input value={getStatutLibelle(formData.statut_professionnel_id || null)} disabled />
+                            )}
+                          </div>
+                          <div>
+                            <Label className="mb-0.5 block">Secteur d'activité</Label>
+                            {isEditing ? (
+                              <Popover open={isSecteurOpen} onOpenChange={setIsSecteurOpen}>
+                                <PopoverTrigger asChild>
+                                  <button type="button" className="inline-flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm">
+                                    {selectedSecteurLabel}
+                                    <ChevronDown className="h-4 w-4 opacity-70" />
+                                  </button>
+                                </PopoverTrigger>
+                                <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] p-0">
+                                  <Command>
+                                    <CommandInput placeholder="Rechercher un secteur..." />
+                                    <CommandList className="max-h-56">
+                                      <CommandEmpty>Aucun secteur trouvé.</CommandEmpty>
+                                      <CommandGroup>
+                                        <CommandItem
+                                          value="Non renseigné"
+                                          onSelect={() => {
+                                            setFormData({ ...formData, secteur_id: null })
+                                            setIsSecteurOpen(false)
+                                          }}
+                                        >
+                                          <Check className={cn("h-4 w-4", !formData.secteur_id ? "opacity-100" : "opacity-0")} />
+                                          Non renseigné
+                                        </CommandItem>
+                                        {secteurs.map((secteur) => (
+                                          <CommandItem
+                                            key={secteur.id}
+                                            value={secteur.libelle}
+                                            onSelect={() => {
+                                              setFormData({ ...formData, secteur_id: secteur.id })
+                                              setIsSecteurOpen(false)
+                                            }}
+                                          >
+                                            <Check className={cn("h-4 w-4", formData.secteur_id === secteur.id ? "opacity-100" : "opacity-0")} />
+                                            {secteur.libelle}
+                                          </CommandItem>
+                                        ))}
+                                      </CommandGroup>
+                                    </CommandList>
+                                  </Command>
+                                </PopoverContent>
+                              </Popover>
+                            ) : (
+                              <Input value={getSecteurLibelle(formData.secteur_id || null)} disabled />
+                            )}
+                          </div>
+                        </div>
+                        <div className="grid md:grid-cols-2 gap-4">
+                          <div>
+                            <Label htmlFor="entreprise" className="mb-0.5 block">Entreprise</Label>
+                            <Input
+                              id="entreprise"
+                              value={formData.entreprise || ''}
+                              onChange={(e) => setFormData({...formData, entreprise: e.target.value})}
+                              disabled={!isEditing}
+                              placeholder="Nom de votre entreprise"
+                            />
+                          </div>
+                          <div>
+                            <Label htmlFor="poste_actuel" className="mb-0.5 block">Poste actuel</Label>
+                            <Input
+                              id="poste_actuel"
+                              value={formData.poste_actuel || ''}
+                              onChange={(e) => setFormData({...formData, poste_actuel: e.target.value})}
+                              disabled={!isEditing}
+                              placeholder="Ex: Développeur, Manager..."
+                            />
+                          </div>
+                        </div>
+                        <div>
+                          <Label htmlFor="linkedin_url" className="mb-0.5 block">Profil LinkedIn</Label>
                           <Input
-                            value={getDiplomeLabel(formData.diplome)}
-                            disabled
+                            id="linkedin_url"
+                            value={formData.linkedin_url || ''}
+                            onChange={(e) => setFormData({...formData, linkedin_url: e.target.value})}
+                            disabled={!isEditing}
+                            placeholder="https://linkedin.com/in/votre-profil"
                           />
-                        )}
-                      </div>
-                      <div>
-                        <Label htmlFor="formation_domaine" className="mb-0.5 block">Domaine de formation</Label>
-                        <Input
-                          id="formation_domaine"
-                          value={formData.formation_domaine || ''}
-                          onChange={(e) => setFormData({...formData, formation_domaine: e.target.value})}
-                          disabled={!isEditing}
-                          placeholder="Informatique, Droit, Médecine..."
-                        />
+                        </div>
                       </div>
                     </div>
 
-                    {/* Situation professionnelle */}
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="statut_professionnel" className="mb-0.5 block">Statut professionnel</Label>
-                        {isEditing ? (
-                          <Popover open={isStatutOpen} onOpenChange={setIsStatutOpen}>
-                            <PopoverTrigger asChild>
-                              <button type="button" className="inline-flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm">
-                                {selectedStatutLabel}
-                                <ChevronDown className="h-4 w-4 opacity-70" />
-                              </button>
-                            </PopoverTrigger>
-                            <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] p-0">
-                              <Command>
-                                <CommandInput placeholder="Rechercher un statut..." />
-                                <CommandList className="max-h-56">
-                                  <CommandEmpty>Aucun statut trouvé.</CommandEmpty>
-                                  <CommandGroup>
-                                    <CommandItem
-                                      value="Non renseigné"
-                                      onSelect={() => {
-                                        setFormData({ ...formData, statut_professionnel_id: null })
-                                        setIsStatutOpen(false)
-                                      }}
-                                    >
-                                      <Check className={cn("h-4 w-4", !formData.statut_professionnel_id ? "opacity-100" : "opacity-0")} />
-                                      Non renseigné
-                                    </CommandItem>
-                                    {statutsPro.map((statut) => (
-                                      <CommandItem
-                                        key={statut.id}
-                                        value={statut.libelle}
-                                        onSelect={() => {
-                                          setFormData({ ...formData, statut_professionnel_id: statut.id })
-                                          setIsStatutOpen(false)
-                                        }}
-                                      >
-                                        <Check className={cn("h-4 w-4", formData.statut_professionnel_id === statut.id ? "opacity-100" : "opacity-0")} />
-                                        {statut.libelle}
-                                      </CommandItem>
-                                    ))}
-                                  </CommandGroup>
-                                </CommandList>
-                              </Command>
-                            </PopoverContent>
-                          </Popover>
-                        ) : (
-                          <Input
-                            value={getStatutLibelle(formData.statut_professionnel_id || null)}
-                            disabled
-                          />
-                        )}
-                      </div>
-                      <div>
-                        <Label htmlFor="secteur" className="mb-0.5 block">Secteur d'activité</Label>
-                        {isEditing ? (
-                          <Popover open={isSecteurOpen} onOpenChange={setIsSecteurOpen}>
-                            <PopoverTrigger asChild>
-                              <button type="button" className="inline-flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm">
-                                {selectedSecteurLabel}
-                                <ChevronDown className="h-4 w-4 opacity-70" />
-                              </button>
-                            </PopoverTrigger>
-                            <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] p-0">
-                              <Command>
-                                <CommandInput placeholder="Rechercher un secteur..." />
-                                <CommandList className="max-h-56">
-                                  <CommandEmpty>Aucun secteur trouvé.</CommandEmpty>
-                                  <CommandGroup>
-                                    <CommandItem
-                                      value="Non renseigné"
-                                      onSelect={() => {
-                                        setFormData({ ...formData, secteur_id: null })
-                                        setIsSecteurOpen(false)
-                                      }}
-                                    >
-                                      <Check className={cn("h-4 w-4", !formData.secteur_id ? "opacity-100" : "opacity-0")} />
-                                      Non renseigné
-                                    </CommandItem>
-                                    {secteurs.map((secteur) => (
-                                      <CommandItem
-                                        key={secteur.id}
-                                        value={secteur.libelle}
-                                        onSelect={() => {
-                                          setFormData({ ...formData, secteur_id: secteur.id })
-                                          setIsSecteurOpen(false)
-                                        }}
-                                      >
-                                        <Check className={cn("h-4 w-4", formData.secteur_id === secteur.id ? "opacity-100" : "opacity-0")} />
-                                        {secteur.libelle}
-                                      </CommandItem>
-                                    ))}
-                                  </CommandGroup>
-                                </CommandList>
-                              </Command>
-                            </PopoverContent>
-                          </Popover>
-                        ) : (
-                          <Input
-                            value={getSecteurLibelle(formData.secteur_id || null)}
-                            disabled
-                          />
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="grid md:grid-cols-2 gap-4">
-                      <div>
-                        <Label htmlFor="entreprise" className="mb-0.5 block">Entreprise</Label>
-                        <Input
-                          id="entreprise"
-                          value={formData.entreprise || ''}
-                          onChange={(e) => setFormData({...formData, entreprise: e.target.value})}
-                          disabled={!isEditing}
-                          placeholder="Nom de votre entreprise"
-                        />
-                      </div>
-                      <div>
-                        <Label htmlFor="poste_actuel" className="mb-0.5 block">Poste actuel</Label>
-                        <Input
-                          id="poste_actuel"
-                          value={formData.poste_actuel || ''}
-                          onChange={(e) => setFormData({...formData, poste_actuel: e.target.value})}
-                          disabled={!isEditing}
-                          placeholder="Ex: Développeur, Manager..."
-                        />
-                      </div>
-                    </div>
-
-                    {/* Liens */}
-                    <div>
-                      <Label htmlFor="linkedin_url" className="mb-0.5 block">Profil LinkedIn</Label>
-                      <Input
-                        id="linkedin_url"
-                        value={formData.linkedin_url || ''}
-                        onChange={(e) => setFormData({...formData, linkedin_url: e.target.value})}
-                        disabled={!isEditing}
-                        placeholder="https://linkedin.com/in/votre-profil"
-                      />
-                    </div>
-
-                    {/* Bio */}
-                    <div>
-                      <Label htmlFor="bio" className="mb-0.5 block">Biographie</Label>
-                      <Textarea
-                        id="bio"
-                        rows={4}
-                        value={formData.bio || ''}
-                        onChange={(e) => setFormData({...formData, bio: e.target.value})}
-                        disabled={!isEditing}
-                        placeholder="Parlez-nous de votre parcours et de vos objectifs..."
-                      />
-                    </div>
-
-                    {/* Plan de retour */}
-                    <div>
-                      <Label htmlFor="plan_retour" className="mb-0.5 block">Plan de retour en Guinée</Label>
-                      {isEditing ? (
-                        <Popover open={isPlanRetourOpen} onOpenChange={setIsPlanRetourOpen}>
-                          <PopoverTrigger asChild>
-                            <button type="button" className="inline-flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm">
-                              {selectedPlanRetourLabel}
-                              <ChevronDown className="h-4 w-4 opacity-70" />
-                            </button>
-                          </PopoverTrigger>
-                          <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] p-0">
-                            <Command>
-                              <CommandList className="max-h-48">
-                                <CommandGroup>
-                                  <CommandItem
-                                    value="Non renseigné"
-                                    onSelect={() => {
-                                      setFormData({ ...formData, plan_retour: null })
-                                      setIsPlanRetourOpen(false)
-                                    }}
-                                  >
-                                    <Check className={cn("h-4 w-4", !formData.plan_retour ? "opacity-100" : "opacity-0")} />
-                                    Non renseigné
-                                  </CommandItem>
-                                  {PLAN_RETOUR_OPTIONS.map((option) => (
-                                    <CommandItem
-                                      key={option}
-                                      value={option}
-                                      onSelect={() => {
-                                        setFormData({ ...formData, plan_retour: option })
-                                        setIsPlanRetourOpen(false)
-                                      }}
-                                    >
-                                      <Check className={cn("h-4 w-4", formData.plan_retour === option ? "opacity-100" : "opacity-0")} />
-                                      {option}
-                                    </CommandItem>
-                                  ))}
-                                </CommandGroup>
-                              </CommandList>
-                            </Command>
-                          </PopoverContent>
-                        </Popover>
-                      ) : (
-                        <Input value={selectedPlanRetourLabel} disabled />
-                      )}
-                    </div>
-
-                            {/* Visibilité */}
+                    {/* 5. Visibilité */}
                     <div className="flex items-center justify-between p-4 bg-muted rounded-lg">
                       <div className="flex items-center gap-3">
                         {formData.visible_annuaire ? (
