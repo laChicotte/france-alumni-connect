@@ -96,14 +96,31 @@ export default function HomePage() {
         <div className="relative z-10 flex h-full flex-col justify-center px-16 sm:px-32 lg:px-48">
           <div className="flex flex-col gap-3 sm:gap-4">
             <div>
-              <span className="inline-block bg-[#5B3FC8] px-4 py-2 text-xl font-bold leading-tight text-white sm:text-3xl lg:text-5xl">
+              <span className="hero-title-line hero-title-top inline-block bg-[#3558A2] px-4 py-2 text-xl font-bold leading-tight text-white sm:text-3xl lg:text-5xl">
                 Le réseau des
               </span>
             </div>
             <div>
-              <span className="inline-block bg-[#1B8C7A] px-4 py-2 text-xl font-bold leading-tight text-white sm:text-3xl lg:text-5xl">
+              <span className="hero-title-line hero-title-bottom inline-block bg-[#da281c] px-4 py-2 text-xl font-bold leading-tight text-white sm:text-3xl lg:text-5xl">
                 Guinéens diplômés de France.
               </span>
+            </div>
+          </div>
+        </div>
+        <div className="hero-affiliate-badge absolute bottom-4 right-4 z-20 sm:bottom-6 sm:right-8">
+          <div className="flex items-start gap-3 sm:gap-4">
+            <span className="mt-0.5 inline-flex rounded-sm px-3 py-2 text-[11px] font-bold lowercase tracking-wide text-white sm:text-xs">
+              en lien avec
+            </span>
+            <div className="max-w-[155px] sm:max-w-[195px]">
+              <img
+                src="/accueil/flag.jpeg"
+                alt="Drapeau France"
+                className="h-5 w-[54px] object-cover sm:h-6 sm:w-[66px]"
+              />
+              <p className="mt-1 text-[11px] font-extrabold uppercase leading-tight tracking-wide text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] sm:text-[13px]">
+                Ambassade de France en Guinée et en Sierra Leone
+              </p>
             </div>
           </div>
         </div>
@@ -235,9 +252,54 @@ export default function HomePage() {
           animation: zoom-breathe 10s ease-in-out infinite;
           transform-origin: center center;
         }
+        .hero-title-line {
+          will-change: transform, opacity;
+          animation-duration: 1900ms;
+          animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+          animation-fill-mode: both;
+        }
+        .hero-title-top {
+          animation-name: hero-enter-top;
+        }
+        .hero-title-bottom {
+          animation-name: hero-enter-bottom;
+          animation-delay: 120ms;
+        }
         @keyframes zoom-breathe {
           0%, 100% { transform: scale(1); }
           50% { transform: scale(1.07); }
+        }
+        @keyframes hero-enter-top {
+          from {
+            transform: translateY(-70px);
+            opacity: 0;
+          }
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+        @keyframes hero-enter-bottom {
+          from {
+            transform: translateY(70px);
+            opacity: 0;
+          }
+          to {
+            transform: translateY(0);
+            opacity: 1;
+          }
+        }
+        .hero-affiliate-badge {
+          animation: badge-float 6.5s ease-in-out infinite;
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .hero-title-line {
+            animation: none;
+          }
+        }
+        @keyframes badge-float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-6px); }
         }
 
         .stat-card-1 {
