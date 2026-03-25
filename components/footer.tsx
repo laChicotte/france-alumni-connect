@@ -11,17 +11,24 @@ export function Footer() {
           <div>
             <h3 className="font-serif text-lg font-bold mb-3">France Alumni Connect</h3>
             <p className="text-sm text-white/75 leading-relaxed">
-              Le réseau des anciens étudiants guinéens diplômés de France.
+              Le réseau des anciens étudiants guinéens <br /> diplômés de France.
             </p>
           </div>
 
           {/* Contacts */}
           <div>
-            <h4 className="font-semibold text-sm uppercase tracking-wider mb-4">Contacts</h4>
+            <h4 className="font-bold text-sm tracking-wider mb-4">contacts</h4>
             <ul className="space-y-3 text-sm text-white/75">
               <li className="flex items-start gap-2">
                 <MapPin className="h-4 w-4 mt-0.5 shrink-0 text-white" />
-                <span>Institut Français de Guinée, Conakry, Guinée</span>
+                <a
+                  href="https://maps.app.goo.gl/8kaEAzcEyiu3b89dA"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-[#f48988] transition-colors"
+                >
+                  Institut Français de Guinée
+                </a>
               </li>
               <li className="flex items-center gap-2">
                 <Mail className="h-4 w-4 shrink-0 text-white" />
@@ -43,18 +50,17 @@ export function Footer() {
 
           {/* Liens rapides */}
           <div>
-            <h4 className="font-semibold text-sm uppercase tracking-wider mb-4">Liens rapides</h4>
+            <h4 className="font-bold text-sm tracking-wider mb-4">liens rapides</h4>
             <ul className="space-y-2 text-sm text-white/75">
-              <li><Link href="/" className="hover:text-[#f48988] transition-colors">À propos</Link></li>
+              <li><Link href="/annuaire" className="hover:text-[#f48988] transition-colors">Annuaire</Link></li>
               <li><Link href="/actualites" className="hover:text-[#f48988] transition-colors">Actualités</Link></li>
               <li><Link href="/formation" className="hover:text-[#f48988] transition-colors">Formation</Link></li>
-              <li><Link href="/annuaire" className="hover:text-[#f48988] transition-colors">Annuaire</Link></li>
             </ul>
           </div>
 
           {/* Réseaux sociaux */}
           <div>
-            <h4 className="font-semibold text-sm uppercase tracking-wider mb-4">Suivez-nous</h4>
+            <h4 className="font-bold text-sm tracking-wider mb-4">suivez-nous</h4>
             <div className="flex gap-3">
               <a
                 href="https://www.facebook.com/share/1EaGeQh1f8/?mibextid=wwXIfr"

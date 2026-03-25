@@ -144,7 +144,7 @@ export default function HomePage() {
       </section>
 
       {/* Stats */}
-      <section ref={statsRef} className="py-12 bg-gray-50">
+      <section ref={statsRef} className="py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#3558A2] text-center mb-8">
             Notre communauté
@@ -169,104 +169,62 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Values */}
-      <section className="py-10 bg-[#ffe8e4] mb-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-3 gap-4 sm:gap-8">
-            <Card className="border-2 hover:border-[#3558A2] transition-colors bg-[#ffe8e4]">
-              <CardContent className="pt-2">
-                <h3 className="font-serif text-2xl font-bold mb-3 text-center">Solidarité</h3>
-                <p className="text-muted-foreground leading-relaxed text-justify">
-                  Nous cultivons l'entraide et le soutien mutuel entre alumni pour favoriser la réussite collective.
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="border-2 hover:border-[#f48988] transition-colors bg-[#ffe8e4]">
-              <CardContent className="pt-2">
-                <h3 className="font-serif text-2xl font-bold mb-3 text-center">Excellence</h3>
-                <p className="text-muted-foreground leading-relaxed text-justify">
-                  Nous promouvons l'excellence académique et professionnelle dans tous nos domaines d'intervention.
-                </p>
-              </CardContent>
-            </Card>
-            <Card className="border-2 hover:border-[#3558A2] transition-colors bg-[#ffe8e4]">
-              <CardContent className="pt-2">
-                <h3 className="font-serif text-2xl font-bold mb-3 text-center">Engagement</h3>
-                <p className="text-muted-foreground leading-relaxed text-justify">
-                  Nous sommes engagés pour le développement durable et l'impact social positif en Guinée.
-                </p>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-      </section>
-
       {/* Objectives */}
-      <section className="py-10">
+      <section className="py-14 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-2xl mx-auto space-y-6">
-            <div className="flex gap-3 sm:gap-4">
-              <div className="flex-shrink-0">
-                <div className="w-10 h-10 bg-[#3558A2] text-white rounded-full flex items-center justify-center font-bold">1</div>
-              </div>
-              <div>
-                <h3 className="font-serif text-lg sm:text-xl font-bold mb-2">Représentation et influence</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  Valoriser la diaspora guinéenne diplômée de France et contribuer à un lobbying positif auprès des entreprises et institutions.
-                </p>
-              </div>
+          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#3558A2] text-center mb-12">
+            Nos objectifs
+          </h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
+            <div>
+              <h3 className="font-serif text-xl font-bold text-gray-900 mb-3">Représentation et influence</h3>
+              <p className="text-gray-500 leading-relaxed text-sm text-justify">
+                Fédérer la diaspora guinéenne diplômée de France autour d&apos;une voix structurée, capable de dialoguer avec les entreprises et institutions. L&apos;objectif est de créer des passerelles concrètes vers l&apos;emploi, les partenariats et les opportunités économiques.
+              </p>
             </div>
-            <div className="flex gap-3 sm:gap-4">
-              <div className="flex-shrink-0">
-                <div className="w-10 h-10 bg-[#3558A2] text-white rounded-full flex items-center justify-center font-bold">2</div>
-              </div>
-              <div>
-                <h3 className="font-serif text-lg sm:text-xl font-bold mb-2">Développement local</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  Promouvoir le transfert de compétences au service du développement en Guinée et renforcer les synergies avec les plateformes partenaires.
-                </p>
-              </div>
+            <div>
+              <h3 className="font-serif text-xl font-bold text-gray-900 mb-3">Développement local</h3>
+              <p className="text-gray-500 leading-relaxed text-sm text-justify">
+                Mobiliser les compétences pour répondre à des besoins précis en Guinée : accompagnement d&apos;entrepreneurs, interventions d&apos;experts, programmes de formation et appui à des projets à fort impact.
+              </p>
             </div>
-            <div className="flex gap-3 sm:gap-4">
-              <div className="flex-shrink-0">
-                <div className="w-10 h-10 bg-[#3558A2] text-white rounded-full flex items-center justify-center font-bold">3</div>
-              </div>
-              <div>
-                <h3 className="font-serif text-lg sm:text-xl font-bold mb-2">Solidarité et soutien</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  Favoriser le mentorat, l'entraide et mobiliser les alumni autour d'initiatives citoyennes, éducatives et environnementales.
-                </p>
-              </div>
+            <div>
+              <h3 className="font-serif text-xl font-bold text-gray-900 mb-3">Solidarité et soutien</h3>
+              <p className="text-gray-500 leading-relaxed text-sm text-justify">
+                Structurer un réseau d&apos;entraide efficace basé sur le mentorat, le partage d&apos;expériences et l&apos;accès à des ressources utiles, afin d&apos;accompagner les parcours professionnels et encourager l&apos;engagement collectif.
+              </p>
             </div>
-            <div className="flex gap-3 sm:gap-4">
-              <div className="flex-shrink-0">
-                <div className="w-10 h-10 bg-[#3558A2] text-white rounded-full flex items-center justify-center font-bold">4</div>
-              </div>
-              <div>
-                <h3 className="font-serif text-lg sm:text-xl font-bold mb-2">Rayonnement international</h3>
-                <p className="text-muted-foreground leading-relaxed">
-                  Renforcer les liens entre la France et la Guinée et promouvoir l'excellence guinéenne à l'international.
-                </p>
-              </div>
+            <div>
+              <h3 className="font-serif text-xl font-bold text-gray-900 mb-3">Rayonnement international</h3>
+              <p className="text-gray-500 leading-relaxed text-sm text-justify">
+                Mettre en lumière les réussites guinéennes et développer des connexions stratégiques entre la France et la Guinée pour favoriser les collaborations, l&apos;attractivité et la reconnaissance du réseau.
+              </p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Partners */}
-      <section className="py-8">
+      <section className="py-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-5xl overflow-hidden">
-            <div className="partners-marquee-track">
-              {marqueePartners.map((partner, index) => (
-                <div key={`${partner.name}-${index}`} className="partners-marquee-item">
-                  <img
-                    src={partner.logo || "/placeholder.svg"}
-                    alt={partner.name}
-                    className="h-24 w-full object-contain opacity-85 transition-opacity duration-200 hover:opacity-100 sm:h-28"
-                  />
-                </div>
-              ))}
+          <div className="flex items-center gap-8 lg:gap-14">
+            <div className="flex-shrink-0 w-36 lg:w-48">
+              <h2 className="font-serif text-xl lg:text-2xl font-bold text-[#3558A2] leading-snug">
+                Nos partenaires
+              </h2>
+            </div>
+            <div className="flex-1 overflow-hidden">
+              <div className="partners-marquee-track">
+                {marqueePartners.map((partner, index) => (
+                  <div key={`${partner.name}-${index}`} className="partners-marquee-item">
+                    <img
+                      src={partner.logo || "/placeholder.svg"}
+                      alt={partner.name}
+                      className="h-28 w-full object-contain opacity-85 transition-opacity duration-200 hover:opacity-100 sm:h-32"
+                    />
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
@@ -300,11 +258,14 @@ export default function HomePage() {
           will-change: transform;
         }
         .partners-marquee-item {
-          width: 150px;
+          width: 80px;
           flex: 0 0 auto;
         }
         @media (min-width: 768px) {
-          .partners-marquee-item { width: 180px; }
+          .partners-marquee-item { width: 128px; }
+        }
+        @media (min-width: 1024px) {
+          .partners-marquee-item { width: 215px; }
         }
         .partners-marquee-track:hover {
           animation-play-state: paused;
