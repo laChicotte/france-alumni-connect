@@ -314,7 +314,7 @@ export default function HomePage() {
 
         .partners-marquee-track {
           display: flex;
-          gap: 0.75rem;
+          gap: 0.3rem;
           width: max-content;
           animation: partners-marquee-scroll 34s linear infinite;
           will-change: transform;
@@ -334,7 +334,7 @@ export default function HomePage() {
         }
         @keyframes partners-marquee-scroll {
           from { transform: translateX(0); }
-          to { transform: translateX(calc(-50% - 0.5rem)); }
+          to { transform: translateX(calc(-50% - 0.2rem)); }
         }
       `}</style>
     </div>
