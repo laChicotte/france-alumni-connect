@@ -111,5 +111,6 @@ Ici on travaille étape par étape et selon des règles c'est à dire:
 - Images optimisées avec `<Image>` de Next.js (remplacement de `<img>`):
   - Héros: `actualites`, `annuaire`, `emploi`, `formation` — avec `fill` + `priority`.
   - Logo dans `actualites/[id]` — avec `width/height` fixes.
-**Prochaine étape pour plutard**
-- ajouter le champ plan_retour dans alumnis profiles (qui peux prendre les valeurs suivantes : "Dans 2 ans", "Dans 5 ans", "Déja ne Guinée" et "Autre")
+**A faire**
+- supprimer la page que accueil pointe vers la page appropos donc la page d'accueil actuel j'en ai plus besoin tu peu supprimer tout ce qui y est lié à elle
+- comme apropos devient le nouveau accueil, tu peux le retirer du menu, et amène annuaire au debut du menu

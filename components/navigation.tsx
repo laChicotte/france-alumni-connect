@@ -64,11 +64,10 @@ export function Navigation() {
   const isAdminOrModerator = user.role === 'admin' || user.role === 'moderateur'
 
   const navItems = [
-    { href: "/a-propos", label: "à propos" },
+    { href: "/annuaire", label: "annuaire" },
     { href: "/actualites", label: "actualités" },
     { href: "https://talent-diaspora.fr/", label: "emploi" },
     { href: "/formation", label: "formation" },
-    { href: "/annuaire", label: "annuaire" },
   ]
 
   return (
