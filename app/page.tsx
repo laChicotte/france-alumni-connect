@@ -28,17 +28,29 @@ function useCountUp(target: number, duration = 1400) {
 
 export default function HomePage() {
   type PublicPartner = { name: string; logo: string; site_web?: string | null }
+  type ProfessionalShare = { label: string; value: number }
+  const quiSommesNousImages = [
+    "/accueil/quisommesnous/a.jpg",
+    "/accueil/quisommesnous/b.jpg",
+    "/accueil/quisommesnous/c.jpg",
+    "/accueil/quisommesnous/d.jpg",
+  ]
   const [publicPartners, setPublicPartners] = useState<PublicPartner[]>(partners)
   const marqueePartners = [...publicPartners, ...publicPartners]
 
   const [totalAlumni, setTotalAlumni] = useState(0)
-  const [totalEntrepreneurs, setTotalEntrepreneurs] = useState(0)
   const [totalReturned, setTotalReturned] = useState(0)
+  const [professionalShares, setProfessionalShares] = useState<ProfessionalShare[]>([
+    { label: "Entrepreneurs", value: 0 },
+    { label: "Salariés", value: 0 },
+    { label: "Dirigeants", value: 0 },
+  ])
+  const [activeProfessionalShareIndex, setActiveProfessionalShareIndex] = useState(0)
+  const [activeQuiSommesNousImageIndex, setActiveQuiSommesNousImageIndex] = useState(0)
   const statsRef = useRef<HTMLElement | null>(null)
   const [statsVisible, setStatsVisible] = useState(false)
 
   const countAlumni = useCountUp(statsVisible ? totalAlumni : 0)
-  const countEntrepreneurs = useCountUp(statsVisible ? totalEntrepreneurs : 0)
   const countReturned = useCountUp(statsVisible ? totalReturned : 0)
 
   useEffect(() => {
@@ -63,9 +75,17 @@ export default function HomePage() {
         if (!res.ok || !data) return
         setTotalAlumni(Number(data.totalAlumni) || 0)
         setTotalReturned(Number(data.dejaEnGuineeCount) || 0)
-        const entrepreneurEntry = (data.statusData as { name: string; value: number }[] || [])
-          .find((s) => s.name.toLowerCase().includes("entrepreneur"))
-        setTotalEntrepreneurs(entrepreneurEntry?.value || 0)
+        const percentages = data.professionalPercentages as {
+          entrepreneurs?: number
+          salaries?: number
+          dirigeants?: number
+        } | null
+        setProfessionalShares([
+          { label: "Entrepreneurs", value: Number(percentages?.entrepreneurs) || 0 },
+          { label: "Salariés", value: Number(percentages?.salaries) || 0 },
+          { label: "Dirigeants", value: Number(percentages?.dirigeants) || 0 },
+        ])
+        setActiveProfessionalShareIndex(0)
       } catch {
         // silencieux
       }
@@ -83,12 +103,33 @@ export default function HomePage() {
     return () => observer.disconnect()
   }, [])
 
+  useEffect(() => {
+    if (!statsVisible || professionalShares.length < 2) return
+    const timer = setInterval(() => {
+      setActiveProfessionalShareIndex((prev) => (prev + 1) % professionalShares.length)
+    }, 2400)
+    return () => clearInterval(timer)
+  }, [statsVisible, professionalShares])
+
+  useEffect(() => {
+    if (quiSommesNousImages.length < 2) return
+    const timer = setInterval(() => {
+      setActiveQuiSommesNousImageIndex((prev) => (prev + 1) % quiSommesNousImages.length)
+    }, 2800)
+    return () => clearInterval(timer)
+  }, [quiSommesNousImages.length])
+
+  const activeProfessionalShare = professionalShares[activeProfessionalShareIndex] || professionalShares[0]
+  const activeQuiSommesNousImage =
+    quiSommesNousImages[activeQuiSommesNousImageIndex] || quiSommesNousImages[0]
+
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative mx-4 mt-4 h-[320px] overflow-hidden rounded-3xl sm:mx-6 sm:h-[420px] lg:mx-8 lg:h-[500px]">
+      <section className="relative mx-4 mt-4 h-[380px] overflow-hidden rounded-3xl sm:mx-6 sm:h-[500px] lg:mx-8 lg:h-[620px]">
         <img
-          src="/apropos/apropos.jpg"
+          // src="/apropos/apropos.jpg"
+          src="/accueil/accueil1.jpeg"
           alt="France Alumni Guinée"
           className="absolute inset-0 h-full w-full object-cover hero-zoom"
         />
@@ -102,26 +143,22 @@ export default function HomePage() {
             </div>
             <div>
               <span className="hero-title-line hero-title-bottom inline-block bg-[#da281c] px-4 py-2 text-xl font-bold leading-tight text-white sm:text-3xl lg:text-5xl">
-                Guinéens diplômés de France.
+                Guinéens diplômés de France
               </span>
             </div>
           </div>
         </div>
         <div className="hero-affiliate-badge absolute bottom-4 right-4 z-20 sm:bottom-6 sm:right-8">
-          <div className="flex items-start gap-3 sm:gap-4">
-            <span className="mt-0.5 inline-flex rounded-sm px-3 py-2 text-[11px] font-bold lowercase tracking-wide text-white sm:text-xs">
+          <div className="flex items-start gap-2 sm:gap-3">
+            <span className="inline-flex rounded-sm px-3 py-2 text-[11px] font-bold lowercase tracking-wide text-white sm:text-xs">
               en lien avec
             </span>
-            <div className="max-w-[155px] sm:max-w-[195px]">
-              <img
-                src="/accueil/flag.jpeg"
-                alt="Drapeau France"
-                className="h-5 w-[54px] object-cover sm:h-6 sm:w-[66px]"
-              />
-              <p className="mt-1 text-[11px] font-extrabold uppercase leading-tight tracking-wide text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.85)] sm:text-[13px]">
-                Ambassade de France en Guinée et en Sierra Leone
-              </p>
-            </div>
+            <div className="h-12 w-px bg-white/90 sm:h-14" aria-hidden="true" />
+            <img
+              src="/accueil/ambassade.png"
+              alt="Ambassade de France en Guinée et en Sierra Leone"
+              className="h-14 w-auto object-contain sm:h-16"
+            />
           </div>
         </div>
       </section>
@@ -132,16 +169,16 @@ export default function HomePage() {
           <div className="grid lg:grid-cols-2 gap-8 sm:gap-14 items-center">
             <div className="overflow-hidden rounded-lg shadow-lg">
               <img
-                src="/apropos/nos_objectifs.jpeg"
+                src={activeQuiSommesNousImage}
                 alt="France Alumni Guinée"
                 className="w-full h-full object-cover"
               />
             </div>
             <div>
               <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-[#3558A2] mb-6 leading-tight">
-                QUI SOMMES-<br />NOUS ?
+                qui sommes-<br />nous ?
               </h2>
-              <p className="text-base sm:text-lg text-gray-600 leading-relaxed">
+              <p className="text-base sm:text-lg text-gray-600 leading-relaxed text-justify">
                 France Alumni Guinée, dans le prolongement de Campus France, est une communauté dynamique de 
                 Guinéennes et Guinéens diplômés de l&apos;enseignement supérieur français, rassemblés par leur 
                 parcours d&apos;études en France et leur engagement pour la coopération, le partage d&apos;expériences, 
@@ -160,60 +197,35 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Stats */}
-      <section ref={statsRef} className="py-8">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#3558A2] text-center mb-8">
-            Notre communauté
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-            <div className="stat-card-1 flex flex-col items-center justify-center gap-4 rounded-2xl p-8 text-white">
-              <Users className="h-14 w-14 opacity-90" strokeWidth={1.5} />
-              <span className="text-5xl font-extrabold tracking-tight">{countAlumni.toLocaleString("fr-FR")}</span>
-              <span className="text-center text-sm font-semibold uppercase tracking-widest opacity-90">Alumni</span>
-            </div>
-            <div className="stat-card-2 flex flex-col items-center justify-center gap-4 rounded-2xl p-8 text-white">
-              <Briefcase className="h-14 w-14 opacity-90" strokeWidth={1.5} />
-              <span className="text-5xl font-extrabold tracking-tight">{countEntrepreneurs.toLocaleString("fr-FR")}</span>
-              <span className="text-center text-sm font-semibold uppercase tracking-widest opacity-90">Entrepreneurs</span>
-            </div>
-            <div className="stat-card-3 flex flex-col items-center justify-center gap-4 rounded-2xl p-8 text-white">
-              <MapPin className="h-14 w-14 opacity-90" strokeWidth={1.5} />
-              <span className="text-5xl font-extrabold tracking-tight">{countReturned.toLocaleString("fr-FR")}</span>
-              <span className="text-center text-sm font-semibold uppercase tracking-widest opacity-90">Revenus en Guinée</span>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Objectives */}
-      <section className="py-14 bg-white">
+      <section className="py-14 bg-[#da281c]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#3558A2] text-center mb-12">
-            Nos objectifs
+          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#ffffff] text-center mb-12">
+            nos objectifs
           </h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-10">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-30">
             <div>
-              <h3 className="font-serif text-xl font-bold text-gray-900 mb-3">Représentation et influence</h3>
-              <p className="text-gray-500 leading-relaxed text-sm text-justify">
+              <h3 className="font-serif text-xl font-bold text-white mb-3">représentation et <br />influence</h3>
+              <p className="objectives-justified text-white text-sm leading-7" lang="fr">
                 Fédérer la diaspora guinéenne diplômée de France autour d&apos;une voix structurée, capable de dialoguer avec les entreprises et institutions. L&apos;objectif est de créer des passerelles concrètes vers l&apos;emploi, les partenariats et les opportunités économiques.
               </p>
             </div>
             <div>
-              <h3 className="font-serif text-xl font-bold text-gray-900 mb-3">Développement local</h3>
-              <p className="text-gray-500 leading-relaxed text-sm text-justify">
+              <h3 className="font-serif text-xl font-bold text-white mb-3">développement <br />local</h3>
+              <p className="objectives-justified text-white text-sm leading-7" lang="fr">
                 Mobiliser les compétences pour répondre à des besoins précis en Guinée : accompagnement d&apos;entrepreneurs, interventions d&apos;experts, programmes de formation et appui à des projets à fort impact.
               </p>
             </div>
             <div>
-              <h3 className="font-serif text-xl font-bold text-gray-900 mb-3">Solidarité et soutien</h3>
-              <p className="text-gray-500 leading-relaxed text-sm text-justify">
+              <h3 className="font-serif text-xl font-bold text-white mb-3">solidarité et <br />soutien</h3>
+              <p className="objectives-justified text-white text-sm leading-7" lang="fr">
                 Structurer un réseau d&apos;entraide efficace basé sur le mentorat, le partage d&apos;expériences et l&apos;accès à des ressources utiles, afin d&apos;accompagner les parcours professionnels et encourager l&apos;engagement collectif.
               </p>
             </div>
             <div>
-              <h3 className="font-serif text-xl font-bold text-gray-900 mb-3">Rayonnement international</h3>
-              <p className="text-gray-500 leading-relaxed text-sm text-justify">
+              <h3 className="font-serif text-xl font-bold text-white mb-3">rayonnement <br />international</h3>
+              <p className="objectives-justified text-white text-sm leading-7" lang="fr">
                 Mettre en lumière les réussites guinéennes et développer des connexions stratégiques entre la France et la Guinée pour favoriser les collaborations, l&apos;attractivité et la reconnaissance du réseau.
               </p>
             </div>
@@ -221,13 +233,45 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Partners */}
-      <section className="py-10">
+      {/* Stats */}
+      <section ref={statsRef} className="py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-8 lg:gap-14">
+          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#3558A2] text-center mb-8">
+              le réseau en bref
+          </h2>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+            <div className="stat-card-1 flex min-h-[220px] flex-col items-center justify-center gap-5 rounded-2xl p-10 text-white sm:min-h-[250px]">
+              <Users className="h-16 w-16 opacity-90 sm:h-[4.5rem] sm:w-[4.5rem]" strokeWidth={1.5} />
+              <span className="text-6xl font-extrabold tracking-tight sm:text-7xl">{countAlumni.toLocaleString("fr-FR")}</span>
+              <span className="text-center text-base font-semibold uppercase tracking-widest opacity-90">Alumni</span>
+            </div>
+            <div className="stat-card-2 flex min-h-[220px] flex-col items-center justify-center gap-5 rounded-2xl p-10 text-white sm:min-h-[250px]">
+              <Briefcase className="h-16 w-16 opacity-90 sm:h-[4.5rem] sm:w-[4.5rem]" strokeWidth={1.5} />
+              <span key={`share-value-${activeProfessionalShareIndex}`} className="stat-rotate-in text-6xl font-extrabold tracking-tight sm:text-7xl">
+                {`${activeProfessionalShare.value}%`}
+              </span>
+              <span key={`share-label-${activeProfessionalShareIndex}`} className="stat-rotate-in text-center text-base font-semibold uppercase tracking-widest opacity-90">
+                {activeProfessionalShare.label}
+              </span>
+            </div>
+            <div className="stat-card-3 flex min-h-[220px] flex-col items-center justify-center gap-5 rounded-2xl p-10 text-white sm:min-h-[250px]">
+              <MapPin className="h-16 w-16 opacity-90 sm:h-[4.5rem] sm:w-[4.5rem]" strokeWidth={1.5} />
+              <span className="text-6xl font-extrabold tracking-tight sm:text-7xl">{countReturned.toLocaleString("fr-FR")}</span>
+              <span className="text-center text-base font-semibold uppercase tracking-widest opacity-90">Déjà en Guinée</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      
+
+      {/* Partners */}
+      <section className="py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center gap-4 lg:gap-6">
             <div className="flex-shrink-0 w-36 lg:w-48">
-              <h2 className="font-serif text-xl lg:text-2xl font-bold text-[#3558A2] leading-snug">
-                Nos partenaires
+              <h2 className="font-serif text-xl lg:text-3xl font-bold text-[#da281c] leading-snug">
+                Nos <br />partenaires
               </h2>
             </div>
             <div className="flex-1 overflow-hidden">
@@ -237,7 +281,7 @@ export default function HomePage() {
                     <img
                       src={partner.logo || "/placeholder.svg"}
                       alt={partner.name}
-                      className="h-28 w-full object-contain opacity-85 transition-opacity duration-200 hover:opacity-100 sm:h-32"
+                      className="h-32 w-full object-contain opacity-85 transition-opacity duration-200 hover:opacity-100 sm:h-40"
                     />
                   </div>
                 ))}
@@ -311,30 +355,52 @@ export default function HomePage() {
         .stat-card-3 {
           background: linear-gradient(135deg, #1e3a8a 0%, #2d6ec7 100%);
         }
+        .objectives-justified {
+          text-align: justify;
+          text-justify: inter-word;
+          text-align-last: left;
+          hyphens: auto;
+          overflow-wrap: break-word;
+        }
+        .stat-rotate-in {
+          animation: stat-fade-in 420ms ease;
+        }
+        @keyframes stat-fade-in {
+          from {
+            opacity: 0;
+            transform: translateY(8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
 
         .partners-marquee-track {
           display: flex;
-          gap: 0.3rem;
+          gap: 0.1rem;
           width: max-content;
           animation: partners-marquee-scroll 34s linear infinite;
           will-change: transform;
         }
         .partners-marquee-item {
-          width: 80px;
+          width: 88px;
           flex: 0 0 auto;
+          margin: 0;
+          padding: 0;
         }
         @media (min-width: 768px) {
-          .partners-marquee-item { width: 128px; }
+          .partners-marquee-item { width: 130px; }
         }
         @media (min-width: 1024px) {
-          .partners-marquee-item { width: 215px; }
+          .partners-marquee-item { width: 220px; }
         }
         .partners-marquee-track:hover {
           animation-play-state: paused;
         }
         @keyframes partners-marquee-scroll {
           from { transform: translateX(0); }
-          to { transform: translateX(calc(-50% - 0.2rem)); }
+          to { transform: translateX(calc(-50% - 0.05rem)); }
         }
       `}</style>
     </div>

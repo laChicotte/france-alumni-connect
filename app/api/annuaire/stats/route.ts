@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { createSupabaseAdmin } from "@/lib/supabase-admin"
 
-export const revalidate = 120 // 2 minutes
+export const dynamic = "force-dynamic"
 
 type StatsProfile = {
   user_id: string
@@ -15,6 +15,15 @@ type StatsProfile = {
 
 type ChartItem = { name: string; value: number }
 
+function normalizeLabel(value: string | null | undefined): string {
+  if (!value) return ""
+  return value
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .trim()
+}
+
 function toSortedChartData(counter: Record<string, number>, limit?: number): ChartItem[] {
   const values = Object.entries(counter)
     .map(([name, value]) => ({ name, value }))
@@ -27,7 +36,7 @@ export async function GET() {
   try {
     const supabase = createSupabaseAdmin()
 
-    // Requête unique : jointure !inner sur users filtre directement les alumni actifs
+    // Stats globales basées sur alumni_profiles (tous les profils enregistrés)
     const { data: profilesData, error: profilesError } = await supabase
       .from("alumni_profiles")
       .select(`
@@ -37,11 +46,8 @@ export async function GET() {
         genre,
         plan_retour,
         secteurs(libelle),
-        statuts_professionnels(libelle),
-        users!inner(id)
+        statuts_professionnels(libelle)
       `)
-      .eq("visible_annuaire", true)
-      .eq("users.status", "actif")
 
     if (profilesError) {
       return NextResponse.json({ error: profilesError.message }, { status: 500 })
@@ -53,6 +59,9 @@ export async function GET() {
         totalAlumni: 0,
         withPhoto: 0,
         cityCount: 0,
+        planRetourCount: 0,
+        dejaEnGuineeCount: 0,
+        professionalPercentages: { entrepreneurs: 0, salaries: 0, dirigeants: 0 },
         genderData: [],
         sectorData: [],
         statusData: [],
@@ -68,6 +77,9 @@ export async function GET() {
     const genderCounter: Record<string, number> = { Homme: 0, Femme: 0, Autre: 0 }
     const sectorCounter: Record<string, number> = {}
     const statusCounter: Record<string, number> = {}
+    let entrepreneurCount = 0
+    let salarieCount = 0
+    let dirigeantCount = 0
     let planRetourCount = 0
     let dejaEnGuineeCount = 0
 
@@ -80,11 +92,23 @@ export async function GET() {
 
       const statut = profile.statuts_professionnels?.libelle || "Non renseigné"
       statusCounter[statut] = (statusCounter[statut] || 0) + 1
+      const normalizedStatut = normalizeLabel(statut)
 
-      if (profile.plan_retour === "Dans 2 ans" || profile.plan_retour === "Dans 5 ans") {
+      if (normalizedStatut.includes("entrepreneur")) {
+        entrepreneurCount++
+      }
+      if (normalizedStatut === "salarie" || normalizedStatut.includes("salarie")) {
+        salarieCount++
+      }
+      if (normalizedStatut.includes("dirigeant")) {
+        dirigeantCount++
+      }
+
+      const normalizedPlanRetour = normalizeLabel(profile.plan_retour)
+      if (normalizedPlanRetour === "dans 2 ans" || normalizedPlanRetour === "dans 5 ans") {
         planRetourCount++
       }
-      if (profile.plan_retour === "Déjà en Guinée") {
+      if (normalizedPlanRetour === "deja en guinee") {
         dejaEnGuineeCount++
       }
     })
@@ -95,6 +119,11 @@ export async function GET() {
       cityCount,
       planRetourCount,
       dejaEnGuineeCount,
+      professionalPercentages: {
+        entrepreneurs: totalAlumni > 0 ? Math.round((entrepreneurCount / totalAlumni) * 100) : 0,
+        salaries: totalAlumni > 0 ? Math.round((salarieCount / totalAlumni) * 100) : 0,
+        dirigeants: totalAlumni > 0 ? Math.round((dirigeantCount / totalAlumni) * 100) : 0,
+      },
       genderData: toSortedChartData(genderCounter),
       sectorData: toSortedChartData(sectorCounter, 5),
       statusData: toSortedChartData(statusCounter, 6),

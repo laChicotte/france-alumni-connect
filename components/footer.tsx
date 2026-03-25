@@ -3,7 +3,7 @@ import { Facebook, Linkedin, Mail, MapPin, Phone } from "lucide-react"
 
 export function Footer() {
   return (
-    <footer className="bg-[#3558A2] text-white mt-0">
+    <footer className="bg-[#3558A2] text-white mt-0 p-8">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="grid grid-cols-1 md:grid-cols-[1.5fr_1.5fr_1fr_auto] gap-8 items-start">
 
@@ -11,7 +11,7 @@ export function Footer() {
           <div>
             <h3 className="font-serif text-lg font-bold mb-3">France Alumni Connect</h3>
             <p className="text-sm text-white/75 leading-relaxed">
-              Le réseau des anciens étudiants guinéens <br /> diplômés de France.
+              Le réseau des guinéens <br/> diplômés de France
             </p>
           </div>
 
