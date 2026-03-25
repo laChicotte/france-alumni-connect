@@ -86,7 +86,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-[320px] w-full overflow-hidden rounded-b-3xl sm:h-[420px] lg:h-[500px]">
+      <section className="relative mx-4 mt-4 h-[320px] overflow-hidden rounded-3xl sm:mx-6 sm:h-[420px] lg:mx-8 lg:h-[500px]">
         <img
           src="/apropos/apropos.jpg"
           alt="France Alumni Guinée"
@@ -102,7 +102,7 @@ export default function HomePage() {
             </div>
             <div>
               <span className="inline-block bg-[#1B8C7A] px-4 py-2 text-xl font-bold leading-tight text-white sm:text-3xl lg:text-5xl">
-                Étudiants-Entrepreneurs
+                Guinéens diplômés de France.
               </span>
             </div>
           </div>
@@ -125,10 +125,18 @@ export default function HomePage() {
                 QUI SOMMES-<br />NOUS ?
               </h2>
               <p className="text-base sm:text-lg text-gray-600 leading-relaxed">
-                France Alumni Guinée, dans le prolongement de <strong>Campus France Guinée</strong>, est une
-                communauté dynamique de Guinéennes et Guinéens diplômés de l&apos;enseignement français, rassemblés
-                par leur parcours d&apos;études en France et leur engagement pour la coopération, le partage
-                d&apos;expériences, la création d&apos;opportunités et l&apos;impact positif sur la Guinée.
+                France Alumni Guinée, dans le prolongement de Campus France, est une communauté dynamique de 
+                Guinéennes et Guinéens diplômés de l&apos;enseignement supérieur français, rassemblés par leur 
+                parcours d&apos;études en France et leur engagement pour la coopération, le partage d&apos;expériences, 
+                la création d&apos;opportunités et l&apos;impact positif sur la Guinée. Portée par des valeurs de 
+                solidarité et d&apos;entraide, la communauté encourage le soutien mutuel entre ses membres afin de 
+                favoriser la réussite collective et de faire émerger des projets porteurs d&apos;avenir.
+                <br />
+                <br />
+              
+                Portée par des valeurs de solidarité et d&apos;entraide, la communauté encourage le soutien mutuel 
+                entre ses membres afin de favoriser la réussite collective et de faire émerger des projets porteurs 
+                d&apos;avenir.
               </p>
             </div>
           </div>
