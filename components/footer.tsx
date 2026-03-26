@@ -11,7 +11,7 @@ export function Footer() {
           <div>
             <h3 className="font-serif text-lg font-bold mb-3">France Alumni Connect</h3>
             <p className="text-sm text-white/75 leading-relaxed">
-              Le réseau des guinéens <br/> diplômés de France
+              Le réseau des Guinéens <br/> diplômés de France
             </p>
           </div>
 
@@ -27,7 +27,7 @@ export function Footer() {
                   rel="noopener noreferrer"
                   className="hover:text-[#f48988] transition-colors"
                 >
-                  Institut Français de Guinée
+                  Institut français de Guinée
                 </a>
               </li>
               <li className="flex items-center gap-2">
@@ -50,11 +50,12 @@ export function Footer() {
 
           {/* Liens rapides */}
           <div>
-            <h4 className="font-bold text-sm tracking-wider mb-4">liens rapides</h4>
+            <h4 className="font-bold text-sm tracking-wider mb-1">liens rapides</h4>
             <ul className="space-y-2 text-sm text-white/75">
-              <li><Link href="/annuaire" className="hover:text-[#f48988] transition-colors">Annuaire</Link></li>
-              <li><Link href="/actualites" className="hover:text-[#f48988] transition-colors">Actualités</Link></li>
-              <li><Link href="/formation" className="hover:text-[#f48988] transition-colors">Formation</Link></li>
+              <li><Link href="/annuaire" className="hover:text-[#f48988] transition-colors">annuaire</Link></li>
+              <li><Link href="/actualites" className="hover:text-[#f48988] transition-colors">actualités</Link></li>
+              <li><Link href="/formation" className="hover:text-[#f48988] transition-colors">formation</Link></li>
+              <li><Link href="https://talent-diaspora.fr/" className="hover:text-[#f48988] transition-colors">emploi</Link></li>
             </ul>
           </div>
 

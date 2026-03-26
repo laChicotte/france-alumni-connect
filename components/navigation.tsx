@@ -66,8 +66,8 @@ export function Navigation() {
   const navItems = [
     { href: "/annuaire", label: "annuaire" },
     { href: "/actualites", label: "actualités" },
-    { href: "https://talent-diaspora.fr/", label: "emploi" },
     { href: "/formation", label: "formation" },
+    { href: "https://talent-diaspora.fr/", label: "emploi" },
   ]
 
   return (

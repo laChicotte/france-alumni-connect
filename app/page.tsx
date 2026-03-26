@@ -129,7 +129,7 @@ export default function HomePage() {
       <section className="relative mx-4 mt-4 h-[380px] overflow-hidden rounded-3xl sm:mx-6 sm:h-[500px] lg:mx-8 lg:h-[620px]">
         <img
           // src="/apropos/apropos.jpg"
-          src="/accueil/accueil1.jpeg"
+          src="/accueil/accueil2.jpeg"
           alt="France Alumni Guinée"
           className="absolute inset-0 h-full w-full object-cover hero-zoom"
         />
@@ -149,15 +149,15 @@ export default function HomePage() {
           </div>
         </div>
         <div className="hero-affiliate-badge absolute bottom-4 right-4 z-20 sm:bottom-6 sm:right-8">
-          <div className="flex items-start gap-2 sm:gap-3">
-            <span className="inline-flex rounded-sm px-3 py-2 text-[11px] font-bold lowercase tracking-wide text-white sm:text-xs">
+          <div className="flex items-start gap-2 sm:gap-2.5">
+            <span className="inline-flex rounded-sm px-4 py-2.5 text-xs font-bold lowercase tracking-wide text-white sm:text-sm">
               en lien avec
             </span>
-            <div className="h-12 w-px bg-white/90 sm:h-14" aria-hidden="true" />
+            <div className="h-14 w-[2px] bg-white/90 sm:h-16" aria-hidden="true" />
             <img
               src="/accueil/ambassade.png"
               alt="Ambassade de France en Guinée et en Sierra Leone"
-              className="h-14 w-auto object-contain sm:h-16"
+              className="h-[4.5rem] w-auto object-contain sm:h-[5.5rem]"
             />
           </div>
         </div>
@@ -165,26 +165,24 @@ export default function HomePage() {
 
       {/* Qui sommes-nous */}
       <section className="py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
           <div className="grid lg:grid-cols-2 gap-8 sm:gap-14 items-center">
-            <div className="overflow-hidden rounded-lg shadow-lg">
+            <div className="overflow-hidden rounded-lg shadow-lg h-[340px] sm:h-[420px] lg:h-[600px]">
               <img
                 src={activeQuiSommesNousImage}
                 alt="France Alumni Guinée"
                 className="w-full h-full object-cover"
               />
             </div>
-            <div>
-              <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-[#3558A2] mb-6 leading-tight">
+            <div className="ml-18">
+              <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#3558A2] mb-6 leading-tight">
                 qui sommes-<br />nous ?
               </h2>
               <p className="text-base sm:text-lg text-gray-600 leading-relaxed text-justify">
                 France Alumni Guinée, dans le prolongement de Campus France, est une communauté dynamique de 
                 Guinéennes et Guinéens diplômés de l&apos;enseignement supérieur français, rassemblés par leur 
                 parcours d&apos;études en France et leur engagement pour la coopération, le partage d&apos;expériences, 
-                la création d&apos;opportunités et l&apos;impact positif sur la Guinée. Portée par des valeurs de 
-                solidarité et d&apos;entraide, la communauté encourage le soutien mutuel entre ses membres afin de 
-                favoriser la réussite collective et de faire émerger des projets porteurs d&apos;avenir.
+                la création d&apos;opportunités et l&apos;impact positif sur la Guinée.
                 <br />
                 <br />
               
@@ -207,25 +205,42 @@ export default function HomePage() {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-30">
             <div>
               <h3 className="font-serif text-xl font-bold text-white mb-3">représentation et <br />influence</h3>
-              <p className="objectives-justified text-white text-sm leading-7" lang="fr">
+              <p
+                lang="fr"
+                className="text-left md:text-justify [text-align-last:left] hyphens-auto break-words text-white text-sm leading-7 max-w-md"
+              >
                 Fédérer la diaspora guinéenne diplômée de France autour d&apos;une voix structurée, capable de dialoguer avec les entreprises et institutions. L&apos;objectif est de créer des passerelles concrètes vers l&apos;emploi, les partenariats et les opportunités économiques.
               </p>
             </div>
             <div>
               <h3 className="font-serif text-xl font-bold text-white mb-3">développement <br />local</h3>
-              <p className="objectives-justified text-white text-sm leading-7" lang="fr">
+              <p
+                lang="fr"
+                className="text-left md:text-justify [text-align-last:left] hyphens-auto break-words text-white text-sm leading-7 max-w-md"
+              >
                 Mobiliser les compétences pour répondre à des besoins précis en Guinée : accompagnement d&apos;entrepreneurs, interventions d&apos;experts, programmes de formation et appui à des projets à fort impact.
               </p>
             </div>
             <div>
-              <h3 className="font-serif text-xl font-bold text-white mb-3">solidarité et <br />soutien</h3>
-              <p className="objectives-justified text-white text-sm leading-7" lang="fr">
-                Structurer un réseau d&apos;entraide efficace basé sur le mentorat, le partage d&apos;expériences et l&apos;accès à des ressources utiles, afin d&apos;accompagner les parcours professionnels et encourager l&apos;engagement collectif.
+              <h3 className="font-serif text-xl font-bold text-white mb-3">
+                solidarité et <br />soutien
+              </h3>
+
+              <p
+                lang="fr"
+                className="text-left md:text-justify [text-align-last:left] hyphens-auto break-words text-white text-sm leading-7 max-w-md"
+              >
+                Structurer un réseau d&apos;entraide efficace basé sur le mentorat, le partage
+                d&apos;expériences et l&apos;accès à des ressources utiles, afin d&apos;accompagner les
+                parcours professionnels et encourager l&apos;engagement collectif.
               </p>
             </div>
             <div>
               <h3 className="font-serif text-xl font-bold text-white mb-3">rayonnement <br />international</h3>
-              <p className="objectives-justified text-white text-sm leading-7" lang="fr">
+              <p
+                lang="fr"
+                className="text-left md:text-justify [text-align-last:left] hyphens-auto break-words text-white text-sm leading-7 max-w-md"
+              >
                 Mettre en lumière les réussites guinéennes et développer des connexions stratégiques entre la France et la Guinée pour favoriser les collaborations, l&apos;attractivité et la reconnaissance du réseau.
               </p>
             </div>
@@ -242,12 +257,12 @@ export default function HomePage() {
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             <div className="stat-card-1 flex min-h-[220px] flex-col items-center justify-center gap-5 rounded-2xl p-10 text-white sm:min-h-[250px]">
               <Users className="h-16 w-16 opacity-90 sm:h-[4.5rem] sm:w-[4.5rem]" strokeWidth={1.5} />
-              <span className="text-6xl font-extrabold tracking-tight sm:text-7xl">{countAlumni.toLocaleString("fr-FR")}</span>
+              <span className="text-7xl font-extrabold tracking-tight sm:text-8xl">{countAlumni.toLocaleString("fr-FR")}</span>
               <span className="text-center text-base font-semibold uppercase tracking-widest opacity-90">Alumni</span>
             </div>
             <div className="stat-card-2 flex min-h-[220px] flex-col items-center justify-center gap-5 rounded-2xl p-10 text-white sm:min-h-[250px]">
               <Briefcase className="h-16 w-16 opacity-90 sm:h-[4.5rem] sm:w-[4.5rem]" strokeWidth={1.5} />
-              <span key={`share-value-${activeProfessionalShareIndex}`} className="stat-rotate-in text-6xl font-extrabold tracking-tight sm:text-7xl">
+              <span key={`share-value-${activeProfessionalShareIndex}`} className="stat-rotate-in text-7xl font-extrabold tracking-tight sm:text-8xl">
                 {`${activeProfessionalShare.value}%`}
               </span>
               <span key={`share-label-${activeProfessionalShareIndex}`} className="stat-rotate-in text-center text-base font-semibold uppercase tracking-widest opacity-90">
@@ -256,7 +271,7 @@ export default function HomePage() {
             </div>
             <div className="stat-card-3 flex min-h-[220px] flex-col items-center justify-center gap-5 rounded-2xl p-10 text-white sm:min-h-[250px]">
               <MapPin className="h-16 w-16 opacity-90 sm:h-[4.5rem] sm:w-[4.5rem]" strokeWidth={1.5} />
-              <span className="text-6xl font-extrabold tracking-tight sm:text-7xl">{countReturned.toLocaleString("fr-FR")}</span>
+              <span className="text-7xl font-extrabold tracking-tight sm:text-8xl">{countReturned.toLocaleString("fr-FR")}</span>
               <span className="text-center text-base font-semibold uppercase tracking-widest opacity-90">Déjà en Guinée</span>
             </div>
           </div>
@@ -270,18 +285,18 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 lg:gap-6">
             <div className="flex-shrink-0 w-36 lg:w-48">
-              <h2 className="font-serif text-xl lg:text-3xl font-bold text-[#da281c] leading-snug">
-                Nos <br />partenaires
+              <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#da281c] leading-snug">
+                nos <br />partenaires
               </h2>
             </div>
-            <div className="flex-1 overflow-hidden">
+            <div className="flex-1 max-w-[720px] overflow-hidden ml-36">
               <div className="partners-marquee-track">
                 {marqueePartners.map((partner, index) => (
                   <div key={`${partner.name}-${index}`} className="partners-marquee-item">
                     <img
                       src={partner.logo || "/placeholder.svg"}
                       alt={partner.name}
-                      className="h-32 w-full object-contain opacity-85 transition-opacity duration-200 hover:opacity-100 sm:h-40"
+                      className="h-72 w-full object-contain opacity-85 transition-opacity duration-200 hover:opacity-100 sm:h-64"
                     />
                   </div>
                 ))}
@@ -359,8 +374,9 @@ export default function HomePage() {
           text-align: justify;
           text-justify: inter-word;
           text-align-last: left;
-          hyphens: auto;
-          overflow-wrap: break-word;
+          hyphens: none;
+          overflow-wrap: normal;
+          word-break: normal;
         }
         .stat-rotate-in {
           animation: stat-fade-in 420ms ease;
@@ -378,29 +394,29 @@ export default function HomePage() {
 
         .partners-marquee-track {
           display: flex;
-          gap: 0.1rem;
+          gap: 0.125rem;
           width: max-content;
           animation: partners-marquee-scroll 34s linear infinite;
           will-change: transform;
         }
         .partners-marquee-item {
-          width: 88px;
+          width: 105px;
           flex: 0 0 auto;
           margin: 0;
           padding: 0;
         }
         @media (min-width: 768px) {
-          .partners-marquee-item { width: 130px; }
+          .partners-marquee-item { width: 145px; }
         }
         @media (min-width: 1024px) {
-          .partners-marquee-item { width: 220px; }
+          .partners-marquee-item { width: 170px; }
         }
         .partners-marquee-track:hover {
           animation-play-state: paused;
         }
         @keyframes partners-marquee-scroll {
           from { transform: translateX(0); }
-          to { transform: translateX(calc(-50% - 0.05rem)); }
+          to { transform: translateX(calc(-50% - 0.0625rem)); }
         }
       `}</style>
     </div>
