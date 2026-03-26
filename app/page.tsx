@@ -28,7 +28,6 @@ function useCountUp(target: number, duration = 1400) {
 
 export default function HomePage() {
   type PublicPartner = { name: string; logo: string; site_web?: string | null }
-  type ProfessionalShare = { label: string; value: number }
   const quiSommesNousImages = [
     "/accueil/quisommesnous/a.jpg",
     "/accueil/quisommesnous/b.jpg",
@@ -40,17 +39,13 @@ export default function HomePage() {
 
   const [totalAlumni, setTotalAlumni] = useState(0)
   const [totalReturned, setTotalReturned] = useState(0)
-  const [professionalShares, setProfessionalShares] = useState<ProfessionalShare[]>([
-    { label: "Entrepreneurs", value: 0 },
-    { label: "Salariés", value: 0 },
-    { label: "Dirigeants", value: 0 },
-  ])
-  const [activeProfessionalShareIndex, setActiveProfessionalShareIndex] = useState(0)
+  const [entrepreneurPercentage, setEntrepreneurPercentage] = useState(0)
   const [activeQuiSommesNousImageIndex, setActiveQuiSommesNousImageIndex] = useState(0)
   const statsRef = useRef<HTMLElement | null>(null)
   const [statsVisible, setStatsVisible] = useState(false)
 
   const countAlumni = useCountUp(statsVisible ? totalAlumni : 0)
+  const countEntrepreneurPercentage = useCountUp(statsVisible ? entrepreneurPercentage : 0)
   const countReturned = useCountUp(statsVisible ? totalReturned : 0)
 
   useEffect(() => {
@@ -77,15 +72,8 @@ export default function HomePage() {
         setTotalReturned(Number(data.dejaEnGuineeCount) || 0)
         const percentages = data.professionalPercentages as {
           entrepreneurs?: number
-          salaries?: number
-          dirigeants?: number
         } | null
-        setProfessionalShares([
-          { label: "Entrepreneurs", value: Number(percentages?.entrepreneurs) || 0 },
-          { label: "Salariés", value: Number(percentages?.salaries) || 0 },
-          { label: "Dirigeants", value: Number(percentages?.dirigeants) || 0 },
-        ])
-        setActiveProfessionalShareIndex(0)
+        setEntrepreneurPercentage(Number(percentages?.entrepreneurs) || 0)
       } catch {
         // silencieux
       }
@@ -104,22 +92,12 @@ export default function HomePage() {
   }, [])
 
   useEffect(() => {
-    if (!statsVisible || professionalShares.length < 2) return
-    const timer = setInterval(() => {
-      setActiveProfessionalShareIndex((prev) => (prev + 1) % professionalShares.length)
-    }, 2400)
-    return () => clearInterval(timer)
-  }, [statsVisible, professionalShares])
-
-  useEffect(() => {
     if (quiSommesNousImages.length < 2) return
     const timer = setInterval(() => {
       setActiveQuiSommesNousImageIndex((prev) => (prev + 1) % quiSommesNousImages.length)
     }, 2800)
     return () => clearInterval(timer)
   }, [quiSommesNousImages.length])
-
-  const activeProfessionalShare = professionalShares[activeProfessionalShareIndex] || professionalShares[0]
   const activeQuiSommesNousImage =
     quiSommesNousImages[activeQuiSommesNousImageIndex] || quiSommesNousImages[0]
 
@@ -209,7 +187,7 @@ export default function HomePage() {
                 lang="fr"
                 className="text-white sm:text-lg leading-relaxed max-w-md"
               >
-                Fédérer la diaspora guinéenne diplômée de France autour d&apos;une voix structurée, capable de dialoguer avec les entreprises et institutions. L&apos;objectif est de créer des passerelles concrètes vers l&apos;emploi, les partenariats et les opportunités économiques.
+                Fédérer la diaspora guinéenne diplômée de France autour d&apos;une voix structurée, capable de dialoguer avec les entreprises et institutions. L&apos;objectif : créer des passerelles concrètes vers l&apos;emploi, les partenariats et les opportunités économiques.
               </p>
             </div>
             <div>
@@ -249,7 +227,7 @@ export default function HomePage() {
       </section>
 
       {/* Stats */}
-      <section ref={statsRef} className="py-28">
+      <section ref={statsRef} className="pt-20 pb-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-[#3558A2] text-center mb-8">
               le réseau en bref
@@ -262,11 +240,11 @@ export default function HomePage() {
             </div>
             <div className="stat-card-2 flex min-h-[220px] flex-col items-center justify-center gap-5 rounded-2xl p-10 text-white sm:min-h-[250px]">
               <Briefcase className="h-16 w-16 opacity-90 sm:h-[4.5rem] sm:w-[4.5rem]" strokeWidth={1.5} />
-              <span key={`share-value-${activeProfessionalShareIndex}`} className="stat-rotate-in text-7xl font-extrabold tracking-tight sm:text-8xl">
-                {`${activeProfessionalShare.value}%`}
+              <span className="text-7xl font-extrabold tracking-tight sm:text-8xl">
+                {`${countEntrepreneurPercentage}%`}
               </span>
-              <span key={`share-label-${activeProfessionalShareIndex}`} className="stat-rotate-in text-center text-base font-semibold uppercase tracking-widest opacity-90">
-                {activeProfessionalShare.label}
+              <span className="text-center text-base font-semibold uppercase tracking-widest opacity-90">
+                Entrepreneurs
               </span>
             </div>
             <div className="stat-card-3 flex min-h-[220px] flex-col items-center justify-center gap-5 rounded-2xl p-10 text-white sm:min-h-[250px]">
@@ -279,7 +257,7 @@ export default function HomePage() {
       </section>
 
       {/* Partners */}
-      <section className="py-6">
+      <section className="pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 lg:gap-6">
             <div className="flex-shrink-0 w-36 lg:w-48">
@@ -360,26 +338,13 @@ export default function HomePage() {
         }
 
         .stat-card-1 {
-          background: linear-gradient(135deg, #3558A2 0%, #1e3a8a 100%);
+          background: #3558A2;
         }
         .stat-card-2 {
-          background: linear-gradient(135deg, #2563eb 0%, #3558A2 100%);
+          background: #3558A2;
         }
         .stat-card-3 {
-          background: linear-gradient(135deg, #1e3a8a 0%, #2d6ec7 100%);
-        }
-        .stat-rotate-in {
-          animation: stat-fade-in 420ms ease;
-        }
-        @keyframes stat-fade-in {
-          from {
-            opacity: 0;
-            transform: translateY(8px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+          background: #3558A2;
         }
 
         .partners-marquee-track {
