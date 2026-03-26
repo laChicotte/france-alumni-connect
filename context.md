@@ -15,7 +15,10 @@ Ici on travaille étape par étape et selon des règles c'est à dire:
 - La page annuaire des alumni est maintenant dynamique.
 - Si l'utilisateur est connecté : profils réels avec recherche, filtres et pagination.
 - Si l'utilisateur n'est pas connecté : aperçu limité de profils aléatoires, sans accès aux détails complets (popup pour se connecter / s'inscrire).
-- Les statistiques en bas restent inchangées pour le moment (on y reviendra après).
+- Les statistiques de la home ont été refondues:
+  - 3 cartes unifiées en bleu du site (`#3558A2`).
+  - Valeurs animées en incrémentation sur les 3 cartes (Alumni, % Entrepreneurs, Déjà en Guinée).
+  - La carte centrale affiche uniquement le pourcentage Entrepreneurs (plus d'alternance Salariés/Dirigeants).
 - La section hero de la page d'accueil a été refaite avec un bloc vidéo fixe (hauteur 400px), masque SVG texte géant alternant ALUMNI puis CONNECT (11s chacun), et disparition du bloc au scroll.
 - Le menu de navigation sur la page d'accueil est transparent au départ puis devient bleu navy avec ombre au scroll.
 - Le logo du menu a été remplacé avec les nouveaux assets (logo alumni blanc / bleu).
@@ -111,6 +114,28 @@ Ici on travaille étape par étape et selon des règles c'est à dire:
 - Images optimisées avec `<Image>` de Next.js (remplacement de `<img>`):
   - Héros: `actualites`, `annuaire`, `emploi`, `formation` — avec `fill` + `priority`.
   - Logo dans `actualites/[id]` — avec `width/height` fixes.
+- Mises à jour validées sur `app/page.tsx` (home):
+  - Hero ajusté (hauteur augmentée) avec animation d'entrée des deux lignes de titre au chargement.
+  - Bloc "en lien avec" retravaillé et agrandi, avec séparateur vertical épaissi et logo ambassade (`/accueil/ambassade.png`).
+  - Section "Qui sommes-nous" :
+    - image gauche en rotation automatique en boucle (sans transition) depuis `/public/accueil/quisommesnous/{a,b,c,d}.jpg`.
+    - image rendue plus haute en format rectangulaire.
+  - Titres de sections harmonisés en taille (`text-4xl sm:text-5xl lg:text-6xl`) pour:
+    - qui sommes-nous
+    - nos objectifs
+    - le réseau en bref
+    - nos partenaires
+  - Section partenaires:
+    - marquee logos fortement agrandie.
+    - espacement entre logos réduit de manière agressive (quasi collé).
+    - largeur du bloc partenaires ajustée et espacement inter-sections réduit (stats -> partenaires).
+- API `/api/annuaire/stats` mise à jour:
+  - calcul stats basé sur `alumni_profiles` (sans filtrage `visible_annuaire/users.status`) pour refléter le total réel en base.
+  - comptage `plan_retour` rendu robuste via normalisation (incluant "Déjà en Guinée").
+  - ajout de `professionalPercentages` dans la réponse (`entrepreneurs`, `salaries`, `dirigeants`).
+  - route passée en dynamique (`export const dynamic = "force-dynamic"`).
+- Footer:
+  - adresse "Institut Français de Guinée" rendue cliquable vers Google Maps:
+    - https://maps.app.goo.gl/8kaEAzcEyiu3b89dA
 **A faire**
-- supprimer la page que accueil pointe vers la page appropos donc la page d'accueil actuel j'en ai plus besoin tu peu supprimer tout ce qui y est lié à elle
-- comme apropos devient le nouveau accueil, tu peux le retirer du menu, et amène annuaire au debut du menu
+- on retravailler sur la page annuaire 

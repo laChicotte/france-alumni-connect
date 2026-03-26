@@ -4,18 +4,51 @@ import Link from "next/link"
 import Image from "next/image"
 import { useEffect, useState, useMemo, useRef } from "react"
 import { useRouter } from "next/navigation"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { supabase } from "@/lib/supabase"
 import { alumniMembers } from "@/lib/fake-data"
-import { Search, GraduationCap, Briefcase, MapPin, Mail, Users, TrendingUp, Globe, Target, Loader2, ChevronDown, Check } from "lucide-react"
-import { BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis } from "recharts"
+import { Search, GraduationCap, Briefcase, MapPin, Mail, Users, Loader2, ChevronDown, Check } from "lucide-react"
 import type { AlumniProfile } from "@/types/database.types"
 import { cn } from "@/lib/utils"
+
+function SemiCircleGauge({ pct, label }: { pct: number; label: string }) {
+  const cx = 50, cy = 50, r = 38, SEGS = 12
+  const filled = Math.round((pct / 100) * SEGS)
+  const pt = (t: number) => ({ x: cx - r * Math.cos(t * Math.PI), y: cy - r * Math.sin(t * Math.PI) })
+  const bg0 = pt(0), bg1 = pt(1)
+  return (
+    <div className="flex flex-col items-center gap-1">
+      <svg width="130" height="78" viewBox="0 0 100 60">
+        <path d={`M ${bg0.x} ${bg0.y} A ${r} ${r} 0 0 1 ${bg1.x} ${bg1.y}`} fill="none" stroke="#3558A2" strokeWidth="10" />
+        {Array.from({ length: SEGS }, (_, i) => {
+          if (i >= filled) return null
+          const gap = 0.07
+          const s = pt((i + gap) / SEGS), e = pt((i + 1 - gap) / SEGS)
+          return (
+            <path key={i} d={`M ${s.x} ${s.y} A ${r} ${r} 0 0 1 ${e.x} ${e.y}`}
+              fill="none" stroke="#da281c" strokeWidth="10" />
+          )
+        })}
+        <text x="50" y="47" textAnchor="middle" fontSize="16" fontWeight="800" fill="#1e293b">{pct}%</text>
+      </svg>
+      <span className="text-[11px] text-center text-[#da281c] font-semibold leading-tight max-w-[110px]">{label}</span>
+    </div>
+  )
+}
+
+function PersonIcon({ color }: { color: string }) {
+  return (
+    <svg width="22" height="36" viewBox="0 0 22 36" aria-hidden="true">
+      <circle cx="11" cy="6" r="5" fill={color} />
+      <path d="M 11 11 L 11 24 M 4 16 L 18 16 M 11 24 L 5 34 M 11 24 L 17 34"
+        stroke={color} strokeWidth="2.5" strokeLinecap="round" fill="none" />
+    </svg>
+  )
+}
 
 type AlumniWithJoins = AlumniProfile & {
   secteurs?: { libelle: string } | null
@@ -228,16 +261,56 @@ export default function AnnuairePage() {
     statusData: stats.statusData.length > 0 ? stats.statusData : staticStats.statusData,
   }), [stats, staticStats])
 
-  const genderSummary = useMemo(() => {
-    const getValue = (label: string) => effectiveStats.genderData.find((item) => item.name === label)?.value || 0
-    return {
-      homme: getValue("Homme"),
-      femme: getValue("Femme"),
-      autre: getValue("Autre"),
+  const communityStats = useMemo(() => {
+    const total = effectiveStats.totalAlumni || 1
+    const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    const statusPct = (keyword: string) => {
+      const found = effectiveStats.statusData.find(d => norm(d.name).includes(keyword))
+      return found ? Math.round((found.value / total) * 100) : 0
     }
-  }, [effectiveStats.genderData])
+    return {
+      entrepreneurPct: statusPct("entrepreneur"),
+      salariePct: statusPct("salari"),
+      recherchePct: statusPct("recherche"),
+      dejaEnGuineeRatio: Math.min(10, Math.round((stats.dejaEnGuineeCount / total) * 10)),
+    }
+  }, [effectiveStats, stats.dejaEnGuineeCount])
 
-  const COLORS = ["#3558A2", "#FCD116", "#6B7280", "#9CA3AF", "#ea292c", "#3558A2", "#FCD116", "#6B7280"]
+  const sectorCloudWords = useMemo(() => {
+    const items = effectiveStats.sectorData.slice(0, 9)
+    if (items.length === 0) return []
+
+    const values = items.map((item) => item.value)
+    const min = Math.min(...values)
+    const max = Math.max(...values)
+    const spread = max - min || 1
+
+    // Positions manuelles pour un rendu "éparpillé"
+    const anchors = [
+      { top: 4, left: 58 },
+      { top: 18, left: 34 },
+      { top: 22, left: 70 },
+      { top: 38, left: 16 },
+      { top: 42, left: 52 },
+      { top: 50, left: 74 },
+      { top: 64, left: 30 },
+      { top: 72, left: 58 },
+      { top: 12, left: 10 },
+    ]
+
+    return items.map((item, index) => {
+      const weight = (item.value - min) / spread
+      const fontSize = 14 + weight * 26
+      const anchor = anchors[index % anchors.length]
+      return {
+        ...item,
+        top: anchor.top,
+        left: anchor.left,
+        fontSize,
+        weight,
+      }
+    })
+  }, [effectiveStats.sectorData])
 
   return (
     <div className="min-h-screen">
@@ -256,9 +329,9 @@ export default function AnnuairePage() {
       <div className="h-[380px] sm:h-[630px]" />
 
       {/* Filters */}
-      <section className="border-b bg-white">
-        <div className="mx-auto w-full max-w-[86rem] px-4 sm:px-6 lg:px-8">
-          <div className="mb-4 flex items-center justify-between gap-4">
+      <section>
+        <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-4 flex items-center gap-4">
             <div className="flex w-full flex-wrap items-center gap-3">
                 <div className="flex w-full items-center rounded-full bg-[#8fb5d0] p-1.5 sm:w-auto">
                   <div className="flex min-w-0 flex-1 items-center gap-2 px-4 sm:w-80">
@@ -386,7 +459,6 @@ export default function AnnuairePage() {
                   </PopoverContent>
                 </Popover>
             </div>
-            <div className="ml-2 hidden h-[2px] w-16 bg-[#f48988] sm:block md:w-28" aria-hidden="true" />
           </div>
         </div>
       </section>
@@ -584,151 +656,99 @@ export default function AnnuairePage() {
         </DialogContent>
       </Dialog>
 
-      {/* Nos Alumni en Chiffres - données réelles avec fallback historique */}
-      <section className="py-13 bg-[#ffe8e4]">
+      {/* Notre Communauté */}
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-6 sm:mb-5">
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-4">Nos Alumni en Chiffres</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Découvrez les statistiques de notre communauté d&apos;alumni guinéens
-            </p>
-          </div>
+          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#da281c] text-center mb-12">
+            notre communauté
+          </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6">
-            <Card className="border-2 border-transparent bg-[#ffe8e4] transition-colors hover:border-[#3558A2]">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-xl">Total Alumni</CardTitle>
-                <Users className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">{effectiveStats.totalAlumni.toLocaleString()}</div>
-                <p className="text-xs text-muted-foreground mt-1">Membres actifs</p>
-              </CardContent>
-            </Card>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-6 items-start">
 
-            <Card className="border-2 border-transparent bg-[#ffe8e4] transition-colors hover:border-[#3558A2]">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-xl">Répartition par Genre</CardTitle>
-                <TrendingUp className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">{genderSummary.homme}</div>
-                <p className="text-xs text-muted-foreground mt-1">
-                  Homme: {genderSummary.homme} | Femme: {genderSummary.femme} | Autre: {genderSummary.autre}
-                </p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 border-transparent bg-[#ffe8e4] transition-colors hover:border-[#3558A2]">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-xl">Plan de Retour</CardTitle>
-                <Target className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">{stats.planRetourCount}</div>
-                <p className="text-xs text-muted-foreground mt-1">Alumni prévoyant de retourner</p>
-              </CardContent>
-            </Card>
-
-            <Card className="border-2 border-transparent bg-[#ffe8e4] transition-colors hover:border-[#3558A2]">
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium text-xl">Déjà en Guinée</CardTitle>
-                <Globe className="h-4 w-4 text-muted-foreground" />
-              </CardHeader>
-              <CardContent>
-                <div className="text-3xl font-bold">{stats.dejaEnGuineeCount}</div>
-                <p className="text-xs text-muted-foreground mt-1">Alumni qui sont déjà en Guinée</p>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-4 sm:gap-6 mb-6">
-            <Card className="min-w-0 border-2 border-transparent bg-[#ffe8e4] transition-colors hover:border-[#3558A2]">
-              <CardHeader>
-                <CardTitle className="text-sm font-medium text-xl">Statut Professionnel</CardTitle>
-              </CardHeader>
-              <CardContent className="px-3 sm:px-6 overflow-hidden">
-                <ChartContainer
-                  config={{ value: { label: "Nombre" } }}
-                  className="h-[200px] sm:h-[240px] md:h-[300px] w-full"
-                >
-                  <BarChart data={effectiveStats.statusData} layout="vertical">
-                    <XAxis type="number" />
-                    <YAxis dataKey="name" type="category" width={60} tick={{ fontSize: 10 }} />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar dataKey="value" fill="#3558A2" radius={[0, 4, 4, 0]} />
-                  </BarChart>
-                </ChartContainer>
-              </CardContent>
-            </Card>
-
-            <Card className="min-w-0 border-2 border-transparent bg-[#ffe8e4] transition-colors hover:border-[#3558A2]">
-              <CardHeader>
-                <CardTitle className="text-sm font-medium text-xl">Répartition par Genre</CardTitle>
-              </CardHeader>
-              <CardContent className="px-3 sm:px-6 overflow-hidden">
-                <ChartContainer
-                  config={{ value: { label: "Nombre" } }}
-                  className="h-[200px] sm:h-[240px] md:h-[300px] w-full"
-                >
-                  <PieChart>
-                    <Pie
-                      data={effectiveStats.genderData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                      outerRadius={70}
-                      fill="#8884d8"
-                      dataKey="value"
+            {/* Gauche : demi-cercles + nuage de mots */}
+            <div className="flex flex-col gap-8">
+              <div className="flex justify-around sm:justify-start sm:gap-4">
+                <SemiCircleGauge pct={communityStats.entrepreneurPct} label="entrepreneurs" />
+                <SemiCircleGauge pct={communityStats.salariePct} label="salariés" />
+                <SemiCircleGauge pct={communityStats.recherchePct} label="en recherche d'emploi" />
+              </div>
+              <div className="lg:pr-0">
+                <span className="inline-block bg-[#da281c] text-white px-3 py-1 rounded text-sm font-bold mb-3">
+                  secteurs d&apos;activité
+                </span>
+                <div className="relative h-52 sm:h-56 w-full max-w-[360px] sm:max-w-[420px] ml-auto lg:-mr-8">
+                  {sectorCloudWords.map((sector) => (
+                    <span
+                      key={sector.name}
+                      className="absolute -translate-x-1/2 -translate-y-1/2 text-[#3558A2] whitespace-nowrap leading-none"
+                      style={{
+                        top: `${sector.top}%`,
+                        left: `${sector.left}%`,
+                        fontSize: `${sector.fontSize}px`,
+                        fontWeight: sector.weight > 0.7 ? 900 : sector.weight > 0.4 ? 700 : 600,
+                      }}
                     >
-                      {effectiveStats.genderData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                  </PieChart>
-                </ChartContainer>
-              </CardContent>
-            </Card>
-          </div>
+                      {sector.name.toLowerCase()}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
 
-          <Card className="min-w-0 border-2 border-transparent bg-[#ffe8e4] transition-colors hover:border-[#3558A2]">
-            <CardHeader>
-              <CardTitle className="text-sm font-medium text-xl">Top Secteurs d&apos;Activité</CardTitle>
-            </CardHeader>
-            <CardContent className="px-3 sm:px-6 overflow-hidden">
-              <ChartContainer
-                config={{ value: { label: "Nombre" } }}
-                className="h-[200px] sm:h-[240px] md:h-[300px] w-full"
-              >
-                <BarChart data={effectiveStats.sectorData} layout="vertical">
-                  <XAxis type="number" />
-                  <YAxis dataKey="name" type="category" width={70} tick={{ fontSize: 10 }} />
-                  <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar dataKey="value" fill="#3558A2" radius={[0, 4, 4, 0]} />
-                </BarChart>
-              </ChartContainer>
-            </CardContent>
-          </Card>
+            {/* Centre : grand cercle alumni */}
+            <div className="flex items-start justify-center pt-2">
+              <div className="w-52 h-52 rounded-full bg-[#8ba4c9] flex flex-col items-center justify-center shadow-md">
+                <span className="text-6xl font-extrabold text-white leading-none">
+                  {effectiveStats.totalAlumni.toLocaleString("fr-FR")}
+                </span>
+                <span className="text-white font-semibold text-xl mt-1">Alumni</span>
+              </div>
+            </div>
+
+            {/* Droite : bonhommes + stats retour */}
+            <div className="flex flex-col gap-6">
+              <div>
+                <div className="mb-3 grid grid-cols-5 gap-x-1.5 gap-y-2 w-max">
+                  {Array.from({ length: 10 }, (_, i) => (
+                    <PersonIcon key={i} color={i < 6 ? "#da281c" : "#3558A2"} />
+                  ))}
+                </div>
+                <p className="font-bold text-[#da281c] text-lg leading-snug">
+                  6/10 Alumni
+                  <br />
+                  <span className="text-[#3558A2]">déjà de retour en Guinée</span>
+                </p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div>
+                  <span className="text-7xl font-black text-[#3558A2] leading-none">{stats.planRetourCount}</span>
+                  <p className="text-[#3558A2] font-semibold text-sm mt-1">envisagent le retour</p>
+                </div>
+                <Image
+                  src="/annuaire/fleche.png"
+                  alt="Flèche retour"
+                  width={86}
+                  height={104}
+                  className="shrink-0 h-auto w-[86px] object-contain"
+                />
+              </div>
+            </div>
+
+          </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="py-2">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="rounded-2xl p-8 sm:p-12 text-center">
-            <h2 className="font-serif text-3xl sm:text-4xl font-bold mb-2">
-              Vous n&apos;êtes pas encore inscrit ?
-            </h2>
-            <p className="text-lg mb-2 max-w-2xl mx-auto">
-              Rejoignez l&apos;annuaire pour être visible auprès de la communauté et développer votre
-              réseau professionnel.
-            </p>
-            <Button size="lg" className="bg-[#ea292c] hover:bg-[#f48988]/90 font-semibold" asChild>
-              <Link href="/inscription">Rejoindre l&apos;annuaire</Link>
-            </Button>
-          </div>
+      <section className="py-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <Button
+            size="lg"
+            className="h-14 rounded-full bg-[#ea292c] px-10 text-lg font-semibold hover:bg-[#f48988]/90"
+            asChild
+          >
+            <Link href="/inscription">Rejoignez l&apos;annuaire</Link>
+          </Button>
         </div>
       </section>
     </div>
