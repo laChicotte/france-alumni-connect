@@ -164,10 +164,10 @@ export default function HomePage() {
       </section>
 
       {/* Qui sommes-nous */}
-      <section className="py-12">
+      <section className="py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
           <div className="grid lg:grid-cols-2 gap-8 sm:gap-14 items-center">
-            <div className="overflow-hidden rounded-lg shadow-lg h-[340px] sm:h-[420px] lg:h-[600px]">
+            <div className="mx-auto w-[calc(100%-5px)] overflow-hidden rounded-lg shadow-lg h-[400px] sm:h-[500px] lg:h-[750px]">
               <img
                 src={activeQuiSommesNousImage}
                 alt="France Alumni Guinée"
@@ -175,10 +175,10 @@ export default function HomePage() {
               />
             </div>
             <div className="ml-18">
-              <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#3558A2] mb-6 leading-tight">
+              <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-[#3558A2] mb-6 leading-tight">
                 qui sommes-<br />nous ?
               </h2>
-              <p className="text-base sm:text-lg text-gray-600 leading-relaxed text-justify">
+              <p className="text-base sm:text-lg text-gray-600 leading-relaxed text-left">
                 France Alumni Guinée, dans le prolongement de Campus France, est une communauté dynamique de 
                 Guinéennes et Guinéens diplômés de l&apos;enseignement supérieur français, rassemblés par leur 
                 parcours d&apos;études en France et leur engagement pour la coopération, le partage d&apos;expériences, 
@@ -199,36 +199,36 @@ export default function HomePage() {
       {/* Objectives */}
       <section className="py-14 bg-[#da281c]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#ffffff] text-center mb-12">
+          <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-[#ffffff] text-center mb-12">
             nos objectifs
           </h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-30">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-28">
             <div>
-              <h3 className="font-serif text-xl font-bold text-white mb-3">représentation et <br />influence</h3>
+              <h3 className="font-serif text-xl sm:text-2xl font-bold text-white mb-3">représentation et <br />influence</h3>
               <p
                 lang="fr"
-                className="text-left md:text-justify [text-align-last:left] hyphens-auto break-words text-white text-sm leading-7 max-w-md"
+                className="text-white sm:text-lg leading-relaxed max-w-md"
               >
                 Fédérer la diaspora guinéenne diplômée de France autour d&apos;une voix structurée, capable de dialoguer avec les entreprises et institutions. L&apos;objectif est de créer des passerelles concrètes vers l&apos;emploi, les partenariats et les opportunités économiques.
               </p>
             </div>
             <div>
-              <h3 className="font-serif text-xl font-bold text-white mb-3">développement <br />local</h3>
+              <h3 className="font-serif text-xl sm:text-2xl font-bold text-white mb-3">développement <br />local</h3>
               <p
                 lang="fr"
-                className="text-left md:text-justify [text-align-last:left] hyphens-auto break-words text-white text-sm leading-7 max-w-md"
+                className="text-white sm:text-lg leading-relaxed max-w-md"
               >
                 Mobiliser les compétences pour répondre à des besoins précis en Guinée : accompagnement d&apos;entrepreneurs, interventions d&apos;experts, programmes de formation et appui à des projets à fort impact.
               </p>
             </div>
             <div>
-              <h3 className="font-serif text-xl font-bold text-white mb-3">
+              <h3 className="font-serif text-xl sm:text-2xl font-bold text-white mb-3">
                 solidarité et <br />soutien
               </h3>
 
               <p
                 lang="fr"
-                className="text-left md:text-justify [text-align-last:left] hyphens-auto break-words text-white text-sm leading-7 max-w-md"
+                className="text-white sm:text-lg leading-relaxed max-w-md"
               >
                 Structurer un réseau d&apos;entraide efficace basé sur le mentorat, le partage
                 d&apos;expériences et l&apos;accès à des ressources utiles, afin d&apos;accompagner les
@@ -236,10 +236,10 @@ export default function HomePage() {
               </p>
             </div>
             <div>
-              <h3 className="font-serif text-xl font-bold text-white mb-3">rayonnement <br />international</h3>
+              <h3 className="font-serif text-xl sm:text-2xl font-bold text-white mb-3">rayonnement <br />international</h3>
               <p
                 lang="fr"
-                className="text-left md:text-justify [text-align-last:left] hyphens-auto break-words text-white text-sm leading-7 max-w-md"
+                  className="text-white sm:text-lg leading-relaxed max-w-md"
               >
                 Mettre en lumière les réussites guinéennes et développer des connexions stratégiques entre la France et la Guinée pour favoriser les collaborations, l&apos;attractivité et la reconnaissance du réseau.
               </p>
@@ -249,9 +249,9 @@ export default function HomePage() {
       </section>
 
       {/* Stats */}
-      <section ref={statsRef} className="py-8">
+      <section ref={statsRef} className="py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#3558A2] text-center mb-8">
+          <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-[#3558A2] text-center mb-8">
               le réseau en bref
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -278,18 +278,16 @@ export default function HomePage() {
         </div>
       </section>
 
-      
-
       {/* Partners */}
       <section className="py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-4 lg:gap-6">
             <div className="flex-shrink-0 w-36 lg:w-48">
-              <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#da281c] leading-snug">
+              <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-[#da281c] leading-snug">
                 nos <br />partenaires
               </h2>
             </div>
-            <div className="flex-1 max-w-[720px] overflow-hidden ml-36">
+            <div className="flex-1 max-w-[720px] overflow-hidden ml-50">
               <div className="partners-marquee-track">
                 {marqueePartners.map((partner, index) => (
                   <div key={`${partner.name}-${index}`} className="partners-marquee-item">
@@ -370,14 +368,6 @@ export default function HomePage() {
         .stat-card-3 {
           background: linear-gradient(135deg, #1e3a8a 0%, #2d6ec7 100%);
         }
-        .objectives-justified {
-          text-align: justify;
-          text-justify: inter-word;
-          text-align-last: left;
-          hyphens: none;
-          overflow-wrap: normal;
-          word-break: normal;
-        }
         .stat-rotate-in {
           animation: stat-fade-in 420ms ease;
         }
@@ -394,7 +384,7 @@ export default function HomePage() {
 
         .partners-marquee-track {
           display: flex;
-          gap: 0.125rem;
+          gap: 0;
           width: max-content;
           animation: partners-marquee-scroll 34s linear infinite;
           will-change: transform;
@@ -416,7 +406,7 @@ export default function HomePage() {
         }
         @keyframes partners-marquee-scroll {
           from { transform: translateX(0); }
-          to { transform: translateX(calc(-50% - 0.0625rem)); }
+          to { transform: translateX(calc(-50% - 0.03rem)); }
         }
       `}</style>
     </div>
