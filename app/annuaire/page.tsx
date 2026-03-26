@@ -23,14 +23,14 @@ function SemiCircleGauge({ pct, label }: { pct: number; label: string }) {
   return (
     <div className="flex flex-col items-center gap-1">
       <svg width="130" height="78" viewBox="0 0 100 60">
-        <path d={`M ${bg0.x} ${bg0.y} A ${r} ${r} 0 0 1 ${bg1.x} ${bg1.y}`} fill="none" stroke="#3558A2" strokeWidth="10" />
+        <path d={`M ${bg0.x} ${bg0.y} A ${r} ${r} 0 0 1 ${bg1.x} ${bg1.y}`} fill="none" stroke="#ffffff" strokeWidth="10" />
         {Array.from({ length: SEGS }, (_, i) => {
           if (i >= filled) return null
           const gap = 0.07
           const s = pt((i + gap) / SEGS), e = pt((i + 1 - gap) / SEGS)
           return (
             <path key={i} d={`M ${s.x} ${s.y} A ${r} ${r} 0 0 1 ${e.x} ${e.y}`}
-              fill="none" stroke="#da281c" strokeWidth="10" />
+              fill="none" stroke="#3558A2" strokeWidth="10" />
           )
         })}
         <text x="50" y="47" textAnchor="middle" fontSize="16" fontWeight="800" fill="#1e293b">{pct}%</text>
@@ -316,7 +316,7 @@ export default function AnnuairePage() {
     <div className="min-h-screen">
       {/* Hero image */}
       <section ref={heroRef} className="fixed left-0 top-20 z-10 h-[300px] w-full overflow-hidden will-change-transform sm:h-[550px]">
-        <Image src="/annuaire/annuaire1.jpg" alt="Annuaire" fill className="object-cover" priority />
+        <Image src="/annuaire/annuaire2.jpg" alt="Annuaire" fill className="object-cover" priority />
         <div className="absolute inset-0 bg-black/20" />
         <div className="relative z-10 mx-auto flex h-full w-full max-w-7xl items-end px-4 pb-6 sm:px-6 sm:pb-8 lg:px-8">
           <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold text-white leading-none">
@@ -657,7 +657,7 @@ export default function AnnuairePage() {
       </Dialog>
 
       {/* Notre Communauté */}
-      <section className="py-16">
+      <section className="py-16 bg-[#da281c]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#da281c] text-center mb-12">
             notre communauté
@@ -673,7 +673,7 @@ export default function AnnuairePage() {
                 <SemiCircleGauge pct={communityStats.recherchePct} label="en recherche d'emploi" />
               </div>
               <div className="lg:pr-0">
-                <span className="inline-block bg-[#da281c] text-white px-3 py-1 rounded text-sm font-bold mb-3">
+                <span className="inline-block bg-[#3558A2] text-[#ffffff] px-3 py-1 rounded text-sm font-bold mb-3">
                   secteurs d&apos;activité
                 </span>
                 <div className="relative h-52 sm:h-56 w-full max-w-[360px] sm:max-w-[420px] ml-auto lg:-mr-8">
@@ -698,7 +698,7 @@ export default function AnnuairePage() {
             {/* Centre : grand cercle alumni */}
             <div className="flex items-start justify-center pt-2">
               <div className="w-52 h-52 rounded-full bg-[#8ba4c9] flex flex-col items-center justify-center shadow-md">
-                <span className="text-6xl font-extrabold text-white leading-none">
+                <span className="text-[4.1rem] font-extrabold text-white leading-none drop-shadow-[0_4px_8px_rgba(0,0,0,0.35)]">
                   {effectiveStats.totalAlumni.toLocaleString("fr-FR")}
                 </span>
                 <span className="text-white font-semibold text-xl mt-1">Alumni</span>
@@ -710,10 +710,10 @@ export default function AnnuairePage() {
               <div>
                 <div className="mb-3 grid grid-cols-5 gap-x-1.5 gap-y-2 w-max">
                   {Array.from({ length: 10 }, (_, i) => (
-                    <PersonIcon key={i} color={i < 6 ? "#da281c" : "#3558A2"} />
+                    <PersonIcon key={i} color={i < 6 ? "#ffffff" : "#3558A2"} />
                   ))}
                 </div>
-                <p className="font-bold text-[#da281c] text-lg leading-snug">
+                <p className="font-bold text-[#ffffff] text-lg leading-snug">
                   6/10 Alumni
                   <br />
                   <span className="text-[#3558A2]">déjà de retour en Guinée</span>
@@ -722,11 +722,11 @@ export default function AnnuairePage() {
 
               <div className="flex items-center gap-3">
                 <div>
-                  <span className="text-7xl font-black text-[#3558A2] leading-none">{stats.planRetourCount}</span>
+                  <span className="text-7xl font-black text-[#ffffff] leading-none ml-10">{stats.planRetourCount}</span>
                   <p className="text-[#3558A2] font-semibold text-sm mt-1">envisagent le retour</p>
                 </div>
                 <Image
-                  src="/annuaire/fleche.png"
+                  src="/annuaire/fleche2.png"
                   alt="Flèche retour"
                   width={86}
                   height={104}
