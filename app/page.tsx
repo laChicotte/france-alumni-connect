@@ -131,7 +131,7 @@ export default function HomePage() {
             <span className="inline-flex rounded-sm px-4 py-2.5 text-xs font-bold lowercase tracking-wide text-white sm:text-sm">
               en lien avec
             </span>
-            <div className="h-14 w-[2px] bg-white/90 sm:h-16" aria-hidden="true" />
+            <div className="h-14 w-[2px] bg-white/90 sm:h-22" aria-hidden="true" />
             <img
               src="/accueil/ambassade.png"
               alt="Ambassade de France en Guinée et en Sierra Leone"
