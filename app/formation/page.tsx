@@ -5,7 +5,7 @@ import Image from "next/image"
 export default function FormationPage() {
   return (
     <div className="min-h-screen">
-      <section className="relative mx-4 mt-4 h-[320px] overflow-hidden rounded-3xl sm:mx-6 sm:h-[420px] lg:mx-8 lg:h-[520px]">
+      <section className="relative mx-4 mt-4 h-[320px] overflow-hidden rounded-3xl sm:mx-6 sm:h-[420px] lg:mx-8 lg:h-[400px]">
         <Image src="/formation/formation1.jpg" alt="Formation" fill className="object-cover hero-zoom" priority />
         <div className="absolute inset-0 bg-black/35" />
         <div className="relative z-10 flex h-full flex-col justify-end pb-10 px-10 sm:pb-14 sm:px-20 lg:pb-16 lg:px-32">
