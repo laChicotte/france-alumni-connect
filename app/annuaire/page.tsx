@@ -33,9 +33,9 @@ function SemiCircleGauge({ pct, label }: { pct: number; label: string }) {
               fill="none" stroke="#3558A2" strokeWidth="10" />
           )
         })}
-        <text x="50" y="47" textAnchor="middle" fontSize="16" fontWeight="800" fill="#1e293b">{pct}%</text>
+        <text x="50" y="47" textAnchor="middle" fontSize="16" fontWeight="800" fill="#ffffff">{pct}%</text>
       </svg>
-      <span className="text-[11px] text-center text-[#da281c] font-semibold leading-tight max-w-[110px]">{label}</span>
+      <span className="text-[11px] text-center text-[#ffffff] font-semibold leading-tight max-w-[110px]">{label}</span>
     </div>
   )
 }
@@ -663,7 +663,7 @@ export default function AnnuairePage() {
             notre communauté
           </h2>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-6 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-2 items-start">
 
             {/* Gauche : demi-cercles + nuage de mots */}
             <div className="flex flex-col gap-8">
@@ -680,7 +680,7 @@ export default function AnnuairePage() {
                   {sectorCloudWords.map((sector) => (
                     <span
                       key={sector.name}
-                      className="absolute -translate-x-1/2 -translate-y-1/2 text-[#3558A2] whitespace-nowrap leading-none"
+                      className="absolute -translate-x-1/2 -translate-y-1/2 text-[#8ba4c9] whitespace-nowrap leading-none"
                       style={{
                         top: `${sector.top}%`,
                         left: `${sector.left}%`,
@@ -697,8 +697,8 @@ export default function AnnuairePage() {
 
             {/* Centre : grand cercle alumni */}
             <div className="flex items-start justify-center pt-2">
-              <div className="w-52 h-52 rounded-full bg-[#8ba4c9] flex flex-col items-center justify-center shadow-md">
-                <span className="text-[4.1rem] font-extrabold text-white leading-none drop-shadow-[0_4px_8px_rgba(0,0,0,0.35)]">
+              <div className="w-60 h-60 rounded-full bg-[#8ba4c9] flex flex-col items-center justify-center shadow-md">
+                <span className="text-[4.4rem] font-extrabold text-white leading-none drop-shadow-[0_6px_14px_rgba(0,0,0,0.55)]">
                   {effectiveStats.totalAlumni.toLocaleString("fr-FR")}
                 </span>
                 <span className="text-white font-semibold text-xl mt-1">Alumni</span>
@@ -710,20 +710,20 @@ export default function AnnuairePage() {
               <div>
                 <div className="mb-3 grid grid-cols-5 gap-x-1.5 gap-y-2 w-max">
                   {Array.from({ length: 10 }, (_, i) => (
-                    <PersonIcon key={i} color={i < 6 ? "#ffffff" : "#3558A2"} />
+                    <PersonIcon key={i} color={i < communityStats.dejaEnGuineeRatio ? "#ffffff" : "#8ba4c9"} />
                   ))}
                 </div>
                 <p className="font-bold text-[#ffffff] text-lg leading-snug">
-                  6/10 Alumni
+                  {stats.dejaEnGuineeCount.toLocaleString("fr-FR")}/{effectiveStats.totalAlumni.toLocaleString("fr-FR")} Alumni
                   <br />
-                  <span className="text-[#3558A2]">déjà de retour en Guinée</span>
+                  <span className="text-[#ffffff]">déjà de retour en Guinée</span>
                 </p>
               </div>
 
               <div className="flex items-center gap-3">
                 <div>
                   <span className="text-7xl font-black text-[#ffffff] leading-none ml-10">{stats.planRetourCount}</span>
-                  <p className="text-[#3558A2] font-semibold text-sm mt-1">envisagent le retour</p>
+                  <p className="text-[#8ba4c9] font-semibold text-sm mt-1">envisagent le <br />retour</p>
                 </div>
                 <Image
                   src="/annuaire/fleche2.png"
