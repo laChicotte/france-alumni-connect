@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { useEffect, useState, useMemo, useRef } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -35,7 +35,7 @@ function SemiCircleGauge({ pct, label }: { pct: number; label: string }) {
         })}
         <text x="50" y="47" textAnchor="middle" fontSize="18" fontWeight="800" fill="#ffffff">{pct}%</text>
       </svg>
-      <span className="text-xs text-center text-[#ffffff] font-semibold leading-tight max-w-[126px]">{label}</span>
+      <span className="text-base sm:text-lg text-center text-[#ffffff] font-semibold leading-tight max-w-[200px]">{label}</span>
     </div>
   )
 }
@@ -59,7 +59,6 @@ type StatsItem = { name: string; value: number }
 type AnnuaireStats = {
   totalAlumni: number
   sectorData: StatsItem[]
-  genderData: StatsItem[]
   statusData: StatsItem[]
   planRetourCount: number
   dejaEnGuineeCount: number
@@ -69,7 +68,6 @@ const PAGE_SIZE = 6
 const DEFAULT_STATS: AnnuaireStats = {
   totalAlumni: 0,
   sectorData: [],
-  genderData: [],
   statusData: [],
   planRetourCount: 0,
   dejaEnGuineeCount: 0,
@@ -99,7 +97,6 @@ export default function AnnuairePage() {
   const [isVilleOpen, setIsVilleOpen] = useState(false)
   const [currentPage, setCurrentPage] = useState(1)
   const [stats, setStats] = useState<AnnuaireStats>(DEFAULT_STATS)
-  const heroRef = useRef<HTMLElement | null>(null)
 
   useEffect(() => {
     const loadStats = async () => {
@@ -111,7 +108,6 @@ export default function AnnuairePage() {
         setStats({
           totalAlumni: Number(data.totalAlumni) || 0,
           sectorData: Array.isArray(data.sectorData) ? data.sectorData : [],
-          genderData: Array.isArray(data.genderData) ? data.genderData : [],
           statusData: Array.isArray(data.statusData) ? data.statusData : [],
           planRetourCount: Number(data.planRetourCount) || 0,
           dejaEnGuineeCount: Number(data.dejaEnGuineeCount) || 0,
@@ -123,21 +119,6 @@ export default function AnnuairePage() {
 
     loadStats()
   }, [])
-
-  useEffect(() => {
-    const onScroll = () => {
-      const y = window.scrollY
-      const maxTravel = window.innerWidth >= 640 ? 550 : 300
-      const translateY = -Math.min(y, maxTravel)
-      if (heroRef.current) {
-        heroRef.current.style.transform = `translateY(${translateY}px)`
-      }
-    }
-    onScroll()
-    window.addEventListener("scroll", onScroll, { passive: true })
-    return () => window.removeEventListener("scroll", onScroll)
-  }, [])
-
 
   // Charger les alumni: complet si connecté, aperçu limité si visiteur
   useEffect(() => {
@@ -236,10 +217,6 @@ export default function AnnuairePage() {
       .map(([name, value]) => ({ name, value }))
       .sort((a, b) => b.value - a.value)
       .slice(0, 5)
-    const genderData = [
-      { name: "Homme", value: Math.floor(totalAlumni * 0.54) },
-      { name: "Femme", value: Math.floor(totalAlumni * 0.46) },
-    ]
     const statusData = [
       { name: "Employé", value: Math.floor(totalAlumni * 0.65) },
       { name: "Étudiant", value: Math.floor(totalAlumni * 0.20) },
@@ -249,7 +226,6 @@ export default function AnnuairePage() {
     return {
       totalAlumni,
       sectorData,
-      genderData,
       statusData,
     }
   }, [])
@@ -257,7 +233,6 @@ export default function AnnuairePage() {
   const effectiveStats = useMemo(() => ({
     totalAlumni: stats.totalAlumni > 0 ? stats.totalAlumni : staticStats.totalAlumni,
     sectorData: stats.sectorData.length > 0 ? stats.sectorData : staticStats.sectorData,
-    genderData: stats.genderData.length > 0 ? stats.genderData : staticStats.genderData,
     statusData: stats.statusData.length > 0 ? stats.statusData : staticStats.statusData,
   }), [stats, staticStats])
 
@@ -315,21 +290,18 @@ export default function AnnuairePage() {
   return (
     <div className="min-h-screen">
       {/* Hero image */}
-      <section ref={heroRef} className="fixed left-0 top-20 z-10 h-[300px] w-full overflow-hidden will-change-transform sm:h-[550px]">
+      <section className="relative mx-4 mt-4 h-[320px] overflow-hidden rounded-3xl sm:mx-6 sm:h-[420px] lg:mx-8 lg:h-[520px]">
         <Image src="/annuaire/annuaire2.jpg" alt="Annuaire" fill className="object-cover" priority />
-        <div className="absolute inset-0 bg-black/20" />
-        <div className="relative z-10 mx-auto flex h-full w-full max-w-7xl items-end px-4 pb-6 sm:px-6 sm:pb-8 lg:px-8">
-          <h1 className="font-serif text-4xl sm:text-6xl lg:text-7xl font-bold text-white leading-none">
+        <div className="absolute inset-0 bg-black/35" />
+        <div className="relative z-10 flex h-full flex-col justify-center px-10 sm:px-20 lg:px-32">
+          <h1 className="inline-block w-fit bg-[#3558A2] px-4 py-2 font-serif text-4xl font-bold leading-none text-white sm:text-6xl lg:text-7xl">
             annuaire
           </h1>
         </div>
       </section>
 
-      {/* Spacer pour que le contenu remonte seulement après sortie du hero */}
-      <div className="h-[380px] sm:h-[630px]" />
-
       {/* Filters */}
-      <section>
+      <section className="py-8">
         <div className="mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-4 flex items-center gap-4">
             <div className="flex w-full flex-wrap items-center gap-3">
@@ -659,24 +631,24 @@ export default function AnnuairePage() {
       {/* Notre Communauté */}
       <section className="py-16 bg-[#da281c]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#da281c] text-center mb-12">
+          <h2 className="font-serif text-3xl sm:text-4xl font-bold text-[#ffffff] text-center mb-12">
             notre communauté
           </h2>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-2 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-6 items-center justify-items-center">
 
             {/* Gauche : demi-cercles + nuage de mots */}
-            <div className="flex flex-col gap-8">
-              <div className="flex justify-around sm:justify-start sm:gap-4">
+            <div className="flex flex-col items-center gap-8">
+              <div className="flex justify-center gap-4">
                 <SemiCircleGauge pct={communityStats.entrepreneurPct} label="entrepreneurs" />
                 <SemiCircleGauge pct={communityStats.salariePct} label="salariés" />
                 <SemiCircleGauge pct={communityStats.recherchePct} label="en recherche d'emploi" />
               </div>
-              <div className="lg:pr-0 lg:mt-18">
+              <div className="lg:mt-18">
                 <span className="inline-block bg-[#3558A2] text-[#ffffff] px-3 py-1 rounded text-sm font-bold mb-3">
                   secteurs d&apos;activité
                 </span>
-                <div className="relative h-52 sm:h-56 w-full max-w-[360px] sm:max-w-[420px] ml-auto lg:-mr-8">
+                <div className="relative h-52 sm:h-56 w-full max-w-[360px] sm:max-w-[420px] mx-auto">
                   {sectorCloudWords.map((sector) => (
                     <span
                       key={sector.name}
@@ -696,7 +668,7 @@ export default function AnnuairePage() {
             </div>
 
             {/* Centre : grand cercle alumni */}
-            <div className="flex items-start justify-center pt-2">
+            <div className="flex items-center justify-center pt-2">
               <div className="w-60 h-60 rounded-full bg-[#8ba4c9] flex flex-col items-center justify-center shadow-md">
                 <span className="text-[4.4rem] font-extrabold text-white leading-none drop-shadow-[0_6px_14px_rgba(0,0,0,0.55)]">
                   {effectiveStats.totalAlumni.toLocaleString("fr-FR")}
@@ -706,9 +678,9 @@ export default function AnnuairePage() {
             </div>
 
             {/* Droite : bonhommes + stats retour */}
-            <div className="flex flex-col gap-6">
-              <div>
-                <div className="mb-3 grid grid-cols-5 gap-x-1.5 gap-y-2 w-max">
+            <div className="flex flex-col items-center gap-6">
+              <div className="text-center">
+                <div className="mb-3 grid grid-cols-5 gap-x-1.5 gap-y-2 w-max mx-auto">
                   {Array.from({ length: 10 }, (_, i) => (
                     <PersonIcon key={i} color={i < communityStats.dejaEnGuineeRatio ? "#ffffff" : "#8ba4c9"} />
                   ))}
@@ -720,10 +692,10 @@ export default function AnnuairePage() {
                 </p>
               </div>
 
-              <div className="flex items-center gap-3 lg:ml-8">
-                <div>
-                  <span className="text-7xl font-black text-[#ffffff] leading-none ml-10">{stats.planRetourCount}</span>
-                  <p className="text-[#8ba4c9] font-semibold text-sm mt-1">envisagent le <br />retour</p>
+              <div className="flex items-center justify-center gap-3">
+                <div className="text-center">
+                  <span className="text-7xl font-black text-[#ffffff] leading-none">{stats.planRetourCount}</span>
+                  <p className="text-2xl font-semibold text-[#8ba4c9] mt-1">envisagent le <br />retour</p>
                 </div>
                 <Image
                   src="/annuaire/fleche2.png"
