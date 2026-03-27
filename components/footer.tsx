@@ -50,7 +50,7 @@ export function Footer() {
 
           {/* Liens rapides */}
           <div>
-            <h4 className="font-bold text-sm tracking-wider mb-1">liens rapides</h4>
+            <h4 className="font-bold text-sm tracking-wider mb-4">liens rapides</h4>
             <ul className="space-y-2 text-sm text-white/75">
               <li><Link href="/annuaire" className="hover:text-[#f48988] transition-colors">annuaire</Link></li>
               <li><Link href="/actualites" className="hover:text-[#f48988] transition-colors">actualités</Link></li>

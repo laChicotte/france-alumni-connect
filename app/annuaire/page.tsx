@@ -22,7 +22,7 @@ function SemiCircleGauge({ pct, label }: { pct: number; label: string }) {
   const bg0 = pt(0), bg1 = pt(1)
   return (
     <div className="flex flex-col items-center gap-1">
-      <svg width="130" height="78" viewBox="0 0 100 60">
+      <svg width="138" height="84" viewBox="0 0 100 60">
         <path d={`M ${bg0.x} ${bg0.y} A ${r} ${r} 0 0 1 ${bg1.x} ${bg1.y}`} fill="none" stroke="#ffffff" strokeWidth="10" />
         {Array.from({ length: SEGS }, (_, i) => {
           if (i >= filled) return null
@@ -33,9 +33,9 @@ function SemiCircleGauge({ pct, label }: { pct: number; label: string }) {
               fill="none" stroke="#3558A2" strokeWidth="10" />
           )
         })}
-        <text x="50" y="47" textAnchor="middle" fontSize="16" fontWeight="800" fill="#ffffff">{pct}%</text>
+        <text x="50" y="47" textAnchor="middle" fontSize="18" fontWeight="800" fill="#ffffff">{pct}%</text>
       </svg>
-      <span className="text-[11px] text-center text-[#ffffff] font-semibold leading-tight max-w-[110px]">{label}</span>
+      <span className="text-xs text-center text-[#ffffff] font-semibold leading-tight max-w-[126px]">{label}</span>
     </div>
   )
 }
@@ -672,7 +672,7 @@ export default function AnnuairePage() {
                 <SemiCircleGauge pct={communityStats.salariePct} label="salariés" />
                 <SemiCircleGauge pct={communityStats.recherchePct} label="en recherche d'emploi" />
               </div>
-              <div className="lg:pr-0">
+              <div className="lg:pr-0 lg:mt-18">
                 <span className="inline-block bg-[#3558A2] text-[#ffffff] px-3 py-1 rounded text-sm font-bold mb-3">
                   secteurs d&apos;activité
                 </span>
@@ -720,7 +720,7 @@ export default function AnnuairePage() {
                 </p>
               </div>
 
-              <div className="flex items-center gap-3">
+              <div className="flex items-center gap-3 lg:ml-8">
                 <div>
                   <span className="text-7xl font-black text-[#ffffff] leading-none ml-10">{stats.planRetourCount}</span>
                   <p className="text-[#8ba4c9] font-semibold text-sm mt-1">envisagent le <br />retour</p>
