@@ -169,6 +169,15 @@
   }
 }
 
+.hero-zoom {
+  animation: zoom-breathe 10s ease-in-out infinite;
+  transform-origin: center center;
+}
+@keyframes zoom-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.07); }
+}
+
 body {
   font-family: "Marianne", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   color: var(--color-foreground);
