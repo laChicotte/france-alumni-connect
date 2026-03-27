@@ -34,7 +34,11 @@ export default function ActualitesPage() {
   const [currentPage, setCurrentPage] = useState(1)
   const [isLoadingFeed, setIsLoadingFeed] = useState(true)
   const articlesPerPage = 6
-  const categories = ["Tous", ...Array.from(new Set(feedItems.map((item) => item.category)))]
+  const categories = ["Tous", ...Array.from(new Set(feedItems.map((item) => item.category))).sort((a, b) => {
+    if (a === "Événements") return 1
+    if (b === "Événements") return -1
+    return 0
+  })]
 
   const filteredArticles =
     selectedCategory === "Tous"
@@ -73,7 +77,7 @@ export default function ActualitesPage() {
     <div className="min-h-screen">
       {/* Hero image */}
       <section className="relative mx-4 mt-4 h-[320px] overflow-hidden rounded-3xl sm:mx-6 sm:h-[420px] lg:mx-8 lg:h-[520px]">
-        <Image src="/actualites/actualites1.jpg" alt="Actualités" fill className="object-cover hero-zoom" priority />
+        <Image src="/actualites/actualites2.jpg" alt="Actualités" fill className="object-cover hero-zoom" priority />
         <div className="absolute inset-0 bg-black/35" />
         <div className="relative z-10 flex h-full flex-col justify-end pb-10 px-10 sm:pb-14 sm:px-20 lg:pb-16 lg:px-32">
           <h1 className="inline-block w-fit bg-[#3558A2] px-3 py-2 font-serif text-2xl font-bold leading-none text-white sm:text-3xl lg:text-4xl">
@@ -83,7 +87,7 @@ export default function ActualitesPage() {
       </section>
 
       {/* Categories Filter */}
-      <section className="py-6 border-b">
+      <section className="py-6">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-wrap gap-3">
             {categories.map((category) => (
@@ -110,7 +114,7 @@ export default function ActualitesPage() {
 
       {/* Articles Grid */}
       <section className="py-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-0">
           {isLoadingFeed ? (
             <div className="flex justify-center py-16">
               <Loader2 className="h-8 w-8 animate-spin text-[#3558A2]" />
@@ -119,7 +123,7 @@ export default function ActualitesPage() {
             <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
               {currentArticles.map((article) => (
                 <Link key={article.id} href={article.href}>
-                  <Card className="overflow-hidden hover:shadow-lg transition-shadow group h-full cursor-pointer">
+                  <Card className="overflow-hidden hover:shadow-lg transition-shadow group h-full cursor-pointer !pt-0">
                     <div className="relative overflow-hidden">
                       <img
                         src={article.image || "/placeholder.svg"}
@@ -200,23 +204,17 @@ export default function ActualitesPage() {
         </div>
       </section>
 
-      {/* Newsletter CTA */}
-      <section className="py-10 bg-[#ffe8e4]">
-        <div className="w-full px-2 sm:px-4">
-          <div className="max-w-2xl mx-auto text-center">
-            <h2 className="font-serif text-3xl font-bold mb-4">Restez informé</h2>
-            <p className="text-lg text-muted-foreground mb-3">
-              Inscrivez-vous à notre newsletter pour recevoir les dernières actualités et opportunités du réseau.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-              <input
-                type="email"
-                placeholder="Votre adresse email"
-                className="h-10 flex-1 rounded-lg border border-input bg-background px-4"
-              />
-              <Button className="h-10 bg-[#3558A2] hover:bg-[#3558A2]/90">S'abonner</Button>
-            </div>
-          </div>
+      {/* Contribuez CTA */}
+      <section className="py-16">
+        <div className="max-w-2xl mx-auto px-4 text-center">
+          <a href="mailto:france.alumni@institutfrancais-guinee.fr">
+            <Button className="mb-6 h-auto cursor-pointer rounded-full bg-[#da281c] px-10 py-6 text-xl font-bold text-white shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#c92317] hover:shadow-xl active:translate-y-0 focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#da281c]">
+              CONTRIBUEZ
+            </Button>
+          </a>
+          <p className="text-base text-muted-foreground">
+            Vous êtes alumni ? Partagez vos idées et vos travaux avec la communauté. Proposez vos contenus (portraits, recherches, billets, études…) pour publication ici!
+          </p>
         </div>
       </section>
     </div>

@@ -645,14 +645,14 @@ export default function AnnuairePage() {
                 <SemiCircleGauge pct={communityStats.recherchePct} label="en recherche d'emploi" />
               </div>
               <div className="lg:mt-18">
-                <span className="inline-block bg-[#3558A2] text-[#ffffff] px-3 py-1 rounded text-sm font-bold mb-3">
+                {/* <span className="inline-block bg-[#3558A2] text-[#ffffff] px-3 py-1 rounded text-sm font-bold mb-3">
                   secteurs d&apos;activité
-                </span>
+                </span> */}
                 <div className="relative h-52 sm:h-56 w-full max-w-[360px] sm:max-w-[420px] mx-auto">
                   {sectorCloudWords.map((sector) => (
                     <span
                       key={sector.name}
-                      className="absolute -translate-x-1/2 -translate-y-1/2 text-[#8ba4c9] whitespace-nowrap leading-none"
+                      className="absolute -translate-x-1/2 -translate-y-1/2 text-[#3558A2] whitespace-nowrap leading-none"
                       style={{
                         top: `${sector.top}%`,
                         left: `${sector.left}%`,
@@ -688,14 +688,14 @@ export default function AnnuairePage() {
                 <p className="font-bold text-[#ffffff] text-lg leading-snug">
                   {stats.dejaEnGuineeCount.toLocaleString("fr-FR")}/{effectiveStats.totalAlumni.toLocaleString("fr-FR")} Alumni
                   <br />
-                  <span className="text-[#ffffff]">déjà de retour en Guinée</span>
+                  <span className="text-[#3558A2]">déjà de retour en Guinée</span>
                 </p>
               </div>
 
               <div className="flex items-center justify-center gap-3">
                 <div className="text-center">
                   <span className="text-7xl font-black text-[#ffffff] leading-none">{stats.planRetourCount}</span>
-                  <p className="text-2xl font-semibold text-[#8ba4c9] mt-1">envisagent le <br />retour</p>
+                  <p className="text-2xl font-semibold text-[#3558A2] mt-1">envisagent le <br />retour</p>
                 </div>
                 <Image
                   src="/annuaire/fleche2.png"

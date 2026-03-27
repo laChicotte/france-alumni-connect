@@ -17,8 +17,8 @@ export default function FormationPage() {
 
       <section className="bg-white py-16">
         <div className="mx-auto max-w-4xl px-4 text-center sm:px-6 lg:px-8">
-          <h2 className="font-serif text-3xl font-bold text-[#3558A2] sm:text-4xl">
-            À venir dans les prochaines mises à jour
+          <h2 className="font-serif text-3xl sm:text-4xl">
+          Cette page est en cours de développement. Bientôt, vous, alumni, pourrez y proposer vos formations (pour les alumni ou le grand public) et découvrir celles auxquelles vous inscrire. 
           </h2>
         </div>
       </section>
