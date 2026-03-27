@@ -294,7 +294,7 @@ export default function AnnuairePage() {
         <Image src="/annuaire/annuaire2.jpg" alt="Annuaire" fill className="object-cover hero-zoom" priority />
         <div className="absolute inset-0 bg-black/35" />
         <div className="relative z-10 flex h-full flex-col justify-end pb-10 px-10 sm:pb-14 sm:px-20 lg:pb-16 lg:px-32">
-          <h1 className="inline-block w-fit bg-[#3558A2] px-4 py-2 font-serif text-4xl font-bold leading-none text-white sm:text-6xl lg:text-7xl">
+          <h1 className="inline-block w-fit bg-[#3558A2] px-3 py-2 font-serif text-2xl font-bold leading-none text-white sm:text-3xl lg:text-4xl">
             annuaire
           </h1>
         </div>
