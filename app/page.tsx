@@ -265,7 +265,7 @@ export default function HomePage() {
                 nos <br />partenaires
               </h2>
             </div>
-            <div className="flex-1 max-w-[720px] overflow-hidden ml-50">
+            <div className="flex-1 max-w-[720px] overflow-hidden lg:ml-34">
               <div className="partners-marquee-track">
                 {marqueePartners.map((partner, index) => (
                   <div key={`${partner.name}-${index}`} className="partners-marquee-item">
