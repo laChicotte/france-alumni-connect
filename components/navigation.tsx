@@ -72,7 +72,7 @@ export function Navigation() {
 
   return (
     <nav className="sticky top-0 z-[100] w-full border-b border-[#3558A2]/25 bg-white">
-      <div className="w-full">
+      <div className="relative w-full">
         <div className="flex h-20 items-center justify-between px-4 sm:px-6 lg:px-8">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3">
@@ -84,7 +84,7 @@ export function Navigation() {
               className="object-contain h-14 w-auto"
             />
             <span
-              className="hidden text-2xl font-bold uppercase tracking-wide text-[#3558A2] md:block"
+              className="block max-w-[180px] text-[10px] font-bold uppercase leading-tight tracking-[0.02em] text-[#3558A2] sm:max-w-[260px] sm:text-sm sm:tracking-wide md:max-w-none md:text-2xl"
               style={{
                 letterSpacing: '0.05em',
                 textShadow: "1px 1px 0 #d9e3ff",
@@ -223,7 +223,7 @@ export function Navigation() {
 
         {/* Mobile Navigation */}
         {isOpen && (
-          <div className="m-3 grid grid-cols-2 gap-2 rounded-lg border border-[#3558A2]/20 bg-white p-2 lg:hidden">
+          <div className="absolute right-4 top-[calc(100%-0.25rem)] z-[120] w-72 rounded-lg border border-[#3558A2]/20 bg-white p-2 text-right shadow-lg lg:hidden">
             {navItems.map((item) => {
               const isActive = item.href.startsWith("http") ? false : pathname.startsWith(item.href)
               const isExternal = item.href.startsWith("http")
@@ -233,10 +233,10 @@ export function Navigation() {
                   href={item.href}
                   target={isExternal ? "_blank" : undefined}
                   rel={isExternal ? "noopener noreferrer" : undefined}
-                  className={`rounded-md border px-3 py-2 text-center text-xs font-semibold transition-colors ${
+                  className={`block rounded-md px-3 py-2 text-right text-sm transition-colors ${
                     isActive
-                      ? "border-[#3558A2] bg-[#3558A2]/10 text-[#3558A2]"
-                      : "border-[#3558A2]/30 text-[#3558A2] hover:bg-[#3558A2]/5"
+                      ? "bg-[#3558A2]/10 font-semibold text-[#3558A2]"
+                      : "text-[#3558A2]/90 hover:bg-[#3558A2]/5 hover:text-[#3558A2]"
                   }`}
                   onClick={() => setIsOpen(false)}
                 >
@@ -249,19 +249,19 @@ export function Navigation() {
             {isAuthenticated && isAdminOrModerator && (
               <Link
                 href="/admin"
-                className="col-span-2 inline-flex items-center justify-center gap-1.5 rounded-md border border-[#3558A2] px-3 py-2 text-center text-xs font-semibold text-[#3558A2]"
+                className="mt-1 inline-flex w-full items-center justify-end gap-2 rounded-md px-3 py-2 text-sm font-semibold text-[#3558A2] hover:bg-[#3558A2]/5"
                 onClick={() => setIsOpen(false)}
               >
-                <Shield className="h-5 w-5" />
+                <Shield className="h-4 w-4" />
                 Administration
               </Link>
             )}
 
             {/* Mobile User Profile */}
-            <div className="col-span-2 mt-1 border-t border-[#3558A2]/20 px-2 pt-2">
+            <div className="mt-2 border-t border-[#3558A2]/20 px-1 pt-2">
               {isAuthenticated ? (
                 <div className="space-y-2">
-                  <div className="flex items-center gap-3 px-2 py-2">
+                  <div className="flex items-center gap-2 px-2 py-1">
                     <Avatar className="h-8 w-8">
                       <AvatarImage src={user.avatar && user.avatar !== '/placeholder.svg' ? user.avatar : undefined} alt={user.name} />
                       <AvatarFallback className="bg-[#3558A2]/10 text-[#3558A2] text-xs font-bold">
@@ -286,10 +286,10 @@ export function Navigation() {
                       <p className="text-xs text-muted-foreground">{user.email}</p>
                     </div>
                   </div>
-                  <div className="space-y-1">
+                    <div className="space-y-0.5">
                     <Link
                       href="/profil"
-                      className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-[#3558A2]/85 hover:bg-[#3558A2]/10 hover:text-[#3558A2] transition-colors"
+                      className="flex items-center gap-2 rounded-md px-2 py-2 text-sm text-[#3558A2]/90 transition-colors hover:bg-[#3558A2]/10 hover:text-[#3558A2]"
                       onClick={() => setIsOpen(false)}
                     >
                       <User className="h-4 w-4" />
@@ -316,7 +316,7 @@ export function Navigation() {
                         handleLogout()
                         setIsOpen(false)
                       }}
-                      className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm text-[#3558A2]/85 hover:bg-[#3558A2]/10 hover:text-[#3558A2] transition-colors"
+                      className="flex w-full items-center gap-2 rounded-md px-2 py-2 text-left text-sm text-[#3558A2]/90 transition-colors hover:bg-[#3558A2]/10 hover:text-[#3558A2]"
                     >
                       <LogOut className="h-4 w-4" />
                       Se déconnecter
@@ -326,17 +326,11 @@ export function Navigation() {
               ) : (
                 <Link
                   href="/connexion"
-                  className="block cursor-pointer"
+                  className="block cursor-pointer rounded-md px-2 py-2 text-right text-sm font-medium text-[#3558A2] hover:bg-[#3558A2]/5"
                   onClick={() => setIsOpen(false)}
                   aria-label="Se connecter"
                 >
-                  <Button variant="ghost" className="w-full justify-center border border-[#3558A2]/30 hover:bg-[#3558A2]/10 cursor-pointer">
-                    <Avatar className="h-10 w-10">
-                      <AvatarFallback className="bg-transparent text-[#3558A2]">
-                        <User className="h-5 w-5" />
-                      </AvatarFallback>
-                    </Avatar>
-                  </Button>
+                  Se connecter
                 </Link>
               )}
             </div>
