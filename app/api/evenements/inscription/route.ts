@@ -11,11 +11,8 @@ function getBearerToken(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const token = getBearerToken(request)
-    if (!token) {
-      return NextResponse.json({ error: "Non authentifié" }, { status: 401 })
-    }
-
-    const { evenement_id } = await request.json()
+    const body = await request.json()
+    const { evenement_id } = body || {}
     if (!evenement_id) {
       return NextResponse.json({ error: "evenement_id est requis" }, { status: 400 })
     }
@@ -26,11 +23,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Configuration Supabase manquante" }, { status: 500 })
     }
 
-    // Client lié à la session utilisateur -> RLS appliquée normalement
+    // Client Supabase (session utilisateur si token présent, sinon anon)
     const userClient = createClient<Database>(url, anon, {
       global: {
         headers: {
-          Authorization: `Bearer ${token}`,
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
         },
       },
       auth: {
@@ -39,34 +36,69 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    const { data: userData, error: userError } = await userClient.auth.getUser(token)
-    if (userError || !userData.user) {
-      return NextResponse.json({ error: "Session invalide" }, { status: 401 })
+    // Mode interne: utilisateur connecté
+    if (token) {
+      const { data: userData, error: userError } = await userClient.auth.getUser(token)
+      if (userError || !userData.user) {
+        return NextResponse.json({ error: "Session invalide" }, { status: 401 })
+      }
+
+      const userId = userData.user.id
+
+      // Insertion inscription interne (doublon/capacité gérés en base)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error: insertError } = await (userClient.from("inscriptions_evenements") as any).insert({
+        evenement_id,
+        user_id: userId,
+      })
+
+      if (insertError) {
+        if ((insertError as any).code === "23505") {
+          return NextResponse.json({ error: "Vous êtes déjà inscrit à cet événement" }, { status: 409 })
+        }
+        if ((insertError.message || "").toLowerCase().includes("complet")) {
+          return NextResponse.json({ error: "Cet événement est complet" }, { status: 409 })
+        }
+        return NextResponse.json({ error: insertError.message }, { status: 400 })
+      }
+
+      return NextResponse.json({ success: true, mode: "interne" })
     }
 
-    const userId = userData.user.id
+    // Mode externe: sans compte
+    const nom_externe = (body?.nom_externe || "").toString().trim()
+    const prenom_externe = (body?.prenom_externe || "").toString().trim()
+    const email_externe = (body?.email_externe || "").toString().trim().toLowerCase()
+    const telephone_externe = (body?.telephone_externe || "").toString().trim() || null
+    const organisation_externe = (body?.organisation_externe || "").toString().trim() || null
 
-    // Vérifier que l'événement est encore ouvert
-    const { data: event, error: eventError } = await userClient
-      .from("evenements")
-      .select("id, titre, actif, archive")
-      .eq("id", evenement_id)
-      .single()
-
-    if (eventError || !event || !event.actif || event.archive) {
-      return NextResponse.json({ error: "Événement indisponible" }, { status: 400 })
+    if (!nom_externe || !prenom_externe || !email_externe) {
+      return NextResponse.json(
+        { error: "Nom, prénom et email sont requis pour une inscription externe" },
+        { status: 400 },
+      )
     }
 
-    // Insertion inscription (doublon/capacité gérés par index+trigger en base)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email_externe)) {
+      return NextResponse.json({ error: "Email invalide" }, { status: 400 })
+    }
+
+    // Insertion inscription externe via user anon (policy dédiée en base)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error: insertError } = await (userClient.from("inscriptions_evenements") as any).insert({
       evenement_id,
-      user_id: userId,
+      user_id: null,
+      nom_externe,
+      prenom_externe,
+      email_externe,
+      telephone_externe,
+      organisation_externe,
     })
 
     if (insertError) {
       if ((insertError as any).code === "23505") {
-        return NextResponse.json({ error: "Vous êtes déjà inscrit à cet événement" }, { status: 409 })
+        return NextResponse.json({ error: "Cet email est déjà inscrit à cet événement" }, { status: 409 })
       }
       if ((insertError.message || "").toLowerCase().includes("complet")) {
         return NextResponse.json({ error: "Cet événement est complet" }, { status: 409 })
@@ -74,7 +106,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: insertError.message }, { status: 400 })
     }
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true, mode: "externe" })
   } catch (error) {
     console.error("Erreur inscription événement:", error)
     return NextResponse.json({ error: "Erreur serveur" }, { status: 500 })

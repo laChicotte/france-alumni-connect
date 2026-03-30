@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useState } from "react"
+import Link from "next/link"
 import { AdminWrapper } from "@/components/admin/admin-wrapper"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
@@ -14,7 +15,7 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
-import { Search, Plus, Pencil, Trash2, Archive, Loader2, CalendarDays, MapPin, Clock3 } from "lucide-react"
+import { Search, Plus, Pencil, Trash2, Archive, Loader2, CalendarDays, MapPin, Clock3, Eye } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import type { Evenement, TypeEvenement } from "@/types/database.types"
 
@@ -24,12 +25,14 @@ interface EvenementWithType extends Evenement {
 }
 
 export default function EvenementsPage() {
+  const PAGE_SIZE = 4
   const [evenements, setEvenements] = useState<EvenementWithType[]>([])
   const [types, setTypes] = useState<TypeEvenement[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [filterType, setFilterType] = useState<string>("all")
   const [filterArchive, setFilterArchive] = useState<string>("all")
+  const [currentPage, setCurrentPage] = useState(1)
   const [selectedEvent, setSelectedEvent] = useState<EvenementWithType | null>(null)
   const [dialogAction, setDialogAction] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -195,6 +198,18 @@ export default function EvenementsPage() {
     return matchesSearch && matchesType && matchesArchive
   })
 
+  const totalPages = Math.max(1, Math.ceil(filteredEvents.length / PAGE_SIZE))
+  const safePage = Math.min(currentPage, totalPages)
+  const paginatedEvents = filteredEvents.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE)
+
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [searchTerm, filterType, filterArchive])
+
+  useEffect(() => {
+    if (currentPage > totalPages) setCurrentPage(totalPages)
+  }, [currentPage, totalPages])
+
   return (
     <AdminWrapper>
       <div className="p-6">
@@ -242,8 +257,8 @@ export default function EvenementsPage() {
           ) : filteredEvents.length === 0 ? (
             <p className="text-center py-8 text-gray-500">Aucun événement trouvé</p>
           ) : (
-            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-              {filteredEvents.map((event) => (
+            <div className="grid gap-4 md:grid-cols-2">
+              {paginatedEvents.map((event) => (
                 <Card key={event.id} className={event.archive ? "opacity-70 border-dashed" : ""}>
                   <img src={event.image_url || "/placeholder.svg"} alt={event.titre} className="h-40 w-full object-cover rounded-t-lg" />
                   <CardContent className="pt-4 space-y-3">
@@ -260,36 +275,74 @@ export default function EvenementsPage() {
                     <p className="text-sm text-muted-foreground line-clamp-3">{event.description}</p>
 
                     <div className="space-y-1 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-2"><CalendarDays className="h-4 w-4 text-[#3558A2]" />{new Date(event.date).toLocaleDateString('fr-FR')}</div>
-                      <div className="flex items-center gap-2"><Clock3 className="h-4 w-4 text-[#3558A2]" />{event.heure}</div>
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+                        <span className="inline-flex items-center gap-2">
+                          <CalendarDays className="h-4 w-4 text-[#3558A2]" />
+                          {new Date(event.date).toLocaleDateString('fr-FR')}
+                        </span>
+                        <span className="inline-flex items-center gap-2">
+                          <Clock3 className="h-4 w-4 text-[#3558A2]" />
+                          {event.heure}
+                        </span>
+                        <span className="text-xs">
+                          Inscriptions: {event.inscriptions_count || 0}
+                          {event.places_max ? ` / ${event.places_max}` : " (illimité)"}
+                        </span>
+                      </div>
                       <div className="flex items-center gap-2"><MapPin className="h-4 w-4 text-[#3558A2]" />{event.lieu}</div>
                     </div>
 
-                    <p className="text-xs text-muted-foreground">
-                      Inscriptions: {event.inscriptions_count || 0}
-                      {event.places_max ? ` / ${event.places_max}` : " (illimité)"}
-                    </p>
-
-                    <div className="flex flex-wrap gap-2 pt-1">
-                      <Button variant="outline" size="sm" onClick={() => openEditDialog(event)}>
-                        <Pencil className="mr-2 h-4 w-4" /> Modifier
-                      </Button>
+                    <div className="flex items-center justify-between gap-3 pt-1 pb-1">
+                      <div className="flex items-center gap-2">
+                        <Button asChild variant="outline" size="icon" className="h-8 w-8 shrink-0" title="Voir inscrits">
+                          <Link href={`/admin/evenements/${event.id}/inscrits`} aria-label="Voir inscrits">
+                            <Eye className="h-4 w-4" />
+                          </Link>
+                        </Button>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          className="h-8 w-8 shrink-0"
+                          title="Modifier"
+                          onClick={() => openEditDialog(event)}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
+                        <Button
+                          size="icon"
+                          variant="destructive"
+                          className="h-8 w-8 shrink-0"
+                          title="Supprimer"
+                          onClick={() => { setSelectedEvent(event); setDialogAction('delete') }}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                       {!event.archive && (
-                        <Button variant="outline" size="sm" onClick={() => handleMarkTerminated(event)}>
+                        <Button variant="outline" size="sm" className="shrink-0" onClick={() => handleMarkTerminated(event)}>
                           <Archive className="mr-2 h-4 w-4" /> Marquer terminé
                         </Button>
                       )}
-                      <Button
-                        size="sm"
-                        variant="destructive"
-                        onClick={() => { setSelectedEvent(event); setDialogAction('delete') }}
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" /> Supprimer
-                      </Button>
                     </div>
                   </CardContent>
                 </Card>
               ))}
+            </div>
+          )}
+          {!isLoading && filteredEvents.length > 0 && (
+            <div className="mt-4 flex items-center justify-between border-t pt-4">
+              <span className="text-sm text-gray-500">
+                {(safePage - 1) * PAGE_SIZE + 1}–{Math.min(safePage * PAGE_SIZE, filteredEvents.length)} sur {filteredEvents.length}
+              </span>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={safePage === 1}>
+                  Précédent
+                </Button>
+                <span className="text-sm text-gray-600">Page {safePage} / {totalPages}</span>
+                <Button variant="outline" size="sm" onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={safePage === totalPages}>
+                  Suivant
+                </Button>
+              </div>
             </div>
           )}
         </CardContent>
@@ -391,6 +444,7 @@ export default function EvenementsPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
       </div>
     </AdminWrapper>
   )

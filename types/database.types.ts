@@ -300,18 +300,33 @@ export interface Database {
         Row: {
           id: string
           evenement_id: string
-          user_id: string
+          user_id: string | null
+          nom_externe: string | null
+          prenom_externe: string | null
+          email_externe: string | null
+          telephone_externe: string | null
+          organisation_externe: string | null
           created_at: string
         }
         Insert: {
           id?: string
           evenement_id: string
-          user_id: string
+          user_id?: string | null
+          nom_externe?: string | null
+          prenom_externe?: string | null
+          email_externe?: string | null
+          telephone_externe?: string | null
+          organisation_externe?: string | null
           created_at?: string
         }
         Update: {
           evenement_id?: string
-          user_id?: string
+          user_id?: string | null
+          nom_externe?: string | null
+          prenom_externe?: string | null
+          email_externe?: string | null
+          telephone_externe?: string | null
+          organisation_externe?: string | null
         }
       }
       partenaires: {

@@ -5,6 +5,9 @@ import Link from "next/link"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { CalendarDays, Clock3, MapPin, Loader2, User } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import type { Evenement } from "@/types/database.types"
@@ -19,6 +22,15 @@ export default function EvenementsPublicPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmittingId, setIsSubmittingId] = useState<string | null>(null)
   const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [externalDialogEventId, setExternalDialogEventId] = useState<string | null>(null)
+  const [externalRegisteredEventIds, setExternalRegisteredEventIds] = useState<Set<string>>(new Set())
+  const [externalForm, setExternalForm] = useState({
+    nom: "",
+    prenom: "",
+    email: "",
+    telephone: "",
+    organisation: "",
+  })
 
   useEffect(() => {
     loadData()
@@ -58,7 +70,7 @@ export default function EvenementsPublicPage() {
     const { data: sessionData } = await supabase.auth.getSession()
     const token = sessionData.session?.access_token
     if (!token) {
-      window.location.href = "/connexion"
+      setExternalDialogEventId(eventId)
       return
     }
 
@@ -85,6 +97,45 @@ export default function EvenementsPublicPage() {
     }
   }
 
+  const handleExternalRegister = async () => {
+    if (!externalDialogEventId) return
+    if (!externalForm.nom.trim() || !externalForm.prenom.trim() || !externalForm.email.trim()) {
+      alert("Nom, prénom et email sont obligatoires")
+      return
+    }
+
+    setIsSubmittingId(externalDialogEventId)
+    try {
+      const res = await fetch("/api/evenements/inscription", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          evenement_id: externalDialogEventId,
+          nom_externe: externalForm.nom.trim(),
+          prenom_externe: externalForm.prenom.trim(),
+          email_externe: externalForm.email.trim().toLowerCase(),
+          telephone_externe: externalForm.telephone.trim() || null,
+          organisation_externe: externalForm.organisation.trim() || null,
+        }),
+      })
+
+      if (!res.ok) {
+        const data = await res.json().catch(() => null)
+        alert(data?.error || "Impossible de vous inscrire pour le moment")
+        return
+      }
+
+      setExternalRegisteredEventIds((prev) => new Set(prev).add(externalDialogEventId))
+      setExternalDialogEventId(null)
+      setExternalForm({ nom: "", prenom: "", email: "", telephone: "", organisation: "" })
+      alert("Inscription enregistrée avec succès")
+    } finally {
+      setIsSubmittingId(null)
+    }
+  }
+
   return (
     <div className="min-h-screen py-8">
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -95,7 +146,7 @@ export default function EvenementsPublicPage() {
 
         {!isAuthenticated && (
           <div className="mb-6 rounded-lg border bg-[#ffe8e4] p-4 text-sm">
-            Connectez-vous pour vous inscrire aux événements.
+            Vous pouvez vous inscrire en tant qu'invité, ou vous connecter pour retrouver vos inscriptions.
             <Link href="/connexion" className="ml-2 font-semibold text-[#3558A2] underline">
               Se connecter
             </Link>
@@ -112,6 +163,7 @@ export default function EvenementsPublicPage() {
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
             {events.map((event) => {
               const isRegistered = registeredEventIds.has(event.id)
+              const isExternalRegistered = externalRegisteredEventIds.has(event.id)
               return (
                 <Card key={event.id} className="overflow-hidden border-[#3558A2]/20">
                   <img src={event.image_url || "/placeholder.svg"} alt={event.titre} className="h-44 w-full object-cover" />
@@ -146,7 +198,7 @@ export default function EvenementsPublicPage() {
                     <div className="pt-2">
                       <Button
                         className="w-full bg-[#3558A2] hover:bg-[#3558A2]/90"
-                        disabled={isRegistered || isSubmittingId === event.id}
+                        disabled={isRegistered || isExternalRegistered || isSubmittingId === event.id}
                         onClick={() => handleRegister(event.id)}
                       >
                         {isSubmittingId === event.id ? (
@@ -156,6 +208,8 @@ export default function EvenementsPublicPage() {
                           </>
                         ) : isRegistered ? (
                           "Déjà inscrit"
+                        ) : isExternalRegistered ? (
+                          "Inscription envoyée"
                         ) : (
                           <>
                             <User className="h-4 w-4 mr-2" />
@@ -171,6 +225,66 @@ export default function EvenementsPublicPage() {
           </div>
         )}
       </section>
+
+      <Dialog open={!!externalDialogEventId} onOpenChange={(open) => !open && setExternalDialogEventId(null)}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Inscription externe</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-3">
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>Nom *</Label>
+                <Input
+                  value={externalForm.nom}
+                  onChange={(e) => setExternalForm((prev) => ({ ...prev, nom: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Prénom *</Label>
+                <Input
+                  value={externalForm.prenom}
+                  onChange={(e) => setExternalForm((prev) => ({ ...prev, prenom: e.target.value }))}
+                />
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              <Label>Email *</Label>
+              <Input
+                type="email"
+                value={externalForm.email}
+                onChange={(e) => setExternalForm((prev) => ({ ...prev, email: e.target.value }))}
+              />
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>Téléphone</Label>
+                <Input
+                  value={externalForm.telephone}
+                  onChange={(e) => setExternalForm((prev) => ({ ...prev, telephone: e.target.value }))}
+                />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Organisation</Label>
+                <Input
+                  value={externalForm.organisation}
+                  onChange={(e) => setExternalForm((prev) => ({ ...prev, organisation: e.target.value }))}
+                />
+              </div>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setExternalDialogEventId(null)}>Annuler</Button>
+            <Button
+              className="bg-[#3558A2] hover:bg-[#3558A2]/90"
+              onClick={handleExternalRegister}
+              disabled={!externalDialogEventId || isSubmittingId === externalDialogEventId}
+            >
+              {externalDialogEventId && isSubmittingId === externalDialogEventId ? "Inscription..." : "Valider"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
