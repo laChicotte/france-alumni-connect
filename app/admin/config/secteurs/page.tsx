@@ -1,21 +1,24 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { AdminWrapper } from "@/components/admin/admin-wrapper"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import {
   Table, TableBody, TableCell, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table"
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog"
-import { Plus, Pencil, Trash2, Loader2, ArrowLeft } from "lucide-react"
+import { Plus, Pencil, Trash2, Loader2, ArrowLeft, AlertCircle, CheckCircle2 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import type { Secteur } from "@/types/database.types"
 import Link from "next/link"
+
+const PAGE_SIZE = 6
 
 export default function SecteursPage() {
   const [items, setItems] = useState<Secteur[]>([])
@@ -24,38 +27,78 @@ export default function SecteursPage() {
   const [dialogAction, setDialogAction] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState({ libelle: "", ordre: 0 })
+  const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
+
+  const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE))
+  const paginatedItems = useMemo(() => {
+    const start = (currentPage - 1) * PAGE_SIZE
+    return items.slice(start, start + PAGE_SIZE)
+  }, [items, currentPage])
 
   useEffect(() => {
     fetchItems()
   }, [])
 
+  useEffect(() => {
+    setCurrentPage((prev) => Math.min(prev, totalPages))
+  }, [totalPages])
+
   const fetchItems = async () => {
     setIsLoading(true)
     const { data, error } = await supabase.from('secteurs').select('*').order('ordre')
-    if (!error) setItems(data || [])
+    if (error) {
+      setFeedback({ type: "error", message: `Chargement impossible: ${error.message}` })
+    } else {
+      setItems(data || [])
+    }
     setIsLoading(false)
   }
 
   const handleCreate = async () => {
     setIsSubmitting(true)
+    setFeedback(null)
     const { error } = await supabase.from('secteurs').insert(formData)
-    if (!error) { fetchItems(); setDialogAction(null); resetForm() }
+    if (error) {
+      setFeedback({ type: "error", message: `Création échouée: ${error.message}` })
+    } else {
+      setFeedback({ type: "success", message: "Secteur créé avec succès." })
+      fetchItems()
+      setDialogAction(null)
+      resetForm()
+    }
     setIsSubmitting(false)
   }
 
   const handleUpdate = async () => {
     if (!selectedItem) return
     setIsSubmitting(true)
+    setFeedback(null)
     const { error } = await supabase.from('secteurs').update(formData).eq('id', selectedItem.id)
-    if (!error) { fetchItems(); setDialogAction(null); resetForm() }
+    if (error) {
+      setFeedback({ type: "error", message: `Modification échouée (${selectedItem.libelle}): ${error.message}` })
+    } else {
+      setFeedback({ type: "success", message: `Secteur "${selectedItem.libelle}" mis à jour.` })
+      fetchItems()
+      setDialogAction(null)
+      resetForm()
+    }
     setIsSubmitting(false)
   }
 
   const handleDelete = async () => {
     if (!selectedItem) return
     setIsSubmitting(true)
+    setFeedback(null)
     const { error } = await supabase.from('secteurs').delete().eq('id', selectedItem.id)
-    if (!error) { fetchItems(); setDialogAction(null); setSelectedItem(null) }
+    if (error) {
+      setFeedback({ type: "error", message: `Suppression échouée (${selectedItem.libelle}): ${error.message}` })
+    } else {
+      setFeedback({ type: "success", message: `Secteur "${selectedItem.libelle}" supprimé.` })
+      fetchItems()
+      setDialogAction(null)
+      setSelectedItem(null)
+    }
     setIsSubmitting(false)
   }
 
@@ -91,6 +134,16 @@ export default function SecteursPage() {
       <Card>
         <CardHeader><CardTitle>Liste des secteurs ({items.length})</CardTitle></CardHeader>
         <CardContent>
+          {feedback && (
+            <Alert variant={feedback.type === "error" ? "destructive" : "default"} className="mb-4">
+              {feedback.type === "error" ? (
+                <AlertCircle className="h-4 w-4" />
+              ) : (
+                <CheckCircle2 className="h-4 w-4 text-green-600" />
+              )}
+              <AlertDescription>{feedback.message}</AlertDescription>
+            </Alert>
+          )}
           {isLoading ? (
             <div className="flex justify-center py-8"><Loader2 className="h-8 w-8 animate-spin text-gray-400" /></div>
           ) : (
@@ -106,7 +159,7 @@ export default function SecteursPage() {
                 {items.length === 0 ? (
                   <TableRow><TableCell colSpan={3} className="text-center py-8 text-gray-500">Aucun secteur</TableCell></TableRow>
                 ) : (
-                  items.map((item) => (
+                  paginatedItems.map((item) => (
                     <TableRow key={item.id}>
                       <TableCell className="font-medium">{item.libelle}</TableCell>
                       <TableCell>{item.ordre}</TableCell>
@@ -123,6 +176,29 @@ export default function SecteursPage() {
                 )}
               </TableBody>
             </Table>
+          )}
+          {!isLoading && items.length > 0 && (
+            <div className="mt-4 flex items-center justify-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+              >
+                Précédent
+              </Button>
+              <span className="text-sm text-muted-foreground">
+                Page {currentPage} / {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+              >
+                Suivant
+              </Button>
+            </div>
           )}
         </CardContent>
       </Card>
