@@ -26,7 +26,6 @@ const DIPLOME_OPTIONS: { value: DiplomeType; label: string }[] = [
   { value: 'ingenieur', label: 'Ingénieur' },
   { value: 'autre', label: 'Autre' },
 ]
-const GENRE_OPTIONS: GenreType[] = ['Homme', 'Femme', 'Autre']
 const PLAN_RETOUR_OPTIONS: PlanRetourType[] = ['Dans 2 ans', 'Dans 5 ans', 'Déjà en Guinée', 'Autre']
 
 function extractAlumniPhotoPath(photoUrl: string | null | undefined): string | null {
@@ -51,7 +50,6 @@ export default function ProfilPage() {
   const [formData, setFormData] = useState<Partial<AlumniProfile>>({})
   const [photoFile, setPhotoFile] = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
-  const [isGenreOpen, setIsGenreOpen] = useState(false)
   const [isDiplomeOpen, setIsDiplomeOpen] = useState(false)
   const [isStatutOpen, setIsStatutOpen] = useState(false)
   const [isSecteurOpen, setIsSecteurOpen] = useState(false)
@@ -204,7 +202,6 @@ export default function ProfilPage() {
           universite: formData.universite,
           annee_promotion: formData.annee_promotion,
           diplome: formData.diplome,
-          genre: (formData.genre as GenreType) || 'Autre',
           formation_domaine: formData.formation_domaine,
           secteur_id: secteurId,
           statut_professionnel_id: statutId,
@@ -320,7 +317,6 @@ export default function ProfilPage() {
   }
 
   const isAlumni = user.role === 'alumni'
-  const selectedGenreLabel = ((formData.genre as GenreType) || 'Autre') as string
   const selectedDiplomeLabel = getDiplomeLabel(formData.diplome)
   const selectedStatutLabel = getStatutLibelle(formData.statut_professionnel_id || null)
   const selectedSecteurLabel = getSecteurLibelle(formData.secteur_id || null)
@@ -510,9 +506,13 @@ export default function ProfilPage() {
                           <p className="font-medium">{formData.nom || '-'}</p>
                         </div>
                         <div>
-                          <Label className="mb-0.5 block text-muted-foreground text-xs">Email</Label>
-                          <p className="font-medium">{user.email}</p>
+                          <Label className="mb-0.5 block text-muted-foreground text-xs">Genre</Label>
+                          <p className="font-medium">{(formData.genre as GenreType) || '-'}</p>
                         </div>
+                      </div>
+                      <div className="mt-4">
+                        <Label className="mb-0.5 block text-muted-foreground text-xs">Email</Label>
+                        <p className="font-medium">{user.email}</p>
                       </div>
                     </div>
 
@@ -520,55 +520,15 @@ export default function ProfilPage() {
                     <div>
                       <h3 className="text-sm font-semibold text-[#3558A2] uppercase tracking-wide mb-3 border-b border-[#3558A2]/20 pb-1">Profil personnel</h3>
                       <div className="space-y-4">
-                        <div className="grid md:grid-cols-2 gap-4">
-                          <div>
-                            <Label className="mb-0.5 block">Genre</Label>
-                            {isEditing ? (
-                              <Popover open={isGenreOpen} onOpenChange={setIsGenreOpen}>
-                                <PopoverTrigger asChild>
-                                  <button type="button" className="inline-flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm">
-                                    {selectedGenreLabel}
-                                    <ChevronDown className="h-4 w-4 opacity-70" />
-                                  </button>
-                                </PopoverTrigger>
-                                <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] p-0">
-                                  <Command>
-                                    <CommandInput placeholder="Rechercher un genre..." />
-                                    <CommandList className="max-h-48">
-                                      <CommandEmpty>Aucun genre trouvé.</CommandEmpty>
-                                      <CommandGroup>
-                                        {GENRE_OPTIONS.map((option) => (
-                                          <CommandItem
-                                            key={option}
-                                            value={option}
-                                            onSelect={() => {
-                                              setFormData({ ...formData, genre: option as GenreType })
-                                              setIsGenreOpen(false)
-                                            }}
-                                          >
-                                            <Check className={cn("h-4 w-4", selectedGenreLabel === option ? "opacity-100" : "opacity-0")} />
-                                            {option}
-                                          </CommandItem>
-                                        ))}
-                                      </CommandGroup>
-                                    </CommandList>
-                                  </Command>
-                                </PopoverContent>
-                              </Popover>
-                            ) : (
-                              <Input value={(formData.genre as GenreType) || 'Autre'} disabled />
-                            )}
-                          </div>
-                          <div>
-                            <Label htmlFor="ville" className="mb-0.5 block">Ville de résidence</Label>
-                            <Input
-                              id="ville"
-                              value={formData.ville || ''}
-                              onChange={(e) => setFormData({...formData, ville: e.target.value})}
-                              disabled={!isEditing}
-                              placeholder="Conakry, Guinée"
-                            />
-                          </div>
+                        <div>
+                          <Label htmlFor="ville" className="mb-0.5 block">Ville de résidence</Label>
+                          <Input
+                            id="ville"
+                            value={formData.ville || ''}
+                            onChange={(e) => setFormData({...formData, ville: e.target.value})}
+                            disabled={!isEditing}
+                            placeholder="Conakry, Guinée"
+                          />
                         </div>
                         <div>
                           <Label className="mb-0.5 block">Plan de retour en Guinée</Label>

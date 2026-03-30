@@ -27,7 +27,7 @@ export default function InscriptionPage() {
     confirmPassword: "",
     prenom: "",
     nom: "",
-    genre: "Autre",
+    genre: "",
     telephone: "",
     universite: "",
     annee_promotion: "",
@@ -35,7 +35,7 @@ export default function InscriptionPage() {
   })
   const [diplomeFile, setDiplomeFile] = useState<File | null>(null)
   const [photoFile, setPhotoFile] = useState<File | null>(null)
-  const genreOptions = ["Homme", "Femme", "Autre"] as const
+  const genreOptions = ["Homme", "Femme"] as const
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { id, value } = e.target
@@ -65,6 +65,12 @@ export default function InscriptionPage() {
 
     if (!formData.terms) {
       setError("Vous devez accepter les conditions d'utilisation")
+      setIsLoading(false)
+      return
+    }
+
+    if (!formData.genre) {
+      setError("Veuillez sélectionner votre genre")
       setIsLoading(false)
       return
     }
@@ -195,44 +201,6 @@ export default function InscriptionPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="genre">Genre *</Label>
-              <Popover open={isGenreOpen} onOpenChange={setIsGenreOpen}>
-                <PopoverTrigger asChild>
-                  <button
-                    type="button"
-                    className="inline-flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm"
-                  >
-                    {formData.genre}
-                    <ChevronDown className="h-4 w-4 opacity-70" />
-                  </button>
-                </PopoverTrigger>
-                <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] p-0">
-                  <Command>
-                    <CommandInput placeholder="Rechercher un genre..." />
-                    <CommandList className="max-h-48">
-                      <CommandEmpty>Aucun genre trouvé.</CommandEmpty>
-                      <CommandGroup>
-                        {genreOptions.map((option) => (
-                          <CommandItem
-                            key={option}
-                            value={option}
-                            onSelect={() => {
-                              setFormData((prev) => ({ ...prev, genre: option }))
-                              setIsGenreOpen(false)
-                            }}
-                          >
-                            <Check className={cn("h-4 w-4", formData.genre === option ? "opacity-100" : "opacity-0")} />
-                            {option}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-            </div>
-
-            <div className="space-y-2">
               <Label htmlFor="email">Adresse email *</Label>
               <Input
                 id="email"
@@ -243,41 +211,83 @@ export default function InscriptionPage() {
               />
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="telephone">Téléphone *</Label>
-              <Input
-                id="telephone"
-                type="tel"
-                placeholder="+224 6XX XX XX XX"
-                value={formData.telephone}
-                onChange={handleInputChange}
-                required
-              />
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="genre">Genre *</Label>
+                <Popover open={isGenreOpen} onOpenChange={setIsGenreOpen}>
+                  <PopoverTrigger asChild>
+                    <button
+                      type="button"
+                      className="inline-flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm"
+                    >
+                      {formData.genre || "Sélectionner"}
+                      <ChevronDown className="h-4 w-4 opacity-70" />
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] p-0">
+                    <Command>
+                      <CommandInput placeholder="Rechercher un genre..." />
+                      <CommandList className="max-h-48">
+                        <CommandEmpty>Aucun genre trouvé.</CommandEmpty>
+                        <CommandGroup>
+                          {genreOptions.map((option) => (
+                            <CommandItem
+                              key={option}
+                              value={option}
+                              onSelect={() => {
+                                setFormData((prev) => ({ ...prev, genre: option }))
+                                setIsGenreOpen(false)
+                              }}
+                            >
+                              <Check className={cn("h-4 w-4", formData.genre === option ? "opacity-100" : "opacity-0")} />
+                              {option}
+                            </CommandItem>
+                          ))}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="telephone">Téléphone *</Label>
+                <Input
+                  id="telephone"
+                  type="tel"
+                  placeholder="+224 6XX XX XX XX"
+                  value={formData.telephone}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="universite">Université française *</Label>
-              <Input
-                id="universite"
-                placeholder="Ex: Université Paris-Saclay"
-                value={formData.universite}
-                onChange={handleInputChange}
-                required
-              />
-            </div>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="universite">Université française *</Label>
+                <Input
+                  id="universite"
+                  placeholder="Ex: Université Paris-Saclay"
+                  value={formData.universite}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="annee_promotion">Année de promotion *</Label>
-              <Input
-                id="annee_promotion"
-                type="number"
-                placeholder="Ex: 2020"
-                min="1950"
-                max={new Date().getFullYear()}
-                value={formData.annee_promotion}
-                onChange={handleInputChange}
-                required
-              />
+              <div className="space-y-2">
+                <Label htmlFor="annee_promotion">Année de promotion *</Label>
+                <Input
+                  id="annee_promotion"
+                  type="number"
+                  placeholder="Ex: 2020"
+                  min="1950"
+                  max={new Date().getFullYear()}
+                  value={formData.annee_promotion}
+                  onChange={handleInputChange}
+                  required
+                />
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4">
