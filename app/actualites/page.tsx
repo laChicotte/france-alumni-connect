@@ -68,11 +68,7 @@ export default function ActualitesPage() {
     organisation: "",
   })
   const articlesPerPage = 6
-  const categories = ["Tous", ...Array.from(new Set(feedItems.map((item) => item.category))).sort((a, b) => {
-    if (a === "Événements") return 1
-    if (b === "Événements") return -1
-    return 0
-  })]
+  const categories = ["Tous", ...Array.from(new Set(feedItems.map((item) => item.category)))]
 
   const filteredArticles =
     selectedCategory === "Tous"
@@ -91,7 +87,8 @@ export default function ActualitesPage() {
         const res = await fetch("/api/actualites/feed", { cache: "no-store" })
         const data = await res.json().catch(() => null)
         if (res.ok && Array.isArray(data?.items) && data.items.length > 0) {
-          setFeedItems(data.items as FeedItem[])
+          const articleOnlyItems = (data.items as FeedItem[]).filter((item) => item.category !== "Événements")
+          setFeedItems(articleOnlyItems)
         }
       } catch {
         // fallback silencieux vers les données locales
@@ -227,7 +224,7 @@ export default function ActualitesPage() {
     <div className="min-h-screen">
       {/* Hero image */}
       <section className="relative mx-4 mt-4 h-[320px] overflow-hidden rounded-3xl sm:mx-6 sm:h-[420px] lg:mx-8 lg:h-[400px]">
-        <Image src="/actualites/actualites3.jpg" alt="Actualités" fill className="object-cover hero-zoom" priority />
+        <Image src="/actualites/actualites.jpg" alt="Actualités" fill className="object-cover hero-zoom" priority />
         <div className="absolute inset-0 bg-black/35" />
         <div className="relative z-10 flex h-full flex-col justify-end pb-10 px-10 sm:pb-14 sm:px-20 lg:pb-16 lg:px-32">
           <h1 className="inline-block w-fit bg-[#3558A2] px-3 py-2 font-serif text-2xl font-bold leading-none text-white sm:text-3xl lg:text-4xl">

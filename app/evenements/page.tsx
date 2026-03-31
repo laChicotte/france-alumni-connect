@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
@@ -137,12 +138,22 @@ export default function EvenementsPublicPage() {
   }
 
   return (
-    <div className="min-h-screen py-8">
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mb-8">
-          <h1 className="font-serif text-4xl font-bold text-[#3558A2]">Événements</h1>
-          <p className="text-muted-foreground mt-2">Inscrivez-vous aux prochains événements de la communauté.</p>
+    <div className="min-h-screen">
+      <section className="relative mx-4 mt-4 h-[320px] overflow-hidden rounded-3xl sm:mx-6 sm:h-[420px] lg:mx-8 lg:h-[400px]">
+        <Image src="/evenements/evenements.jpg" alt="Événements" fill className="object-cover hero-zoom" priority />
+        <div className="absolute inset-0 bg-black/35" />
+        <div className="relative z-10 flex h-full flex-col justify-end px-10 pb-10 sm:px-20 sm:pb-14 lg:px-32 lg:pb-16">
+          <h1 className="inline-block w-fit bg-[#3558A2] px-3 py-2 font-serif text-2xl font-bold leading-none text-white sm:text-3xl lg:text-4xl">
+            événements
+          </h1>
         </div>
+      </section>
+
+      <section className="py-8">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="mb-8">
+            <p className="text-muted-foreground mt-2">Inscrivez-vous aux prochains événements de la communauté.</p>
+          </div>
 
         {!isAuthenticated && (
           <div className="mb-6 rounded-lg border bg-[#ffe8e4] p-4 text-sm">
@@ -165,9 +176,9 @@ export default function EvenementsPublicPage() {
               const isRegistered = registeredEventIds.has(event.id)
               const isExternalRegistered = externalRegisteredEventIds.has(event.id)
               return (
-                <Card key={event.id} className="overflow-hidden border-[#3558A2]/20">
+                <Card key={event.id} className="group h-full overflow-hidden border-[#3558A2]/20 !pt-0 transition-shadow hover:shadow-lg">
                   <img src={event.image_url || "/placeholder.svg"} alt={event.titre} className="h-44 w-full object-cover" />
-                  <CardContent className="pt-4 space-y-3">
+                  <CardContent className="space-y-3 pt-2">
                     <div className="flex items-center justify-between gap-2">
                       <Badge variant="outline">{event.types_evenements?.libelle || "Événement"}</Badge>
                       {event.places_max ? (
@@ -177,15 +188,13 @@ export default function EvenementsPublicPage() {
                       )}
                     </div>
 
-                    <h2 className="font-serif text-xl font-bold line-clamp-2">{event.titre}</h2>
-                    <p className="text-sm text-muted-foreground line-clamp-3">{event.description}</p>
+                    <h2 className="font-serif text-xl font-bold line-clamp-2 transition-colors group-hover:text-[#3558A2]">{event.titre}</h2>
+                    <p className="text-sm text-muted-foreground line-clamp-1">{event.description}</p>
 
                     <div className="space-y-1 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-4">
                         <CalendarDays className="h-4 w-4 text-[#3558A2]" />
                         {new Date(event.date).toLocaleDateString("fr-FR")}
-                      </div>
-                      <div className="flex items-center gap-2">
                         <Clock3 className="h-4 w-4 text-[#3558A2]" />
                         {event.heure}
                       </div>
@@ -224,6 +233,7 @@ export default function EvenementsPublicPage() {
             })}
           </div>
         )}
+        </div>
       </section>
 
       <Dialog open={!!externalDialogEventId} onOpenChange={(open) => !open && setExternalDialogEventId(null)}>
@@ -285,6 +295,18 @@ export default function EvenementsPublicPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <style jsx>{`
+        .hero-zoom {
+          animation: zoom-breathe 10s ease-in-out infinite;
+          transform-origin: center center;
+        }
+        @keyframes zoom-breathe {
+          0%,
+          100% { transform: scale(1); }
+          50% { transform: scale(1.08); }
+        }
+      `}</style>
     </div>
   )
 }
