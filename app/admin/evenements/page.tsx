@@ -15,9 +15,10 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
-import { Search, Plus, Pencil, Trash2, Archive, Loader2, CalendarDays, MapPin, Clock3, Eye } from "lucide-react"
+import { Search, Plus, Pencil, Trash2, Archive, Loader2, CalendarDays, MapPin, Clock3, Eye, Download } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import type { Evenement, TypeEvenement } from "@/types/database.types"
+import { downloadCsv } from "@/lib/export/csv"
 
 interface EvenementWithType extends Evenement {
   types_evenements?: { libelle: string } | null
@@ -32,6 +33,8 @@ export default function EvenementsPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [filterType, setFilterType] = useState<string>("all")
   const [filterArchive, setFilterArchive] = useState<string>("all")
+  const [startDate, setStartDate] = useState("")
+  const [endDate, setEndDate] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const [selectedEvent, setSelectedEvent] = useState<EvenementWithType | null>(null)
   const [dialogAction, setDialogAction] = useState<string | null>(null)
@@ -195,7 +198,10 @@ export default function EvenementsPage() {
     const matchesSearch = e.titre.toLowerCase().includes(searchTerm.toLowerCase()) || e.lieu.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesType = filterType === 'all' || e.type_evenement_id === filterType
     const matchesArchive = filterArchive === 'all' || (filterArchive === 'termine' ? e.archive : !e.archive)
-    return matchesSearch && matchesType && matchesArchive
+    const eventDate = new Date(e.date)
+    const matchesStartDate = !startDate || eventDate >= new Date(`${startDate}T00:00:00`)
+    const matchesEndDate = !endDate || eventDate <= new Date(`${endDate}T23:59:59`)
+    return matchesSearch && matchesType && matchesArchive && matchesStartDate && matchesEndDate
   })
 
   const totalPages = Math.max(1, Math.ceil(filteredEvents.length / PAGE_SIZE))
@@ -204,11 +210,106 @@ export default function EvenementsPage() {
 
   useEffect(() => {
     setCurrentPage(1)
-  }, [searchTerm, filterType, filterArchive])
+  }, [searchTerm, filterType, filterArchive, startDate, endDate])
 
   useEffect(() => {
     if (currentPage > totalPages) setCurrentPage(totalPages)
   }, [currentPage, totalPages])
+
+  const handleExportEventsCsv = async () => {
+    const eventIds = filteredEvents.map((event) => event.id)
+    const registrationsByEvent = new Map<string, { total: number; alumni: number; externes: number }>()
+
+    if (eventIds.length > 0) {
+      const { data: registrationsData } = await (supabase.from("inscriptions_evenements") as any)
+        .select("evenement_id, user_id")
+        .in("evenement_id", eventIds)
+      for (const registration of (registrationsData || []) as Array<{ evenement_id: string; user_id: string | null }>) {
+        const current = registrationsByEvent.get(registration.evenement_id) || { total: 0, alumni: 0, externes: 0 }
+        current.total += 1
+        if (registration.user_id) current.alumni += 1
+        else current.externes += 1
+        registrationsByEvent.set(registration.evenement_id, current)
+      }
+    }
+
+    const rows = filteredEvents.map((event) => {
+      const counts = registrationsByEvent.get(event.id) || { total: 0, alumni: 0, externes: 0 }
+      return {
+        titre: event.titre,
+        date: event.date,
+        heure: event.heure,
+        lieu: event.lieu,
+        mode: event.lien_visio ? "En ligne" : "Présentiel",
+        type: event.types_evenements?.libelle || "",
+        participants_total: counts.total,
+        participants_alumni: counts.alumni,
+        participants_externes: counts.externes,
+        places_max: event.places_max || "",
+        statut: event.archive ? "Terminé" : "Ouvert",
+      }
+    })
+    downloadCsv(`evenements_${new Date().toISOString().slice(0, 10)}.csv`, rows)
+  }
+
+  const handleExportParticipantsCsv = async () => {
+    const eventIds = filteredEvents.map((event) => event.id)
+    if (eventIds.length === 0) {
+      downloadCsv(`participants_evenements_${new Date().toISOString().slice(0, 10)}.csv`, [])
+      return
+    }
+
+    const eventTitleById = new Map(filteredEvents.map((event) => [event.id, event.titre]))
+    const { data: registrationsData } = await (supabase.from("inscriptions_evenements") as any)
+      .select("evenement_id, user_id, nom_externe, prenom_externe, email_externe, organisation_externe, created_at")
+      .in("evenement_id", eventIds)
+      .order("created_at", { ascending: false })
+
+    const registrations = (registrationsData || []) as Array<{
+      evenement_id: string
+      user_id: string | null
+      nom_externe: string | null
+      prenom_externe: string | null
+      email_externe: string | null
+      organisation_externe: string | null
+      created_at: string
+    }>
+
+    const alumniIds = Array.from(new Set(registrations.map((r) => r.user_id).filter(Boolean) as string[]))
+    const userById = new Map<string, { nom: string | null; prenom: string | null; email: string }>()
+    if (alumniIds.length > 0) {
+      const { data: usersData } = await supabase.from("users").select("id, nom, prenom, email").in("id", alumniIds)
+      for (const user of (usersData || []) as Array<{ id: string; nom: string | null; prenom: string | null; email: string }>) {
+        userById.set(user.id, { nom: user.nom, prenom: user.prenom, email: user.email })
+      }
+    }
+
+    const rows = registrations.map((registration) => {
+      if (registration.user_id) {
+        const user = userById.get(registration.user_id)
+        return {
+          evenement: eventTitleById.get(registration.evenement_id) || registration.evenement_id,
+          type_participant: "Alumni",
+          nom: user?.nom || "",
+          prenom: user?.prenom || "",
+          email: user?.email || "",
+          organisation: "",
+          date_inscription: registration.created_at,
+        }
+      }
+      return {
+        evenement: eventTitleById.get(registration.evenement_id) || registration.evenement_id,
+        type_participant: "Externe",
+        nom: registration.nom_externe || "",
+        prenom: registration.prenom_externe || "",
+        email: registration.email_externe || "",
+        organisation: registration.organisation_externe || "",
+        date_inscription: registration.created_at,
+      }
+    })
+
+    downloadCsv(`participants_evenements_${new Date().toISOString().slice(0, 10)}.csv`, rows)
+  }
 
   return (
     <AdminWrapper>
@@ -218,9 +319,19 @@ export default function EvenementsPage() {
             <h1 className="text-2xl font-bold text-gray-900">Événements</h1>
             <p className="text-gray-500">Gérez les événements de la communauté</p>
           </div>
-        <Button onClick={() => { resetForm(); setDialogAction('create') }}>
-          <Plus className="h-4 w-4 mr-2" /> Nouvel événement
-        </Button>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="outline" onClick={handleExportEventsCsv}>
+              <Download className="h-4 w-4 mr-2" />
+              Export CSV événements
+            </Button>
+            <Button variant="outline" onClick={handleExportParticipantsCsv}>
+              <Download className="h-4 w-4 mr-2" />
+              Export CSV participants
+            </Button>
+            <Button onClick={() => { resetForm(); setDialogAction('create') }}>
+              <Plus className="h-4 w-4 mr-2" /> Nouvel événement
+            </Button>
+          </div>
       </div>
 
       <Card className="mb-6">
@@ -245,6 +356,18 @@ export default function EvenementsPage() {
                 <SelectItem value="termine">Terminés</SelectItem>
               </SelectContent>
             </Select>
+            <Input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="w-full sm:w-[170px]"
+            />
+            <Input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="w-full sm:w-[170px]"
+            />
           </div>
         </CardContent>
       </Card>

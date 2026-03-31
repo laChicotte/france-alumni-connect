@@ -23,8 +23,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Loader2, Search, ArrowLeft } from "lucide-react"
+import { Loader2, Search, ArrowLeft, Download } from "lucide-react"
 import { supabase } from "@/lib/supabase"
+import { downloadCsv } from "@/lib/export/csv"
 
 type RegistrationRow = {
   id: string
@@ -212,6 +213,17 @@ export default function EventRegistrationsPage() {
     setCurrentPage(1)
   }, [searchTerm, filterSource, filterFonctionnaire])
 
+  const handleExportCsv = () => {
+    const rowsToExport = filteredRows.map((row) => ({
+      participant: `${row.prenom} ${row.nom}`.trim(),
+      type: row.source,
+      email: row.email,
+      organisation: row.organisation,
+      date_inscription: row.createdAt,
+    }))
+    downloadCsv(`inscrits_evenement_${new Date().toISOString().slice(0, 10)}.csv`, rowsToExport)
+  }
+
   return (
     <AdminWrapper>
       <div className="p-6 space-y-4">
@@ -220,12 +232,18 @@ export default function EventRegistrationsPage() {
             <h1 className="text-2xl font-bold text-gray-900">Inscrits événement</h1>
             <p className="text-gray-500">{eventTitle}</p>
           </div>
-          <Button asChild variant="outline">
-            <Link href="/admin/evenements">
-              <ArrowLeft className="mr-2 h-4 w-4" />
-              Retour aux événements
-            </Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" onClick={handleExportCsv}>
+              <Download className="mr-2 h-4 w-4" />
+              Exporter CSV
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/admin/evenements">
+                <ArrowLeft className="mr-2 h-4 w-4" />
+                Retour aux événements
+              </Link>
+            </Button>
+          </div>
         </div>
 
         <div className="grid gap-3 md:grid-cols-2">

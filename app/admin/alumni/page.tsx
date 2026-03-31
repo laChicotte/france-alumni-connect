@@ -37,12 +37,14 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Search, MoreHorizontal, Eye, EyeOff, Loader2 } from "lucide-react"
+import { Search, MoreHorizontal, Eye, EyeOff, Loader2, Download } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import type { AlumniProfile, Secteur } from "@/types/database.types"
+import { downloadCsv } from "@/lib/export/csv"
 
 interface AlumniWithSecteur extends AlumniProfile {
   secteurs?: { libelle: string } | null
+  users?: { email: string } | null
 }
 
 export default function AlumniPage() {
@@ -52,6 +54,8 @@ export default function AlumniPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [filterSecteur, setFilterSecteur] = useState<string>("all")
   const [filterVisible, setFilterVisible] = useState<string>("all")
+  const [startDate, setStartDate] = useState("")
+  const [endDate, setEndDate] = useState("")
   const [selectedAlumni, setSelectedAlumni] = useState<AlumniWithSecteur | null>(null)
   const [dialogAction, setDialogAction] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -65,7 +69,7 @@ export default function AlumniPage() {
     setIsLoading(true)
     const { data, error } = await supabase
       .from('alumni_profiles')
-      .select('*, secteurs(libelle)')
+      .select('*, secteurs(libelle), users(email)')
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -111,8 +115,36 @@ export default function AlumniPage() {
       (filterVisible === 'visible' && profile.visible_annuaire) ||
       (filterVisible === 'masque' && !profile.visible_annuaire)
 
-    return matchesSearch && matchesSecteur && matchesVisible
+    const profileDate = new Date(profile.created_at)
+    const matchesStartDate = !startDate || profileDate >= new Date(`${startDate}T00:00:00`)
+    const matchesEndDate = !endDate || profileDate <= new Date(`${endDate}T23:59:59`)
+
+    return matchesSearch && matchesSecteur && matchesVisible && matchesStartDate && matchesEndDate
   })
+
+  const handleExportCsv = () => {
+    const rows = filteredAlumni.map((profile) => ({
+      id: profile.id,
+      nom: profile.nom,
+      prenom: profile.prenom,
+      email: profile.users?.email || "",
+      genre: profile.genre,
+      telephone: profile.telephone,
+      ville: profile.ville,
+      universite: profile.universite,
+      annee_promotion: profile.annee_promotion,
+      diplome: profile.diplome,
+      formation_domaine: profile.formation_domaine,
+      secteur: profile.secteurs?.libelle || "",
+      entreprise: profile.entreprise || "",
+      poste_actuel: profile.poste_actuel || "",
+      visible_annuaire: profile.visible_annuaire ? "oui" : "non",
+      plan_retour: profile.plan_retour || "",
+      created_at: profile.created_at,
+      updated_at: profile.updated_at,
+    }))
+    downloadCsv(`alumni_${new Date().toISOString().slice(0, 10)}.csv`, rows)
+  }
 
   return (
     <AdminWrapper>
@@ -121,6 +153,12 @@ export default function AlumniPage() {
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-gray-900">Profils Alumni</h1>
           <p className="text-gray-500">Gérez les profils des anciens étudiants</p>
+          <div className="mt-3">
+            <Button variant="outline" onClick={handleExportCsv}>
+              <Download className="mr-2 h-4 w-4" />
+              Exporter CSV
+            </Button>
+          </div>
         </div>
 
       {/* Filters */}
@@ -159,6 +197,18 @@ export default function AlumniPage() {
                 <SelectItem value="masque">Masqué</SelectItem>
               </SelectContent>
             </Select>
+            <Input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+              className="w-full sm:w-[170px]"
+            />
+            <Input
+              type="date"
+              value={endDate}
+              onChange={(e) => setEndDate(e.target.value)}
+              className="w-full sm:w-[170px]"
+            />
           </div>
         </CardContent>
       </Card>

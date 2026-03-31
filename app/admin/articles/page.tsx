@@ -8,14 +8,17 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Search, Plus, Pencil, Trash2, Eye, EyeOff, Loader2 } from "lucide-react"
+import { Search, Plus, Pencil, Trash2, Eye, EyeOff, Loader2, Download } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import type { Article } from "@/types/database.types"
+import { downloadCsv } from "@/lib/export/csv"
 
 export default function ArticlesPage() {
   const [articles, setArticles] = useState<Article[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
+  const [startDate, setStartDate] = useState("")
+  const [endDate, setEndDate] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   useEffect(() => {
@@ -47,9 +50,22 @@ export default function ArticlesPage() {
     if (!error) fetchArticles()
   }
 
-  const filteredArticles = articles.filter((article) =>
-    article.titre.toLowerCase().includes(searchTerm.toLowerCase())
-  )
+  const filteredArticles = articles.filter((article) => {
+    const matchesSearch = article.titre.toLowerCase().includes(searchTerm.toLowerCase())
+    const articleDate = new Date(article.created_at)
+    const matchesStartDate = !startDate || articleDate >= new Date(`${startDate}T00:00:00`)
+    const matchesEndDate = !endDate || articleDate <= new Date(`${endDate}T23:59:59`)
+    return matchesSearch && matchesStartDate && matchesEndDate
+  })
+
+  const handleExportCsv = () => {
+    const rows = filteredArticles.map((article) => ({
+      titre: article.titre,
+      date_creation: new Date(article.created_at).toLocaleDateString("fr-FR"),
+      vues: article.vues,
+    }))
+    downloadCsv(`articles_${new Date().toISOString().slice(0, 10)}.csv`, rows)
+  }
 
   return (
     <AdminWrapper>
@@ -65,18 +81,26 @@ export default function ArticlesPage() {
               Nouvel article
             </Button>
           </Link>
+          <Button variant="outline" onClick={handleExportCsv}>
+            <Download className="h-4 w-4 mr-2" />
+            Exporter CSV
+          </Button>
         </div>
 
         <Card>
           <CardContent className="pt-6">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
-              <Input
-                className="pl-10"
-                placeholder="Rechercher un article..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <Input
+                  className="pl-10"
+                  placeholder="Rechercher un article..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="w-full sm:w-[170px]" />
+              <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-full sm:w-[170px]" />
             </div>
           </CardContent>
         </Card>

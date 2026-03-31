@@ -96,6 +96,17 @@ export function Footer() {
         <div className="border-t border-white/20 mt-3 pt-4 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-white/60">
           <p>&copy; 2026 France Alumni Connect. Tous droits réservés.</p>
           <p>
+            piloté par{" "}
+            <a
+              href="https://institutfrancais-guinee.fr/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-2 hover:text-[#f48988] transition-colors"
+            >
+              l&apos;Institut français de Guinée
+            </a>
+          </p>
+          <p>
             Réalisé par{" "}
             <a
               href="https://efficienceglobale.com/"

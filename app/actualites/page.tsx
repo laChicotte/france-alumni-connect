@@ -461,7 +461,7 @@ export default function ActualitesPage() {
         <div className="max-w-2xl mx-auto px-4 text-center">
           <a href="mailto:france.alumni@institutfrancais-guinee.fr">
             <Button className="mb-6 h-14 rounded-full bg-[#ea292c] px-10 text-lg font-semibold hover:bg-[#f48988]/90">
-              CONTRIBUEZ
+              contribuez
             </Button>
           </a>
           <p className="text-base text-muted-foreground">
