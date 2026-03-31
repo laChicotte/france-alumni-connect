@@ -19,6 +19,8 @@ interface EvenementWithType extends Evenement {
 
 export default function EvenementsPublicPage() {
   const [events, setEvents] = useState<EvenementWithType[]>([])
+  const [selectedType, setSelectedType] = useState<string>("Tous")
+  const [selectedEvent, setSelectedEvent] = useState<EvenementWithType | null>(null)
   const [registeredEventIds, setRegisteredEventIds] = useState<Set<string>>(new Set())
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmittingId, setIsSubmittingId] = useState<string | null>(null)
@@ -137,6 +139,15 @@ export default function EvenementsPublicPage() {
     }
   }
 
+  const typeFilters = ["Tous", ...Array.from(new Set(events.map((event) => event.types_evenements?.libelle || "Événement")))]
+  const filteredEvents = selectedType === "Tous"
+    ? events
+    : events.filter((event) => (event.types_evenements?.libelle || "Événement") === selectedType)
+
+  const openEventDetails = (event: EvenementWithType) => {
+    setSelectedEvent(event)
+  }
+
   return (
     <div className="min-h-screen">
       <section className="relative mx-4 mt-4 h-[320px] overflow-hidden rounded-3xl sm:mx-6 sm:h-[420px] lg:mx-8 lg:h-[400px]">
@@ -151,52 +162,61 @@ export default function EvenementsPublicPage() {
 
       <section className="py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mb-8">
-            <p className="text-muted-foreground mt-2">Inscrivez-vous aux prochains événements de la communauté.</p>
+          <div className="mb-6 flex flex-wrap gap-3">
+            {typeFilters.map((type) => (
+              <Button
+                key={type}
+                variant={type === selectedType ? "default" : "outline"}
+                className={type === selectedType ? "bg-[#3558A2] hover:bg-[#3558A2]/90" : "hover:bg-[#3558A2] hover:text-white"}
+                onClick={() => setSelectedType(type)}
+              >
+                {type}
+              </Button>
+            ))}
           </div>
-
-        {!isAuthenticated && (
-          <div className="mb-6 rounded-lg border bg-[#ffe8e4] p-4 text-sm">
-            Vous pouvez vous inscrire en tant qu'invité, ou vous connecter pour retrouver vos inscriptions.
-            <Link href="/connexion" className="ml-2 font-semibold text-[#3558A2] underline">
-              Se connecter
-            </Link>
-          </div>
-        )}
 
         {isLoading ? (
           <div className="flex justify-center py-20">
             <Loader2 className="h-10 w-10 animate-spin text-[#3558A2]" />
           </div>
-        ) : events.length === 0 ? (
+        ) : filteredEvents.length === 0 ? (
           <p className="text-center text-muted-foreground py-16">Aucun événement disponible pour le moment.</p>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {events.map((event) => {
+            {filteredEvents.map((event) => {
               const isRegistered = registeredEventIds.has(event.id)
               const isExternalRegistered = externalRegisteredEventIds.has(event.id)
               return (
-                <Card key={event.id} className="group h-full overflow-hidden border-[#3558A2]/20 !pt-0 transition-shadow hover:shadow-lg">
-                  <img src={event.image_url || "/placeholder.svg"} alt={event.titre} className="h-44 w-full object-cover" />
-                  <CardContent className="space-y-3 pt-2">
-                    <div className="flex items-center justify-between gap-2">
-                      <Badge variant="outline">{event.types_evenements?.libelle || "Événement"}</Badge>
-                      {event.places_max ? (
-                        <span className="text-xs text-muted-foreground">Places max: {event.places_max}</span>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">Places illimitées</span>
-                      )}
+                <Card
+                  key={event.id}
+                  className="group h-full cursor-pointer overflow-hidden border-[#3558A2]/20 !pt-0 transition-shadow hover:shadow-lg"
+                  onClick={() => openEventDetails(event)}
+                >
+                  <div className="relative overflow-hidden">
+                    <img src={event.image_url || "/placeholder.svg"} alt={event.titre} className="h-44 w-full object-cover" />
+                    <div className="absolute top-4 left-4">
+                      <span className="inline-block rounded-full bg-[#3558A2] px-3 py-1 text-xs font-semibold text-white">
+                        {event.types_evenements?.libelle || "Événement"}
+                      </span>
                     </div>
-
+                  </div>
+                  <CardContent className="space-y-3 pt-2">
                     <h2 className="font-serif text-xl font-bold line-clamp-2 transition-colors group-hover:text-[#3558A2]">{event.titre}</h2>
                     <p className="text-sm text-muted-foreground line-clamp-1">{event.description}</p>
 
                     <div className="space-y-1 text-sm text-muted-foreground">
-                      <div className="flex items-center gap-4">
-                        <CalendarDays className="h-4 w-4 text-[#3558A2]" />
-                        {new Date(event.date).toLocaleDateString("fr-FR")}
-                        <Clock3 className="h-4 w-4 text-[#3558A2]" />
-                        {event.heure}
+                      <div className="grid grid-cols-3 gap-2 text-xs">
+                        <span className="inline-flex items-center gap-1">
+                          <CalendarDays className="h-4 w-4 text-[#3558A2]" />
+                          {new Date(event.date).toLocaleDateString("fr-FR")}
+                        </span>
+                        <span className="inline-flex items-center gap-1">
+                          <Clock3 className="h-4 w-4 text-[#3558A2]" />
+                          {event.heure}
+                        </span>
+                        <span className="text-right">
+                          {event.places_max ? `${event.places_max} places` : "illimité"}
+                        </span>
                       </div>
                       <div className="flex items-center gap-2">
                         <MapPin className="h-4 w-4 text-[#3558A2]" />
@@ -208,7 +228,10 @@ export default function EvenementsPublicPage() {
                       <Button
                         className="w-full bg-[#3558A2] hover:bg-[#3558A2]/90"
                         disabled={isRegistered || isExternalRegistered || isSubmittingId === event.id}
-                        onClick={() => handleRegister(event.id)}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          openEventDetails(event)
+                        }}
                       >
                         {isSubmittingId === event.id ? (
                           <>
@@ -235,6 +258,79 @@ export default function EvenementsPublicPage() {
         )}
         </div>
       </section>
+
+      <Dialog open={!!selectedEvent} onOpenChange={(open) => !open && setSelectedEvent(null)}>
+        <DialogContent className="sm:max-w-xl">
+          <DialogHeader>
+            <DialogTitle>Détails de l&apos;événement</DialogTitle>
+          </DialogHeader>
+          {selectedEvent && (
+            <div className="space-y-4">
+              <div className="overflow-hidden rounded-lg">
+                <img
+                  src={selectedEvent.image_url || "/placeholder.svg"}
+                  alt={selectedEvent.titre}
+                  className="h-44 w-full object-cover"
+                />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-[#3558A2]">{selectedEvent.titre}</h3>
+                <p className="mt-2 text-sm text-muted-foreground">{selectedEvent.description}</p>
+              </div>
+              <div className="space-y-1 text-sm text-muted-foreground">
+                <p className="inline-flex items-center gap-2">
+                  <CalendarDays className="h-4 w-4 text-[#3558A2]" />
+                  {new Date(selectedEvent.date).toLocaleDateString("fr-FR")}
+                </p>
+                <p className="inline-flex items-center gap-2">
+                  <Clock3 className="h-4 w-4 text-[#3558A2]" />
+                  {selectedEvent.heure}
+                </p>
+                <p className="inline-flex items-center gap-2">
+                  <MapPin className="h-4 w-4 text-[#3558A2]" />
+                  {selectedEvent.lieu}
+                </p>
+              </div>
+              <p className="text-sm">
+                <span className="font-medium">Places :</span>{" "}
+                {selectedEvent.places_max ? `${selectedEvent.places_max} max` : "illimitées"}
+              </p>
+              {selectedEvent.lien_visio && (
+                <p className="text-sm">
+                  <span className="font-medium">Lien visio :</span>{" "}
+                  <a
+                    href={selectedEvent.lien_visio}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[#3558A2] underline"
+                  >
+                    Rejoindre
+                  </a>
+                </p>
+              )}
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setSelectedEvent(null)}>Annuler</Button>
+            <Button
+              className="bg-[#3558A2] hover:bg-[#3558A2]/90"
+              disabled={
+                !selectedEvent ||
+                registeredEventIds.has(selectedEvent.id) ||
+                externalRegisteredEventIds.has(selectedEvent.id) ||
+                isSubmittingId === selectedEvent.id
+              }
+              onClick={() => selectedEvent && handleRegister(selectedEvent.id)}
+            >
+              {selectedEvent && isSubmittingId === selectedEvent.id
+                ? "Inscription..."
+                : selectedEvent && (registeredEventIds.has(selectedEvent.id) || externalRegisteredEventIds.has(selectedEvent.id))
+                ? "Déjà inscrit"
+                : "Valider l'inscription"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={!!externalDialogEventId} onOpenChange={(open) => !open && setExternalDialogEventId(null)}>
         <DialogContent className="sm:max-w-md">
