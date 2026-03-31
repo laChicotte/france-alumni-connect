@@ -94,7 +94,7 @@ export function Footer() {
 
         {/* Bottom bar */}
         <div className="border-t border-white/20 mt-3 pt-4 flex flex-col sm:flex-row justify-between items-center gap-2 text-xs text-white/60">
-          <p>&copy; 2025 France Alumni Connect. Tous droits réservés.</p>
+          <p>&copy; 2026 France Alumni Connect. Tous droits réservés.</p>
           <p>
             Réalisé par{" "}
             <a

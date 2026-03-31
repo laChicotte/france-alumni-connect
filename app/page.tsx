@@ -187,7 +187,7 @@ export default function HomePage() {
                 lang="fr"
                 className="text-white sm:text-lg leading-relaxed max-w-md"
               >
-                Fédérer la diaspora guinéenne diplômée de France autour d&apos;une voix structurée, capable de dialoguer avec les entreprises et institutions. L&apos;objectif : créer des passerelles concrètes vers l&apos;emploi, les partenariats et les opportunités économiques.
+                Fédérer la communauté autour d&apos;une voix structurée, capable de dialoguer avec les entreprises et institutions. L&apos;objectif : créer des passerelles concrètes vers l&apos;emploi, les partenariats et les opportunités économiques.
               </p>
             </div>
             <div>
@@ -265,7 +265,7 @@ export default function HomePage() {
                 nos <br />partenaires
               </h2>
             </div>
-            <div className="flex-1 max-w-[720px] overflow-hidden lg:ml-34">
+            <div className="flex-1 max-w-[720px] overflow-hidden lg:ml-45">
               <div className="partners-marquee-track">
                 {marqueePartners.map((partner, index) => (
                   <div key={`${partner.name}-${index}`} className="partners-marquee-item">

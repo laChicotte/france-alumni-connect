@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { articles } from "@/lib/fake-data"
 import { supabase } from "@/lib/supabase"
-import { Calendar, User, ChevronLeft, ChevronRight, Loader2 } from "lucide-react"
+import { Calendar, User, ChevronLeft, ChevronRight, Loader2, Clock3, MapPin } from "lucide-react"
 import { useEffect, useState } from "react"
 
 type FeedItem = {
@@ -21,6 +21,21 @@ type FeedItem = {
   author: string
   date: string
   href: string
+}
+
+type EventRegistrationDetails = {
+  id: string
+  titre: string
+  description: string
+  date: string
+  heure: string
+  lieu: string
+  image_url: string | null
+  places_max: number | null
+  lien_visio: string | null
+  actif: boolean
+  archive: boolean
+  inscriptionsCount: number
 }
 
 export default function ActualitesPage() {
@@ -42,6 +57,9 @@ export default function ActualitesPage() {
   const [registeredEventIds, setRegisteredEventIds] = useState<Set<string>>(new Set())
   const [externalRegisteredEventIds, setExternalRegisteredEventIds] = useState<Set<string>>(new Set())
   const [externalDialogEventId, setExternalDialogEventId] = useState<string | null>(null)
+  const [eventDetailsDialogId, setEventDetailsDialogId] = useState<string | null>(null)
+  const [eventDetails, setEventDetails] = useState<EventRegistrationDetails | null>(null)
+  const [isLoadingEventDetails, setIsLoadingEventDetails] = useState(false)
   const [externalForm, setExternalForm] = useState({
     nom: "",
     prenom: "",
@@ -110,10 +128,39 @@ export default function ActualitesPage() {
 
   const isEventItem = (item: FeedItem) => item.category === "Événements"
 
+  const openEventDetailsDialog = async (eventId: string) => {
+    setEventDetailsDialogId(eventId)
+    setEventDetails(null)
+    setIsLoadingEventDetails(true)
+    try {
+      const { data: eventData, error: eventError } = await (supabase.from("evenements") as any)
+        .select("id, titre, description, date, heure, lieu, image_url, places_max, lien_visio, actif, archive")
+        .eq("id", eventId)
+        .single()
+      if (eventError || !eventData) {
+        alert("Impossible de charger les détails de l'événement")
+        setEventDetailsDialogId(null)
+        return
+      }
+
+      const { count } = await (supabase.from("inscriptions_evenements") as any)
+        .select("*", { count: "exact", head: true })
+        .eq("evenement_id", eventId)
+
+      setEventDetails({
+        ...(eventData as Omit<EventRegistrationDetails, "inscriptionsCount">),
+        inscriptionsCount: count || 0,
+      })
+    } finally {
+      setIsLoadingEventDetails(false)
+    }
+  }
+
   const handleRegister = async (eventId: string) => {
     const { data: sessionData } = await supabase.auth.getSession()
     const token = sessionData.session?.access_token
     if (!token) {
+      setEventDetailsDialogId(null)
       setExternalDialogEventId(eventId)
       return
     }
@@ -134,6 +181,8 @@ export default function ActualitesPage() {
         return
       }
       setRegisteredEventIds((prev) => new Set(prev).add(eventId))
+      setEventDetailsDialogId(null)
+      alert("Inscription confirmée")
     } finally {
       setIsSubmittingEventId(null)
     }
@@ -258,7 +307,7 @@ export default function ActualitesPage() {
                             onClick={(e) => {
                               e.preventDefault()
                               e.stopPropagation()
-                              handleRegister(article.id)
+                              openEventDetailsDialog(article.id)
                             }}
                           >
                             {isSubmittingEventId === article.id ? (
@@ -336,11 +385,82 @@ export default function ActualitesPage() {
         </div>
       </section>
 
+      <Dialog open={!!eventDetailsDialogId} onOpenChange={(open) => !open && setEventDetailsDialogId(null)}>
+        <DialogContent className="sm:max-w-xl">
+          <DialogHeader>
+            <DialogTitle>Détails de l'événement</DialogTitle>
+          </DialogHeader>
+          {isLoadingEventDetails || !eventDetails ? (
+            <div className="flex justify-center py-8">
+              <Loader2 className="h-6 w-6 animate-spin text-[#3558A2]" />
+            </div>
+          ) : (
+            <div className="space-y-4">
+              <div className="overflow-hidden rounded-lg">
+                <img
+                  src={eventDetails.image_url || "/placeholder.svg"}
+                  alt={eventDetails.titre}
+                  className="h-44 w-full object-cover"
+                />
+              </div>
+              <div>
+                <h3 className="text-xl font-semibold text-[#3558A2]">{eventDetails.titre}</h3>
+                <p className="mt-2 text-sm text-muted-foreground">{eventDetails.description}</p>
+              </div>
+              <div className="space-y-1 text-sm text-muted-foreground">
+                <p className="inline-flex items-center gap-2"><Calendar className="h-4 w-4 text-[#3558A2]" />{new Date(eventDetails.date).toLocaleDateString("fr-FR")}</p>
+                <p className="inline-flex items-center gap-2"><Clock3 className="h-4 w-4 text-[#3558A2]" />{eventDetails.heure}</p>
+                <p className="inline-flex items-center gap-2"><MapPin className="h-4 w-4 text-[#3558A2]" />{eventDetails.lieu}</p>
+              </div>
+              <p className="text-sm">
+                <span className="font-medium">Inscriptions :</span> {eventDetails.inscriptionsCount}
+                {eventDetails.places_max ? ` / ${eventDetails.places_max}` : " (illimité)"}
+              </p>
+              {eventDetails.lien_visio && (
+                <p className="text-sm">
+                  <span className="font-medium">Lien visio :</span>{" "}
+                  <a href={eventDetails.lien_visio} target="_blank" rel="noopener noreferrer" className="text-[#3558A2] underline">
+                    Rejoindre
+                  </a>
+                </p>
+              )}
+              {(!eventDetails.actif || eventDetails.archive) && (
+                <p className="text-sm font-medium text-red-600">
+                  Cet événement n'est plus ouvert aux inscriptions.
+                </p>
+              )}
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEventDetailsDialogId(null)}>Fermer</Button>
+            <Button
+              className="bg-[#3558A2] hover:bg-[#3558A2]/90"
+              disabled={
+                !eventDetails ||
+                !eventDetailsDialogId ||
+                !eventDetails.actif ||
+                eventDetails.archive ||
+                registeredEventIds.has(eventDetailsDialogId) ||
+                externalRegisteredEventIds.has(eventDetailsDialogId) ||
+                isSubmittingEventId === eventDetailsDialogId
+              }
+              onClick={() => eventDetailsDialogId && handleRegister(eventDetailsDialogId)}
+            >
+              {eventDetailsDialogId && isSubmittingEventId === eventDetailsDialogId
+                ? "Validation..."
+                : eventDetailsDialogId && (registeredEventIds.has(eventDetailsDialogId) || externalRegisteredEventIds.has(eventDetailsDialogId))
+                ? "Déjà inscrit"
+                : "Valider l'inscription"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
       {/* Contribuez CTA */}
       <section className="py-16">
         <div className="max-w-2xl mx-auto px-4 text-center">
           <a href="mailto:france.alumni@institutfrancais-guinee.fr">
-            <Button className="mb-6 h-auto cursor-pointer rounded-full bg-[#da281c] px-10 py-6 text-xl font-bold text-white shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#c92317] hover:shadow-xl active:translate-y-0 focus-visible:ring-2 focus-visible:ring-white/80 focus-visible:ring-offset-2 focus-visible:ring-offset-[#da281c]">
+            <Button className="mb-6 h-14 rounded-full bg-[#ea292c] px-10 text-lg font-semibold hover:bg-[#f48988]/90">
               CONTRIBUEZ
             </Button>
           </a>
