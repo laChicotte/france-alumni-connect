@@ -54,10 +54,9 @@ export function Footer() {
             <ul className="space-y-2 text-sm text-white/75">
               <li><Link href="/annuaire" className="hover:text-[#f48988] transition-colors">annuaire</Link></li>
               <li><Link href="/actualites" className="hover:text-[#f48988] transition-colors">actualités</Link></li>
-              <li><Link href="/formation" className="hover:text-[#f48988] transition-colors">formation</Link></li>
               <li><Link href="/evenements" className="hover:text-[#f48988] transition-colors">événements</Link></li>
+              <li><Link href="/formation" className="hover:text-[#f48988] transition-colors">formation</Link></li>
               <li><Link href="https://talent-diaspora.fr/" className="hover:text-[#f48988] transition-colors">emploi</Link></li>
-              <li><Link href="/politique-cookies" className="hover:text-[#f48988] transition-colors">politique cookies</Link></li>
             </ul>
           </div>
 

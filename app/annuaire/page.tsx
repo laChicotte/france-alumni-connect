@@ -719,7 +719,7 @@ export default function AnnuairePage() {
             className="h-14 rounded-full bg-[#ea292c] px-10 text-lg font-semibold hover:bg-[#f48988]/90"
             asChild
           >
-            <Link href="/inscription">Rejoignez l&apos;annuaire</Link>
+            <Link href="/inscription">rejoignez l&apos;annuaire</Link>
           </Button>
         </div>
       </section>

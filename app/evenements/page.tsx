@@ -392,6 +392,19 @@ export default function EvenementsPublicPage() {
         </DialogContent>
       </Dialog>
 
+      <section className="py-16">
+        <div className="max-w-2xl mx-auto px-4 text-center">
+          <a href="mailto:france.alumni@institutfrancais-guinee.fr">
+            <Button className="mb-6 h-14 rounded-full bg-[#ea292c] px-10 text-lg font-semibold hover:bg-[#f48988]/90">
+              proposez votre événement
+            </Button>
+          </a>
+          {/* <p className="text-base text-muted-foreground">
+            Vous avez une idee d&apos;événement ? Soumettez votre proposition pour la partager avec la communaute.
+          </p> */}
+        </div>
+      </section>
+
       <style jsx>{`
         .hero-zoom {
           animation: zoom-breathe 10s ease-in-out infinite;
