@@ -13,6 +13,11 @@ export function Footer() {
             <p className="text-sm text-white/75 leading-relaxed">
               Le réseau des Guinéens <br/> diplômés de France
             </p>
+            <div className="mt-4 flex flex-col gap-1 text-xs text-white/60">
+              <Link href="/mentions-legales" className="hover:text-[#f48988] transition-colors">Mentions légales</Link>
+              <Link href="/conditions-utilisation" className="hover:text-[#f48988] transition-colors">Conditions d&apos;utilisation</Link>
+              <Link href="/politique-cookies" className="hover:text-[#f48988] transition-colors">Politique de cookies</Link>
+            </div>
           </div>
 
           {/* Contacts */}
