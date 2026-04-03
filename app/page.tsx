@@ -112,31 +112,35 @@ export default function HomePage() {
           className="absolute inset-0 h-full w-full object-cover hero-zoom"
         />
         <div className="absolute inset-0 bg-black/35" />
-        <div className="relative z-10 flex h-full flex-col justify-center px-16 sm:px-32 lg:px-48">
+        <div className="relative z-10 flex h-full flex-col justify-center px-5 sm:px-15 lg:px-48">
           <div className="flex flex-col gap-3 sm:gap-4">
             <div>
-              <span className="hero-title-line hero-title-top inline-block bg-[#3558A2] px-4 py-2 text-xl font-bold leading-tight text-white sm:text-3xl lg:text-5xl">
+              <span className="hero-title-line hero-title-top inline-block bg-[#3558A2] px-4 py-2 font-bold leading-tight text-white lg:text-5xl">
                 Le réseau des
               </span>
             </div>
             <div>
-              <span className="hero-title-line hero-title-bottom inline-block bg-[#da281c] px-4 py-2 text-xl font-bold leading-tight text-white sm:text-3xl lg:text-5xl">
+              <span className="hero-title-line hero-title-bottom inline-block bg-[#da281c] px-4 py-2 font-bold leading-tight text-white lg:text-5xl">
                 Guinéens diplômés de France
               </span>
             </div>
           </div>
         </div>
-        <div className="hero-affiliate-badge absolute bottom-4 right-4 z-20 sm:bottom-6 sm:right-8">
-          <div className="flex items-start gap-2 sm:gap-2.5">
-            <span className="inline-flex rounded-sm px-4 py-2.5 text-xs font-bold lowercase tracking-wide text-white sm:text-sm">
+        <div className="hero-affiliate-badge absolute bottom-3 right-3 z-20 sm:bottom-6 sm:right-8">
+          <div className="flex items-start gap-1.5 sm:gap-2.5">
+            
+            <span className="inline-flex rounded-sm px-2 py-1 text-[10px] font-bold lowercase tracking-wide text-white sm:px-4 sm:py-2.5 sm:text-sm">
               en lien avec
             </span>
-            <div className="h-14 w-[2px] bg-white/90 sm:h-22" aria-hidden="true" />
+
+            <div className="h-10 w-[2px] bg-white/90 sm:h-22" aria-hidden="true" />
+
             <img
               src="/accueil/ambassade.png"
               alt="Ambassade de France en Guinée et en Sierra Leone"
-              className="h-[4.5rem] w-auto object-contain sm:h-[5.5rem]"
+              className="h-10 w-auto object-contain sm:h-[5.5rem]"
             />
+            
           </div>
         </div>
       </section>
@@ -144,6 +148,9 @@ export default function HomePage() {
       {/* Qui sommes-nous */}
       <section className="py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
+          <h2 className="block lg:hidden font-serif text-4xl font-bold text-[#3558A2] mb-6 leading-tight text-center">
+            qui sommes-<br />nous ?
+          </h2>
           <div className="grid lg:grid-cols-2 gap-8 sm:gap-14 items-center">
             <div className="mx-auto w-[calc(100%-5px)] overflow-hidden rounded-lg shadow-lg h-[400px] sm:h-[500px] lg:h-[750px]">
               <img
@@ -152,8 +159,8 @@ export default function HomePage() {
                 className="w-full h-full object-cover"
               />
             </div>
-            <div className="ml-18">
-              <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-[#3558A2] mb-6 leading-tight">
+            <div className="ml-0 lg:ml-18">
+              <h2 className="hidden lg:block font-serif text-4xl lg:text-6xl font-bold text-[#3558A2] mb-6 leading-tight">
                 qui sommes-<br />nous ?
               </h2>
               <p className="text-base sm:text-lg text-gray-600 leading-relaxed text-left">
@@ -180,7 +187,7 @@ export default function HomePage() {
           <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-[#ffffff] text-center mb-12">
             nos objectifs
           </h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-28">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 lg:gap-28 gap-10">
             <div>
               <h3 className="font-serif text-xl sm:text-2xl font-bold text-white mb-3">représentation et <br />influence</h3>
               <p
@@ -257,15 +264,15 @@ export default function HomePage() {
       </section>
 
       {/* Partners */}
-      <section className="pb-12">
+      <section className="lg:pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center gap-4 lg:gap-6">
-            <div className="flex-shrink-0 w-36 lg:w-48">
-              <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-[#da281c] leading-snug">
+          <div className="flex flex-col lg:flex-row items-center gap-0 lg:gap-6">
+            <div className="flex-shrink-0 w-36 lg:w-48 text-center lg:text-left">
+              <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-[#da281c] leading-none">
                 nos <br />partenaires
               </h2>
             </div>
-            <div className="flex-1 max-w-[720px] overflow-hidden lg:ml-45">
+            <div className="w-full lg:flex-1 max-w-[720px] overflow-hidden lg:ml-45">
               <div className="partners-marquee-track">
                 {marqueePartners.map((partner, index) => (
                   <div key={`${partner.name}-${index}`} className="partners-marquee-item">

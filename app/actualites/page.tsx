@@ -462,7 +462,7 @@ export default function ActualitesPage() {
             </Button>
           </a>
           <p className="text-base text-muted-foreground">
-            Vous êtes alumni ? Partagez vos idées et vos travaux avec la communauté. Proposez vos contenus (portraits, recherches, billets, études…) pour publication ici!
+            Vous êtes alumni ? Partagez vos idées et vos travaux avec la communauté. Proposez vos contenus (portraits, recherches, études…) pour publication ici !
           </p>
         </div>
       </section>
