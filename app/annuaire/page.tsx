@@ -252,39 +252,32 @@ export default function AnnuairePage() {
   }, [effectiveStats, stats.dejaEnGuineeCount])
 
   const sectorCloudWords = useMemo(() => {
-    const items = effectiveStats.sectorData.slice(0, 9)
+    const items = effectiveStats.sectorData
+      .filter((item) => item.name.toLowerCase() !== "non renseigné")
+      .slice(0, 5)
     if (items.length === 0) return []
-
-    const values = items.map((item) => item.value)
-    const min = Math.min(...values)
-    const max = Math.max(...values)
-    const spread = max - min || 1
-
-    // Positions manuelles pour un rendu "éparpillé"
-    const anchors = [
-      { top: 4, left: 58 },
-      { top: 18, left: 34 },
-      { top: 22, left: 70 },
-      { top: 38, left: 16 },
-      { top: 42, left: 52 },
-      { top: 50, left: 74 },
-      { top: 64, left: 30 },
-      { top: 72, left: 58 },
-      { top: 12, left: 10 },
+  
+    const slots = [
+      { top: 44, left: 38 },
+      { top: 10, left: 68 },
+      { top: 58, left: 62 },
+      { top: 72, left: 18 },
+      { top: 16, left: 18 },
     ]
-
-    return items.map((item, index) => {
-      const weight = (item.value - min) / spread
-      const fontSize = 14 + weight * 26
-      const anchor = anchors[index % anchors.length]
-      return {
-        ...item,
-        top: anchor.top,
-        left: anchor.left,
-        fontSize,
-        weight,
-      }
-    })
+  
+    // Tailles fixes par rang : le 1er est le plus gros, le 5e le plus petit
+    const sizes = [42, 34, 28, 22, 18]
+    const weights = [1, 0.75, 0.55, 0.35, 0.2]
+  
+    const sorted = [...items].sort((a, b) => b.value - a.value)
+  
+    return sorted.map((item, index) => ({
+      ...item,
+      fontSize: sizes[index],
+      weight: weights[index],
+      top: slots[index].top,
+      left: slots[index].left,
+    }))
   }, [effectiveStats.sectorData])
 
   return (
@@ -648,16 +641,18 @@ export default function AnnuairePage() {
                 <span className="inline-block bg-[#3558A2] text-[#ffffff] px-3 py-1 rounded text-sm font-bold mb-3">
                   secteurs d&apos;activité
                 </span>
-                <div className="relative h-52 sm:h-56 w-full max-w-[360px] sm:max-w-[420px] mx-auto">
+                <div className="relative h-48 sm:h-56 w-full max-w-[380px] sm:max-w-[440px] mx-auto select-none">
                   {sectorCloudWords.map((sector) => (
                     <span
                       key={sector.name}
-                      className="absolute -translate-x-1/2 -translate-y-1/2 text-[#bcd5f9] whitespace-nowrap leading-none"
+                      className="absolute text-white whitespace-nowrap leading-none"
                       style={{
                         top: `${sector.top}%`,
                         left: `${sector.left}%`,
+                        transform: "translate(-50%, -50%)",
                         fontSize: `${sector.fontSize}px`,
-                        fontWeight: sector.weight > 0.7 ? 900 : sector.weight > 0.4 ? 700 : 600,
+                        fontWeight: sector.weight > 0.6 ? 900 : sector.weight > 0.3 ? 700 : 600,
+                        opacity: 0.55 + sector.weight * 0.45,
                       }}
                     >
                       {sector.name.toLowerCase()}
