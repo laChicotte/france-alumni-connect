@@ -113,7 +113,7 @@ export default function HomePage() {
         />
         <div className="absolute inset-0 bg-black/35" />
         <div className="relative z-10 flex h-full flex-col justify-center px-5 sm:px-15 lg:px-48">
-          <div className="flex flex-col gap-3 sm:gap-4">
+          <div className="flex flex-col gap-1 sm:gap-4">
             <div>
               <span className="hero-title-line hero-title-top inline-block bg-[#3558A2] px-4 py-2 font-bold leading-tight text-white lg:text-5xl">
                 Le réseau des
@@ -146,7 +146,7 @@ export default function HomePage() {
       </section>
 
       {/* Qui sommes-nous */}
-      <section className="py-28">
+      <section className="lg:py-28 py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 ">
           <h2 className="block lg:hidden font-serif text-4xl font-bold text-[#3558A2] mb-6 leading-tight text-center">
             qui sommes-<br />nous ?
@@ -267,7 +267,7 @@ export default function HomePage() {
       <section className="lg:pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row items-center gap-0 lg:gap-6">
-            <div className="flex-shrink-0 w-36 lg:w-48 text-center lg:text-left">
+            <div className="flex-shrink-0 w-36 lg:w-48 lg:text-left">
               <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-[#da281c] leading-none">
                 nos <br />partenaires
               </h2>
