@@ -349,13 +349,13 @@ export default function InscriptionPage() {
                 onCheckedChange={(checked) => handleCheckboxChange('terms', checked as boolean)}
               />
               <label htmlFor="terms" className="text-sm text-muted-foreground leading-relaxed">
-                J'accepte les{" "}
-                <Link href="/conditions" className="text-[#3558A2] hover:underline">
-                  conditions d'utilisation
+                J&apos;accepte les{" "}
+                <Link href="/conditions-utilisation" className="text-[#3558A2] hover:underline" target="_blank">
+                  conditions d&apos;utilisation
                 </Link>{" "}
-                et la{" "}
-                <Link href="/confidentialite" className="text-[#3558A2] hover:underline">
-                  politique de confidentialité
+                et les{" "}
+                <Link href="/mentions-legales" className="text-[#3558A2] hover:underline" target="_blank">
+                  mentions légales
                 </Link> *
               </label>
             </div>

@@ -628,16 +628,26 @@ export default function AnnuairePage() {
             notre communauté
           </h2>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 lg:gap-6 items-center justify-items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-6 items-center justify-items-center">
+
+            {/* Centre : grand cercle alumni — affiché en 1er sur mobile */}
+            <div className="order-first lg:order-2 flex items-center justify-center pt-2">
+              <div className="w-52 h-52 sm:w-60 sm:h-60 rounded-full bg-[#8ba4c9] flex flex-col items-center justify-center shadow-md">
+                <span className="text-[3.8rem] sm:text-[4.4rem] font-extrabold text-white leading-none drop-shadow-[0_6px_14px_rgba(0,0,0,0.55)]">
+                  {effectiveStats.totalAlumni.toLocaleString("fr-FR")}
+                </span>
+                <span className="text-white font-semibold text-xl mt-1">Alumni</span>
+              </div>
+            </div>
 
             {/* Gauche : demi-cercles + nuage de mots */}
-            <div className="flex flex-col items-center gap-8">
-              <div className="flex justify-center gap-4">
+            <div className="order-2 lg:order-1 flex flex-col items-center gap-6 w-full">
+              <div className="flex flex-wrap justify-center gap-2 sm:gap-4">
                 <SemiCircleGauge pct={communityStats.entrepreneurPct} label="entrepreneurs" />
                 <SemiCircleGauge pct={communityStats.salariePct} label="salariés" />
                 <SemiCircleGauge pct={communityStats.recherchePct} label="en recherche d'emploi" />
               </div>
-              <div className="lg:mt-18">
+              <div className="mt-2 lg:mt-18 w-full">
                 <span className="inline-block bg-[#3558A2] text-[#ffffff] px-3 py-1 rounded text-sm font-bold mb-3">
                   secteurs d&apos;activité
                 </span>
@@ -662,18 +672,8 @@ export default function AnnuairePage() {
               </div>
             </div>
 
-            {/* Centre : grand cercle alumni */}
-            <div className="flex items-center justify-center pt-2">
-              <div className="w-60 h-60 rounded-full bg-[#8ba4c9] flex flex-col items-center justify-center shadow-md">
-                <span className="text-[4.4rem] font-extrabold text-white leading-none drop-shadow-[0_6px_14px_rgba(0,0,0,0.55)]">
-                  {effectiveStats.totalAlumni.toLocaleString("fr-FR")}
-                </span>
-                <span className="text-white font-semibold text-xl mt-1">Alumni</span>
-              </div>
-            </div>
-
             {/* Droite : bonhommes + stats retour */}
-            <div className="flex flex-col items-center gap-6">
+            <div className="order-3 flex flex-col items-center gap-6">
               <div className="text-center">
                 <div className="mb-3 grid grid-cols-5 gap-x-1.5 gap-y-2 w-max mx-auto">
                   {Array.from({ length: 10 }, (_, i) => (
