@@ -85,6 +85,11 @@ export default function MentionsLegalesPage() {
             </p>
           </section>
 
+          <section>
+            <h2 className="mb-3 text-lg font-semibold text-gray-900">7. Crédits photographiques</h2>
+            <p>Images © Louis Syllaty Photographie</p>
+          </section>
+
         </div>
       </section>
     </div>
