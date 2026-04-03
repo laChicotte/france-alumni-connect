@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseAdmin } from '@/lib/supabase-admin'
-import type { Database, GenreType, PlanRetourType } from '@/types/database.types'
+import type { Database, GenreType, NationaliteType, PlanRetourType } from '@/types/database.types'
 
 // Rate limiting : max 5 tentatives par IP par fenêtre de 60s
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
@@ -24,6 +24,7 @@ const ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'
 const MAX_PHOTO_SIZE = 3 * 1024 * 1024 // 3MB
 const ALLOWED_PHOTO_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
 const ALLOWED_GENRES: GenreType[] = ['Homme', 'Femme', 'Autre']
+const ALLOWED_NATIONALITES: NationaliteType[] = ['Guinéenne', 'Franco-Guinéenne', 'Guinéenne-Autre']
 const ALLOWED_PLAN_RETOUR: PlanRetourType[] = ['Dans 2 ans', 'Dans 5 ans', 'Déjà en Guinée', 'Autre']
 
 export async function POST(request: NextRequest) {
@@ -43,6 +44,7 @@ export async function POST(request: NextRequest) {
     const prenom = formData.get('prenom') as string
     const nom = formData.get('nom') as string
     const genre = formData.get('genre') as string
+    const nationalite = formData.get('nationalite') as string
     const planRetour = formData.get('plan_retour') as string | null
     const telephone = formData.get('telephone') as string
     const universite = formData.get('universite') as string
@@ -50,7 +52,7 @@ export async function POST(request: NextRequest) {
     const diplomeFile = formData.get('diplome') as File
     const photoFile = formData.get('photo') as File | null
 
-    if (!email || !password || !prenom || !nom || !genre || !telephone || !universite || !anneePromotion || !diplomeFile?.size) {
+    if (!email || !password || !prenom || !nom || !genre || !nationalite || !telephone || !universite || !anneePromotion || !diplomeFile?.size) {
       return NextResponse.json(
         { error: 'Tous les champs obligatoires doivent être renseignés, y compris le diplôme.' },
         { status: 400 }
@@ -60,6 +62,13 @@ export async function POST(request: NextRequest) {
     if (!ALLOWED_GENRES.includes(genre as GenreType)) {
       return NextResponse.json(
         { error: 'Genre invalide. Valeurs autorisées: Homme, Femme, Autre.' },
+        { status: 400 }
+      )
+    }
+
+    if (!ALLOWED_NATIONALITES.includes(nationalite as NationaliteType)) {
+      return NextResponse.json(
+        { error: 'Nationalité invalide. Valeurs autorisées: Guinéenne, Franco-Guinéenne, Guinéenne-Autre.' },
         { status: 400 }
       )
     }
@@ -240,6 +249,7 @@ export async function POST(request: NextRequest) {
       nom,
       prenom,
       genre: genre as GenreType,
+      nationalite: nationalite as NationaliteType,
       telephone,
       ville: 'Conakry',
       universite,

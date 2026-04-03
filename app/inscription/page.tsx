@@ -20,6 +20,7 @@ export default function InscriptionPage() {
   const [error, setError] = useState<string | null>(null)
   const [success, setSuccess] = useState(false)
   const [isGenreOpen, setIsGenreOpen] = useState(false)
+  const [isNationaliteOpen, setIsNationaliteOpen] = useState(false)
 
   const [formData, setFormData] = useState({
     email: "",
@@ -28,6 +29,7 @@ export default function InscriptionPage() {
     prenom: "",
     nom: "",
     genre: "",
+    nationalite: "",
     telephone: "",
     universite: "",
     annee_promotion: "",
@@ -36,6 +38,7 @@ export default function InscriptionPage() {
   const [diplomeFile, setDiplomeFile] = useState<File | null>(null)
   const [photoFile, setPhotoFile] = useState<File | null>(null)
   const genreOptions = ["Homme", "Femme"] as const
+  const nationaliteOptions = ["Guinéenne", "Franco-Guinéenne", "Guinéenne-Autre"] as const
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { id, value } = e.target
@@ -75,6 +78,12 @@ export default function InscriptionPage() {
       return
     }
 
+    if (!formData.nationalite) {
+      setError("Veuillez sélectionner votre nationalité")
+      setIsLoading(false)
+      return
+    }
+
     if (!diplomeFile) {
       setError("Veuillez joindre votre diplôme")
       setIsLoading(false)
@@ -101,6 +110,7 @@ export default function InscriptionPage() {
       body.append('prenom', formData.prenom)
       body.append('nom', formData.nom)
       body.append('genre', formData.genre)
+      body.append('nationalite', formData.nationalite)
       body.append('telephone', formData.telephone)
       body.append('universite', formData.universite)
       body.append('annee_promotion', formData.annee_promotion)
@@ -261,6 +271,42 @@ export default function InscriptionPage() {
                   required
                 />
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Nationalité *</Label>
+              <Popover open={isNationaliteOpen} onOpenChange={setIsNationaliteOpen}>
+                <PopoverTrigger asChild>
+                  <button
+                    type="button"
+                    className="inline-flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm"
+                  >
+                    {formData.nationalite || "Sélectionner"}
+                    <ChevronDown className="h-4 w-4 opacity-70" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] p-0">
+                  <Command>
+                    <CommandList className="max-h-48">
+                      <CommandGroup>
+                        {nationaliteOptions.map((option) => (
+                          <CommandItem
+                            key={option}
+                            value={option}
+                            onSelect={() => {
+                              setFormData((prev) => ({ ...prev, nationalite: option }))
+                              setIsNationaliteOpen(false)
+                            }}
+                          >
+                            <Check className={cn("h-4 w-4", formData.nationalite === option ? "opacity-100" : "opacity-0")} />
+                            {option}
+                          </CommandItem>
+                        ))}
+                      </CommandGroup>
+                    </CommandList>
+                  </Command>
+                </PopoverContent>
+              </Popover>
             </div>
 
             <div className="grid grid-cols-2 gap-4">

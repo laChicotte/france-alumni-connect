@@ -15,7 +15,7 @@ import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { User, Mail, Phone, MapPin, Building, GraduationCap, Edit2, Save, X, Loader2, Linkedin, CheckCircle, AlertCircle, FileText, Eye, EyeOff, Lock, ChevronDown, Check } from "lucide-react"
 import { supabase } from "@/lib/supabase"
-import { AlumniProfile, Secteur, StatutProfessionnel, DiplomeType, GenreType, PlanRetourType } from "@/types/database.types"
+import { AlumniProfile, Secteur, StatutProfessionnel, DiplomeType, GenreType, NationaliteType, PlanRetourType } from "@/types/database.types"
 import { cn } from "@/lib/utils"
 
 const DIPLOME_OPTIONS: { value: DiplomeType; label: string }[] = [
@@ -27,6 +27,7 @@ const DIPLOME_OPTIONS: { value: DiplomeType; label: string }[] = [
   { value: 'autre', label: 'Autre' },
 ]
 const PLAN_RETOUR_OPTIONS: PlanRetourType[] = ['Dans 2 ans', 'Dans 5 ans', 'Déjà en Guinée', 'Autre']
+const NATIONALITE_OPTIONS: NationaliteType[] = ['Guinéenne', 'Franco-Guinéenne', 'Guinéenne-Autre']
 
 function extractAlumniPhotoPath(photoUrl: string | null | undefined): string | null {
   if (!photoUrl) return null
@@ -54,6 +55,7 @@ export default function ProfilPage() {
   const [isStatutOpen, setIsStatutOpen] = useState(false)
   const [isSecteurOpen, setIsSecteurOpen] = useState(false)
   const [isPlanRetourOpen, setIsPlanRetourOpen] = useState(false)
+  const [isNationaliteOpen, setIsNationaliteOpen] = useState(false)
 
   // Options pour les selects
   const [secteurs, setSecteurs] = useState<Secteur[]>([])
@@ -210,6 +212,7 @@ export default function ProfilPage() {
           photo_url: nextPhotoUrl,
           bio: formData.bio || null,
           linkedin_url: formData.linkedin_url || null,
+          nationalite: formData.nationalite || 'Guinéenne',
           plan_retour: (formData.plan_retour as string) || null,
           updated_at: new Date().toISOString(),
         })
@@ -574,6 +577,42 @@ export default function ProfilPage() {
                             </Popover>
                           ) : (
                             <Input value={selectedPlanRetourLabel} disabled />
+                          )}
+                        </div>
+                        <div>
+                          <Label className="mb-0.5 block">Nationalité</Label>
+                          {isEditing ? (
+                            <Popover open={isNationaliteOpen} onOpenChange={setIsNationaliteOpen}>
+                              <PopoverTrigger asChild>
+                                <button type="button" className="inline-flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm">
+                                  {(formData.nationalite as string) || 'Non renseigné'}
+                                  <ChevronDown className="h-4 w-4 opacity-70" />
+                                </button>
+                              </PopoverTrigger>
+                              <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] p-0">
+                                <Command>
+                                  <CommandList className="max-h-48">
+                                    <CommandGroup>
+                                      {NATIONALITE_OPTIONS.map((option) => (
+                                        <CommandItem
+                                          key={option}
+                                          value={option}
+                                          onSelect={() => {
+                                            setFormData({ ...formData, nationalite: option })
+                                            setIsNationaliteOpen(false)
+                                          }}
+                                        >
+                                          <Check className={cn("h-4 w-4", formData.nationalite === option ? "opacity-100" : "opacity-0")} />
+                                          {option}
+                                        </CommandItem>
+                                      ))}
+                                    </CommandGroup>
+                                  </CommandList>
+                                </Command>
+                              </PopoverContent>
+                            </Popover>
+                          ) : (
+                            <Input value={(formData.nationalite as string) || 'Non renseigné'} disabled />
                           )}
                         </div>
                         <div>
