@@ -67,6 +67,13 @@ Ces scripts ne modifient rien, ils permettent de lister ce qui existe :
 - Valeur par défaut: `Autre`
 - Colonne non nulle (`NOT NULL`)
 
+### Champ nationalite (alumni_profiles)
+- Colonne: `alumni_profiles.nationalite`
+- Valeurs autorisées: `Guinéenne`, `Franco-Guinéenne`, `Guinéenne-Autre`
+- Valeur par défaut: `Guinéenne`
+- Colonne non nulle (`NOT NULL`) avec contrainte `CHECK`
+- Obligatoire à l'inscription, modifiable depuis la page profil alumni
+
 ### Statuts des utilisateurs
 - `en_attente` : Compte créé, en attente de validation admin
 - `actif` : Compte validé par un admin
@@ -156,4 +163,5 @@ Après avoir exécuté les scripts, vérifier :
 - [ ] Vérifier que la photo événement s'upload correctement (`evenements-media`)
 - [ ] Vérifier que le logo partenaire s'upload correctement (`logo-partenaire`)
 - [ ] Vérifier que `genre` est bien renseigné à l'inscription et modifiable dans le profil alumni
+- [ ] Vérifier que `nationalite` est bien renseigné à l'inscription et modifiable dans le profil alumni
 - [ ] Vérifier que le profil s'affiche après validation admin
