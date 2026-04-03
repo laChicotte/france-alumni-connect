@@ -17,7 +17,7 @@ export default function MentionsLegalesPage() {
               </a>
             </p>
             <p className="mt-1"><strong>Directeur de la publication :</strong> M. Sébastien VITTET, Directeur de l&apos;Institut français de Guinée</p>
-            <p className="mt-2 text-muted-foreground italic">Statut juridique : en cours de définition.</p>
+            <p className="mt-1"><strong>Statut juridique :</strong> établissement à autonomie financière.</p>
           </section>
 
           <section>
