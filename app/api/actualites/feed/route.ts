@@ -11,6 +11,7 @@ type FeedItem = {
   category: string
   created_at: string
   href: string
+  epingle?: boolean
 }
 
 function formatAddedDate(value: string) {
@@ -29,11 +30,12 @@ export async function GET() {
     const { data: articles, error: articlesError } = await supabase
       .from("articles")
       .select(`
-        id, titre, image_couverture_url, created_at,
+        id, titre, image_couverture_url, created_at, epingle,
         categories_articles(id, libelle),
         users(id, nom, prenom)
       `)
       .eq("status", "publie")
+      .order("epingle", { ascending: false })
       .order("created_at", { ascending: false })
       .limit(100)
 
@@ -62,6 +64,7 @@ export async function GET() {
       category: article.categories_articles?.libelle || "Actualités",
       created_at: article.created_at,
       href: `/actualites/${article.id}`,
+      epingle: article.epingle ?? false,
     }))
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -76,7 +79,11 @@ export async function GET() {
     }))
 
     const items = [...articleItems, ...eventItems]
-      .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+      .sort((a, b) => {
+        if (a.epingle && !b.epingle) return -1
+        if (!a.epingle && b.epingle) return 1
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      })
       .map((item) => ({
         ...item,
         date: formatAddedDate(item.created_at),

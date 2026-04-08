@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { articles } from "@/lib/fake-data"
 import { supabase } from "@/lib/supabase"
-import { Calendar, User, ChevronLeft, ChevronRight, Loader2, Clock3, MapPin } from "lucide-react"
+import { Calendar, User, ChevronLeft, ChevronRight, Loader2, Clock3, MapPin, Pin } from "lucide-react"
 import { useEffect, useState } from "react"
 
 type FeedItem = {
@@ -21,6 +21,7 @@ type FeedItem = {
   author: string
   date: string
   href: string
+  epingle?: boolean
 }
 
 type EventRegistrationDetails = {
@@ -286,6 +287,14 @@ export default function ActualitesPage() {
                           {article.category}
                         </span>
                       </div>
+                      {article.epingle && (
+                        <div className="absolute top-4 right-4">
+                          <span className="inline-flex items-center gap-1 px-2 py-1 bg-amber-400 text-white text-xs font-semibold rounded-full shadow">
+                            <Pin className="h-3 w-3" />
+                            Épinglé
+                          </span>
+                        </div>
+                      )}
                     </div>
                     <CardContent className="pt-2">
                       <h3 className="font-serif text-lg font-bold mb-3 line-clamp-2 group-hover:text-[#3558A2] transition-colors">

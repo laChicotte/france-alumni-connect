@@ -8,7 +8,9 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Search, Plus, Pencil, Trash2, Eye, EyeOff, Loader2, Download } from "lucide-react"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { Search, Plus, Pencil, Trash2, Eye, EyeOff, Loader2, Download, Pin, PinOff, MoreVertical, CalendarClock } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import type { Article } from "@/types/database.types"
 import { downloadCsv } from "@/lib/export/csv"
@@ -20,6 +22,8 @@ export default function ArticlesPage() {
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [antidateArticle, setAntidateArticle] = useState<Article | null>(null)
+  const [antidateValue, setAntidateValue] = useState("")
 
   useEffect(() => {
     fetchArticles()
@@ -27,7 +31,11 @@ export default function ArticlesPage() {
 
   const fetchArticles = async () => {
     setIsLoading(true)
-    const { data, error } = await supabase.from("articles").select("*").order("created_at", { ascending: false })
+    const { data, error } = await supabase
+      .from("articles")
+      .select("*")
+      .order("epingle", { ascending: false })
+      .order("created_at", { ascending: false })
     if (!error) setArticles(data || [])
     setIsLoading(false)
   }
@@ -36,6 +44,41 @@ export default function ArticlesPage() {
     setIsSubmitting(true)
     const { error } = await (supabase.from("articles") as any).delete().eq("id", id)
     if (!error) fetchArticles()
+    setIsSubmitting(false)
+  }
+
+  const handleTogglePin = async (article: Article) => {
+    if (!article.epingle) {
+      const pinnedCount = articles.filter((a) => a.epingle).length
+      if (pinnedCount >= 3) {
+        alert("Vous ne pouvez pas épingler plus de 3 articles. Désépinglez un article d'abord.")
+        return
+      }
+    }
+    const { error } = await (supabase.from("articles") as any)
+      .update({ epingle: !article.epingle })
+      .eq("id", article.id)
+    if (!error) fetchArticles()
+  }
+
+  const openAntidateDialog = (article: Article) => {
+    const current = article.date_publication
+      ? new Date(article.date_publication).toISOString().slice(0, 16)
+      : new Date().toISOString().slice(0, 16)
+    setAntidateValue(current)
+    setAntidateArticle(article)
+  }
+
+  const handleAntidate = async () => {
+    if (!antidateArticle || !antidateValue) return
+    setIsSubmitting(true)
+    const { error } = await (supabase.from("articles") as any)
+      .update({ date_publication: new Date(antidateValue).toISOString() })
+      .eq("id", antidateArticle.id)
+    if (!error) {
+      fetchArticles()
+      setAntidateArticle(null)
+    }
     setIsSubmitting(false)
   }
 
@@ -120,6 +163,7 @@ export default function ArticlesPage() {
                   <TableRow>
                     <TableHead>Titre</TableHead>
                     <TableHead>Statut</TableHead>
+                    <TableHead>Épinglé</TableHead>
                     <TableHead>Vues</TableHead>
                     <TableHead>Date</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
@@ -128,14 +172,19 @@ export default function ArticlesPage() {
                 <TableBody>
                   {filteredArticles.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={5} className="text-center py-8 text-gray-500">
+                      <TableCell colSpan={6} className="text-center py-8 text-gray-500">
                         Aucun article trouvé
                       </TableCell>
                     </TableRow>
                   ) : (
                     filteredArticles.map((article) => (
-                      <TableRow key={article.id}>
-                        <TableCell className="font-medium max-w-lg truncate">{article.titre}</TableCell>
+                      <TableRow key={article.id} className={article.epingle ? "bg-amber-50" : ""}>
+                        <TableCell className="font-medium max-w-lg truncate">
+                          <div className="flex items-center gap-2">
+                            {article.epingle && <Pin className="h-3.5 w-3.5 shrink-0 text-amber-500" />}
+                            <span>{article.titre}</span>
+                          </div>
+                        </TableCell>
                         <TableCell>
                           {article.status === "publie" ? (
                             <Badge className="bg-green-100 text-green-700 hover:bg-green-100">Publié</Badge>
@@ -143,39 +192,69 @@ export default function ArticlesPage() {
                             <Badge variant="outline">Brouillon</Badge>
                           )}
                         </TableCell>
+                        <TableCell>
+                          {article.epingle ? (
+                            <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100">Épinglé</Badge>
+                          ) : (
+                            <span className="text-gray-400 text-sm">—</span>
+                          )}
+                        </TableCell>
                         <TableCell>{article.vues}</TableCell>
                         <TableCell>
                           {article.date_publication ? new Date(article.date_publication).toLocaleDateString("fr-FR") : "-"}
                         </TableCell>
-                        <TableCell className="text-right space-x-2">
-                          <Link href={`/admin/articles/${article.id}/modifier`}>
-                            <Button variant="outline" size="sm">
-                              <Pencil className="h-4 w-4 mr-1" />
-                              Modifier
-                            </Button>
-                          </Link>
-                          <Button variant="outline" size="sm" onClick={() => handleToggleStatus(article)}>
-                            {article.status === "publie" ? (
-                              <>
-                                <EyeOff className="h-4 w-4 mr-1" />
-                                Suspendre
-                              </>
-                            ) : (
-                              <>
-                                <Eye className="h-4 w-4 mr-1" />
-                                Publier
-                              </>
-                            )}
-                          </Button>
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            disabled={isSubmitting}
-                            onClick={() => handleDelete(article.id)}
-                          >
-                            <Trash2 className="h-4 w-4 mr-1" />
-                            Supprimer
-                          </Button>
+                        <TableCell className="text-right">
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button variant="ghost" size="icon" className="h-8 w-8">
+                                <MoreVertical className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent align="end">
+                              <DropdownMenuItem asChild>
+                                <Link href={`/admin/articles/${article.id}/modifier`} className="flex items-center gap-2 cursor-pointer">
+                                  <Pencil className="h-4 w-4" />
+                                  Modifier
+                                </Link>
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="flex items-center gap-2 cursor-pointer"
+                                onClick={() => handleToggleStatus(article)}
+                              >
+                                {article.status === "publie" ? (
+                                  <><EyeOff className="h-4 w-4" />Suspendre</>
+                                ) : (
+                                  <><Eye className="h-4 w-4" />Publier</>
+                                )}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className={`flex items-center gap-2 cursor-pointer ${article.epingle ? "text-amber-600 focus:text-amber-600" : ""}`}
+                                onClick={() => handleTogglePin(article)}
+                              >
+                                {article.epingle ? (
+                                  <><PinOff className="h-4 w-4" />Désépingler</>
+                                ) : (
+                                  <><Pin className="h-4 w-4" />Épingler</>
+                                )}
+                              </DropdownMenuItem>
+                              <DropdownMenuItem
+                                className="flex items-center gap-2 cursor-pointer"
+                                onClick={() => openAntidateDialog(article)}
+                              >
+                                <CalendarClock className="h-4 w-4" />
+                                Antidater
+                              </DropdownMenuItem>
+                              <DropdownMenuSeparator />
+                              <DropdownMenuItem
+                                className="flex items-center gap-2 cursor-pointer text-red-600 focus:text-red-600"
+                                disabled={isSubmitting}
+                                onClick={() => handleDelete(article.id)}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                                Supprimer
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
                         </TableCell>
                       </TableRow>
                     ))
@@ -186,6 +265,34 @@ export default function ArticlesPage() {
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={!!antidateArticle} onOpenChange={(open) => !open && setAntidateArticle(null)}>
+        <DialogContent className="sm:max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Antidater la publication</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2 py-2">
+            <p className="text-sm text-muted-foreground truncate">
+              {antidateArticle?.titre}
+            </p>
+            <Input
+              type="datetime-local"
+              value={antidateValue}
+              onChange={(e) => setAntidateValue(e.target.value)}
+            />
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setAntidateArticle(null)}>Annuler</Button>
+            <Button
+              className="bg-[#3558A2] hover:bg-[#3558A2]/90"
+              disabled={isSubmitting || !antidateValue}
+              onClick={handleAntidate}
+            >
+              {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Confirmer"}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AdminWrapper>
   )
 }

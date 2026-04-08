@@ -136,6 +136,7 @@ export interface Database {
           status: ArticleStatus
           date_publication: string | null
           vues: number
+          epingle: boolean
           created_at: string
           updated_at: string
         }
@@ -151,6 +152,7 @@ export interface Database {
           status?: ArticleStatus
           date_publication?: string | null
           vues?: number
+          epingle?: boolean
           created_at?: string
           updated_at?: string
         }
@@ -165,6 +167,7 @@ export interface Database {
           status?: ArticleStatus
           date_publication?: string | null
           vues?: number
+          epingle?: boolean
           updated_at?: string
         }
       }
