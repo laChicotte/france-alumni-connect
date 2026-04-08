@@ -164,10 +164,15 @@ export default function HomePage() {
                 qui sommes-<br />nous ?
               </h2>
               <p className="text-base sm:text-lg text-gray-600 leading-relaxed text-left">
-                France Alumni Guinée, dans le prolongement de Campus France, est une communauté dynamique de 
+                {/* France Alumni Guinée, dans le prolongement de Campus France, est une communauté dynamique de 
                 Guinéennes et Guinéens diplômés de l&apos;enseignement supérieur français, rassemblés par leur 
                 parcours d&apos;études en France et leur engagement pour la coopération, le partage d&apos;expériences, 
-                la création d&apos;opportunités et l&apos;impact positif sur la Guinée.
+                la création d&apos;opportunités et l&apos;impact positif sur la Guinée. */}
+
+                France Alumni Guinée, continuité de Campus France portée par l&apos;Institut français de Guinée et rattachée à 
+                l&apos;Ambassade de France en Guinée, est une communauté dynamique de Guinéennes et Guinéens diplômés de l&apos;enseignement 
+                supérieur français. Rassemblés par leur parcours d&apos;études en France, ils ont un même engagement pour la coopération, 
+                le partage d&apos;expériences, la création d&apos;opportunités et l&apos;impact positif sur la Guinée.
                 <br />
                 <br />
               
@@ -175,6 +180,14 @@ export default function HomePage() {
                 entre ses membres afin de favoriser la réussite collective et de faire émerger des projets porteurs 
                 d&apos;avenir.
               </p>
+              <a
+                href="https://drive.google.com/file/d/1v4PrnKUW_eTmPXP5X03zGinuCYAWjz6I/view?usp=sharing"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-5 inline-flex items-center justify-center rounded-lg border border-[#3558A2]/20 bg-[#eef2fb] px-4 py-2.5 text-sm font-medium text-[#3558A2] shadow-sm transition-colors hover:bg-[#e4eaf8] hover:border-[#3558A2]/30"
+              >
+                visa de circulation dédié aux Alumni
+              </a>
             </div>
           </div>
         </div>
@@ -267,7 +280,7 @@ export default function HomePage() {
       <section className="lg:pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row items-center gap-0 lg:gap-6">
-            <div className="flex-shrink-0 w-36 lg:w-48 lg:text-left">
+            <div className="flex-shrink-0 w-36 lg:w-48 lg:text-left mt-10 lg:mt-0">
               <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-[#da281c] leading-none">
                 nos <br />partenaires
               </h2>

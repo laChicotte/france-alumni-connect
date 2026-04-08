@@ -15,6 +15,10 @@ import { supabase } from "@/lib/supabase"
 import type { Article, ArticleMediaType, CategorieArticle } from "@/types/database.types"
 import { RichTextEditor } from "@/components/admin/articles/rich-text-editor"
 import { ArticleContentRenderer } from "@/components/admin/articles/article-content-renderer"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+
+/** Limite côté app (inférieure au plafond bucket Supabase 10 Mo) */
+const MAX_ARTICLE_MEDIA_BYTES = 5 * 1024 * 1024
 
 type PreviewMode = "edit" | "preview" | "split"
 
@@ -42,6 +46,8 @@ export function ArticleEditorScreen({ articleId }: ArticleEditorScreenProps) {
   const [currentUser, setCurrentUser] = useState<{ id: string; role: string; nom?: string; prenom?: string } | null>(null)
   const [endMediaItems, setEndMediaItems] = useState<EndMediaItem[]>([])
   const [articlePublicationDate, setArticlePublicationDate] = useState<string | null>(null)
+  const [uploadSizeError, setUploadSizeError] = useState<string | null>(null)
+  const [coverFileInputKey, setCoverFileInputKey] = useState(0)
 
   const [formData, setFormData] = useState({
     titre: "",
@@ -121,6 +127,14 @@ export function ArticleEditorScreen({ articleId }: ArticleEditorScreenProps) {
       .replace(/(^-|-$)/g, "")
 
   const onSelectCoverFile = (file: File | null) => {
+    if (file && file.size > MAX_ARTICLE_MEDIA_BYTES) {
+      setUploadSizeError("L'image de couverture ne doit pas dépasser 5 Mo.")
+      setCoverFileInputKey((k) => k + 1)
+      setCoverFile(null)
+      setCoverPreviewUrl(formData.image_couverture_url || null)
+      return
+    }
+    setUploadSizeError(null)
     setCoverFile(file)
     if (!file) {
       setCoverPreviewUrl(formData.image_couverture_url || null)
@@ -152,6 +166,9 @@ export function ArticleEditorScreen({ articleId }: ArticleEditorScreenProps) {
 
   const uploadToArticlesMedia = async (file: File, segment: string) => {
     if (!currentUser?.id) throw new Error("Utilisateur non connecté")
+    if (file.size > MAX_ARTICLE_MEDIA_BYTES) {
+      throw new Error("Fichier trop volumineux (max 5 Mo)")
+    }
     const ext = file.name.split(".").pop() || "bin"
     const path = `${currentUser.id}/${segment}_${Date.now()}.${ext}`
     const { data, error } = await supabase.storage.from("articles-media").upload(path, file, {
@@ -192,6 +209,17 @@ export function ArticleEditorScreen({ articleId }: ArticleEditorScreenProps) {
   const handleSave = async (targetStatus?: "brouillon" | "publie") => {
     if (!formData.titre || !formData.contenu) return
     if (!coverFile && !formData.image_couverture_url) return
+
+    if (coverFile && coverFile.size > MAX_ARTICLE_MEDIA_BYTES) {
+      setUploadSizeError("L'image de couverture ne doit pas dépasser 5 Mo.")
+      return
+    }
+    const oversizedMedia = endMediaItems.find((item) => item.file && item.file.size > MAX_ARTICLE_MEDIA_BYTES)
+    if (oversizedMedia?.file) {
+      setUploadSizeError(`Un média dépasse 5 Mo : ${oversizedMedia.file.name}`)
+      return
+    }
+    setUploadSizeError(null)
 
     setIsSubmitting(true)
     try {
@@ -245,6 +273,10 @@ export function ArticleEditorScreen({ articleId }: ArticleEditorScreenProps) {
       router.push("/admin/articles")
     } catch (error) {
       console.error("Erreur sauvegarde article:", error)
+      const msg = error instanceof Error ? error.message : ""
+      if (msg.includes("5 Mo") || msg.toLowerCase().includes("too large") || msg.includes("413")) {
+        setUploadSizeError(msg || "Fichier trop volumineux (max 5 Mo)")
+      }
     } finally {
       setIsSubmitting(false)
     }
@@ -289,6 +321,11 @@ export function ArticleEditorScreen({ articleId }: ArticleEditorScreenProps) {
   return (
     <AdminWrapper>
       <div className="p-6 space-y-4">
+        {uploadSizeError && (
+          <Alert variant="destructive">
+            <AlertDescription>{uploadSizeError}</AlertDescription>
+          </Alert>
+        )}
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3">
             <Button variant="outline" onClick={() => router.push("/admin/articles")}>
@@ -330,7 +367,9 @@ export function ArticleEditorScreen({ articleId }: ArticleEditorScreenProps) {
 
                 <div className="space-y-2">
                   <Label>Image de couverture *</Label>
+                  <p className="text-xs text-muted-foreground">JPEG, PNG ou WebP — max 5 Mo</p>
                   <Input
+                    key={coverFileInputKey}
                     type="file"
                     accept="image/png,image/jpeg,image/jpg,image/webp"
                     onChange={(e) => onSelectCoverFile(e.target.files?.[0] || null)}
@@ -350,7 +389,10 @@ export function ArticleEditorScreen({ articleId }: ArticleEditorScreenProps) {
 
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <Label>Médias de fin</Label>
+                    <div>
+                      <Label>Médias de fin</Label>
+                      <p className="text-xs text-muted-foreground mt-0.5">Chaque fichier (image ou vidéo) — max 5 Mo</p>
+                    </div>
                     <div className="flex gap-2">
                       <Button type="button" variant="outline" size="sm" onClick={() => addMedia("image")}>+ Image</Button>
                       <Button type="button" variant="outline" size="sm" onClick={() => addMedia("video")}>+ Vidéo</Button>
@@ -375,7 +417,16 @@ export function ArticleEditorScreen({ articleId }: ArticleEditorScreenProps) {
                         <Input
                           type="file"
                           accept={item.media_type === "image" ? "image/png,image/jpeg,image/jpg,image/webp" : "video/mp4,video/webm"}
-                          onChange={(e) => updateMedia(item.id, { file: e.target.files?.[0] || null })}
+                          onChange={(e) => {
+                            const f = e.target.files?.[0] || null
+                            if (f && f.size > MAX_ARTICLE_MEDIA_BYTES) {
+                              setUploadSizeError(`Le média ne doit pas dépasser 5 Mo : ${f.name}`)
+                              e.target.value = ""
+                              return
+                            }
+                            setUploadSizeError(null)
+                            updateMedia(item.id, { file: f })
+                          }}
                         />
                       </div>
                       <Button type="button" variant="ghost" className="text-red-600" onClick={() => removeMedia(item.id)}>Retirer</Button>

@@ -336,6 +336,15 @@ export default function EvenementsPublicPage() {
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Inscription externe</DialogTitle>
+            <p className="pt-1 text-xs text-muted-foreground">
+              <Link
+                href="/connexion"
+                className="text-[#3558A2] hover:underline"
+                onClick={() => setExternalDialogEventId(null)}
+              >
+                Me connecter
+              </Link>
+            </p>
           </DialogHeader>
           <div className="space-y-3">
             <div className="grid grid-cols-2 gap-3">

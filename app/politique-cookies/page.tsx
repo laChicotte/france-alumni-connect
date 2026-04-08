@@ -9,17 +9,17 @@ export default function PolitiqueCookiesPage() {
           <section>
             <h2 className="mb-2 text-lg font-semibold text-gray-900">1. Qu&apos;est-ce qu&apos;un cookie ?</h2>
             <p>
-              Un cookie est un petit fichier texte depose sur votre appareil lorsque vous visitez un site web.
+              Un cookie est un petit fichier texte déposé sur votre appareil lorsque vous visitez un site web.
             </p>
           </section>
 
           <section>
-            <h2 className="mb-2 text-lg font-semibold text-gray-900">2. Cookies utilises sur ce site</h2>
+            <h2 className="mb-2 text-lg font-semibold text-gray-900">2. Cookies utilisés sur ce site</h2>
             <ul className="list-disc space-y-1 pl-5">
-              <li><strong>Essentiels</strong> : requis pour la connexion, la securite et le bon fonctionnement.</li>
-              <li><strong>Preferences</strong> : memorisation de certains choix d&apos;interface.</li>
-              <li><strong>Mesure d&apos;audience</strong> : statistiques de frequentation (si acceptees).</li>
-              <li><strong>Marketing</strong> : campagnes et attribution (si activees).</li>
+              <li><strong>Essentiels</strong> : requis pour la connexion, la sécurite et le bon fonctionnement.</li>
+              <li><strong>Preferences</strong> : mémorisation de certains choix d&apos;interface.</li>
+              <li><strong>Mesure d&apos;audience</strong> : statistiques de fréquentation (si acceptés).</li>
+              <li><strong>Marketing</strong> : campagnes et attribution (si activés).</li>
             </ul>
           </section>
 
@@ -31,16 +31,16 @@ export default function PolitiqueCookiesPage() {
           </section>
 
           <section>
-            <h2 className="mb-2 text-lg font-semibold text-gray-900">4. Duree de conservation</h2>
+            <h2 className="mb-2 text-lg font-semibold text-gray-900">4. Durée de conservation</h2>
             <p>
-              Les choix de consentement sont conserves pour une duree limitee (jusqu&apos;a 180 jours) puis redemandes.
+              Les choix de consentement sont conservés pour une durée limitée (jusqu&apos;à 180 jours) puis redemandés.
             </p>
           </section>
 
           <section>
             <h2 className="mb-2 text-lg font-semibold text-gray-900">5. Contact</h2>
             <p>
-              Pour toute question, vous pouvez nous ecrire a : france.alumni@institutfrancais-guinee.fr
+              Pour toute question, vous pouvez nous écrire à : france.alumni@institutfrancais-guinee.fr
             </p>
           </section>
         </div>

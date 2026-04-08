@@ -39,7 +39,7 @@ export function Footer() {
                 <Mail className="h-4 w-4 shrink-0 text-white" />
                 <a
                   href="mailto:france.alumni@institutfrancais-guinee.fr"
-                  className="hover:text-[#f48988] transition-colors break-all"
+                  className="text-sm sm:text-base hover:text-[#f48988] transition-colors break-all"
                 >
                   france.alumni@institutfrancais-guinee.fr
                 </a>
