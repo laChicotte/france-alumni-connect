@@ -163,7 +163,6 @@ export default function ArticlesPage() {
                   <TableRow>
                     <TableHead>Titre</TableHead>
                     <TableHead>Statut</TableHead>
-                    <TableHead>Épinglé</TableHead>
                     <TableHead>Vues</TableHead>
                     <TableHead>Date</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
@@ -172,17 +171,17 @@ export default function ArticlesPage() {
                 <TableBody>
                   {filteredArticles.length === 0 ? (
                     <TableRow>
-                      <TableCell colSpan={6} className="text-center py-8 text-gray-500">
+                      <TableCell colSpan={5} className="text-center py-8 text-gray-500">
                         Aucun article trouvé
                       </TableCell>
                     </TableRow>
                   ) : (
                     filteredArticles.map((article) => (
-                      <TableRow key={article.id} className={article.epingle ? "bg-amber-50" : ""}>
-                        <TableCell className="font-medium max-w-lg truncate">
-                          <div className="flex items-center gap-2">
-                            {article.epingle && <Pin className="h-3.5 w-3.5 shrink-0 text-amber-500" />}
-                            <span>{article.titre}</span>
+                      <TableRow key={article.id}>
+                        <TableCell className="font-medium max-w-lg">
+                          <div className="flex min-w-0 items-center justify-between gap-2">
+                            <span className="truncate">{article.titre}</span>
+                            {article.epingle && <Pin className="h-3.5 w-3.5 shrink-0 text-amber-500" aria-hidden />}
                           </div>
                         </TableCell>
                         <TableCell>
@@ -190,13 +189,6 @@ export default function ArticlesPage() {
                             <Badge className="bg-green-100 text-green-700 hover:bg-green-100">Publié</Badge>
                           ) : (
                             <Badge variant="outline">Brouillon</Badge>
-                          )}
-                        </TableCell>
-                        <TableCell>
-                          {article.epingle ? (
-                            <Badge className="bg-amber-100 text-amber-700 hover:bg-amber-100">Épinglé</Badge>
-                          ) : (
-                            <span className="text-gray-400 text-sm">—</span>
                           )}
                         </TableCell>
                         <TableCell>{article.vues}</TableCell>

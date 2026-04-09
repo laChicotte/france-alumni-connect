@@ -91,6 +91,10 @@ export default function ArticlePage() {
     loadArticle()
   }, [articleId, fallbackArticle])
 
+  useEffect(() => {
+    fetch(`/api/articles/public/${articleId}/view`, { method: "POST" }).catch(() => null)
+  }, [articleId])
+
   if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">

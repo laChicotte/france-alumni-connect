@@ -164,27 +164,22 @@ export default function HomePage() {
                 qui sommes-<br />nous ?
               </h2>
               <p className="text-base sm:text-lg text-gray-600 leading-relaxed text-left">
-                {/* France Alumni Guinée, dans le prolongement de Campus France, est une communauté dynamique de 
-                Guinéennes et Guinéens diplômés de l&apos;enseignement supérieur français, rassemblés par leur 
-                parcours d&apos;études en France et leur engagement pour la coopération, le partage d&apos;expériences, 
-                la création d&apos;opportunités et l&apos;impact positif sur la Guinée. */}
-
-                France Alumni Guinée, continuité de Campus France portée par l&apos;Institut français de Guinée et rattachée à 
-                l&apos;Ambassade de France en Guinée, est une communauté dynamique de Guinéennes et Guinéens diplômés de l&apos;enseignement 
-                supérieur français. Rassemblés par leur parcours d&apos;études en France, ils ont un même engagement pour la coopération, 
-                le partage d&apos;expériences, la création d&apos;opportunités et l&apos;impact positif sur la Guinée.
+                France Alumni Guinée rassemble une communauté dynamique de Guinéennes et Guinéens diplômés de l&apos;enseignement 
+                supérieur français. Service de l&apos;Institut français, rattaché à l&apos;Ambassade de France en Guinée et héritié
+                de la dynamique Campus France, il anime un un réseau engagé et résolument tourné vers l&apos;avenir. Fondé sur des
+                valeurs de solidarité, d&apos;entraide et d&apos;engagement, ce réseau favorise les échanges entre ses membres, 
+                soutient les initiatives collectives et met en lumière les parcours de ses alumni.
                 <br />
                 <br />
-              
-                Portée par des valeurs de solidarité et d&apos;entraide, la communauté encourage le soutien mutuel 
-                entre ses membres afin de favoriser la réussite collective et de faire émerger des projets porteurs 
-                d&apos;avenir.
+                Plus qu&apos;un simple réseau, France Alumni Guinée constitue un véritable espace d'échangeset d'opportunités : 
+                un trait d&apos;union vivant entre la Guinée et la France, au service de la coopération, de l&apos;innovation
+                et de la mobilité.
               </p>
               <a
                 href="https://drive.google.com/file/d/1v4PrnKUW_eTmPXP5X03zGinuCYAWjz6I/view?usp=sharing"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-5 inline-flex items-center justify-center rounded-lg border border-[#3558A2]/20 bg-[#eef2fb] px-4 py-2.5 text-sm font-medium text-[#3558A2] shadow-sm transition-colors hover:bg-[#e4eaf8] hover:border-[#3558A2]/30"
+                className="mt-5 inline-flex items-center justify-center rounded-lg border border-[#3558A2]/20 bg-[#eef2fb] px-4 py-2.5 text-sm font-medium text-[#3558A2] shadow-sm transition-colors hover:bg-[#e4eaf8] hover:border-[#3558A2]/30 mt-5"
               >
                 visa de circulation dédié aux Alumni
               </a>
