@@ -152,21 +152,24 @@ export default function HomePage() {
             qui sommes-<br />nous ?
           </h2>
           <div className="grid lg:grid-cols-2 gap-8 sm:gap-14 items-center">
-            <div className="mx-auto w-[calc(100%-5px)] overflow-hidden rounded-lg shadow-lg h-[400px] sm:h-[500px] lg:h-[750px]">
+            <div className="order-2 lg:order-1 mx-auto w-[calc(100%-5px)] overflow-hidden rounded-lg shadow-lg h-[400px] sm:h-[500px] lg:h-[750px]">
               <img
                 src={activeQuiSommesNousImage}
                 alt="France Alumni Guinée"
                 className="w-full h-full object-cover"
               />
             </div>
-            <div className="ml-0 lg:ml-18">
+            <div className="order-1 lg:order-2 ml-0 lg:ml-18">
               <h2 className="hidden lg:block font-serif text-4xl lg:text-6xl font-bold text-[#3558A2] mb-6 leading-tight">
                 qui sommes-<br />nous ?
               </h2>
               <p className="text-base sm:text-lg text-gray-600 leading-relaxed text-left">
                 France Alumni Guinée rassemble une communauté dynamique de Guinéennes et Guinéens diplômés de l&apos;enseignement 
-                supérieur français. Service de l&apos;Institut français, rattaché à l&apos;Ambassade de France en Guinée et héritié
-                de la dynamique Campus France, il anime un un réseau engagé et résolument tourné vers l&apos;avenir. Fondé sur des
+                supérieur français. 
+                <br />
+                <br />
+                Service de l&apos;Institut français, rattaché à l&apos;Ambassade de France en Guinée et héritié
+                de la dynamique Campus France, il anime un réseau engagé et résolument tourné vers l&apos;avenir. Fondé sur des
                 valeurs de solidarité, d&apos;entraide et d&apos;engagement, ce réseau favorise les échanges entre ses membres, 
                 soutient les initiatives collectives et met en lumière les parcours de ses alumni.
                 <br />
@@ -175,14 +178,16 @@ export default function HomePage() {
                 un trait d&apos;union vivant entre la Guinée et la France, au service de la coopération, de l&apos;innovation
                 et de la mobilité.
               </p>
-              <a
-                href="https://drive.google.com/file/d/1v4PrnKUW_eTmPXP5X03zGinuCYAWjz6I/view?usp=sharing"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-5 inline-flex items-center justify-center rounded-lg border border-[#3558A2]/20 bg-[#eef2fb] px-4 py-2.5 text-sm font-medium text-[#3558A2] shadow-sm transition-colors hover:bg-[#e4eaf8] hover:border-[#3558A2]/30 mt-5"
-              >
-                visa de circulation dédié aux Alumni
-              </a>
+              <div className="mt-5 flex justify-end">
+                <a
+                  href="https://drive.google.com/file/d/1v4PrnKUW_eTmPXP5X03zGinuCYAWjz6I/view?usp=sharing"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center justify-center rounded-lg border border-[#3558A2]/20 bg-[#eef2fb] px-4 py-2.5 text-sm font-medium text-[#3558A2] shadow-sm transition-colors hover:bg-[#e4eaf8] hover:border-[#3558A2]/30"
+                >
+                  visa de circulation dédié aux Alumni
+                </a>
+              </div>
             </div>
           </div>
         </div>
