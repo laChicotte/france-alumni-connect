@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card"
 import { partners } from "@/lib/fake-data"
-import { Users, Briefcase, MapPin } from "lucide-react"
+import { Users, Briefcase, MapPin, Trophy, Network, Target } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 
 function useCountUp(target: number, duration = 1400) {
@@ -200,9 +200,12 @@ export default function HomePage() {
           <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-[#ffffff] text-center mb-12">
             nos objectifs
           </h2>
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 lg:gap-28 gap-10">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 lg:gap-28 gap-10">
             <div>
-              <h3 className="font-serif text-xl sm:text-2xl font-bold text-white mb-3">valoriser</h3>
+              <h3 className="mb-3 inline-flex items-center gap-2 font-serif text-xl font-bold text-white sm:text-2xl">
+                <Trophy className="h-7 w-7 sm:h-8 sm:w-8" aria-hidden />
+                valoriser
+              </h3>
               <p
                 lang="fr"
                 className="text-white sm:text-lg leading-relaxed max-w-md"
@@ -212,7 +215,10 @@ export default function HomePage() {
               </p>
             </div>
             <div>
-              <h3 className="font-serif text-xl sm:text-2xl font-bold text-white mb-3">connecter</h3>
+              <h3 className="mb-3 inline-flex items-center gap-2 font-serif text-xl font-bold text-white sm:text-2xl">
+                <Network className="h-7 w-7 sm:h-8 sm:w-8" aria-hidden />
+                connecter
+              </h3>
               <p
                 lang="fr"
                 className="text-white sm:text-lg leading-relaxed max-w-md"
@@ -222,7 +228,8 @@ export default function HomePage() {
                 </p>
             </div>
             <div>
-              <h3 className="font-serif text-xl sm:text-2xl font-bold text-white mb-3">
+              <h3 className="mb-3 inline-flex items-center gap-2 font-serif text-xl font-bold text-white sm:text-2xl">
+                <Target className="h-7 w-7 sm:h-8 sm:w-8" aria-hidden />
                 impacter
               </h3>
 
@@ -234,15 +241,7 @@ export default function HomePage() {
                 soutenir des projets à fort impact et répondre aux besoins du terrain.
               </p>
             </div>
-            <div>
-              <h3 className="font-serif text-xl sm:text-2xl font-bold text-white mb-3">rayonnement <br />international</h3>
-              <p
-                lang="fr"
-                  className="text-white sm:text-lg leading-relaxed max-w-md"
-              >
-                Mettre en lumière les réussites guinéennes et développer des connexions stratégiques entre la France et la Guinée pour favoriser les collaborations, l&apos;attractivité et la reconnaissance du réseau.
-              </p>
-            </div>
+  
           </div>
         </div>
       </section>

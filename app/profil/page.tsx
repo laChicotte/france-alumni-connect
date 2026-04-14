@@ -18,13 +18,55 @@ import { supabase } from "@/lib/supabase"
 import { AlumniProfile, Secteur, StatutProfessionnel, DiplomeType, GenreType, NationaliteType, PlanRetourType } from "@/types/database.types"
 import { cn } from "@/lib/utils"
 
+
+
 const DIPLOME_OPTIONS: { value: DiplomeType; label: string }[] = [
+  { value: 'bts', label: 'BTS' },
+  { value: 'dut', label: 'DUT' },
+  { value: 'du', label: 'DU' },
+  { value: 'de', label: 'DE' },
+  { value: 'deug', label: 'DEUG' },
+  { value: 'prepa', label: 'Classe Prépa' },
+  { value: 'ecole_ingenieur', label: "École d'ingénieur" },
+  { value: 'ecole_specialisee', label: 'École spécialisée' },
+  { value: 'licence_pro', label: 'Licence professionnelle' },
   { value: 'licence', label: 'Licence' },
-  { value: 'master', label: 'Master' },
+  { value: 'master1', label: 'Master 1' },
+  { value: 'master2', label: 'Master 2' },
   { value: 'doctorat', label: 'Doctorat' },
-  { value: 'mba', label: 'MBA' },
-  { value: 'ingenieur', label: 'Ingénieur' },
-  { value: 'autre', label: 'Autre' },
+  { value: 'post_doctorat', label: 'Post Doctorat' },
+]
+const FORMATION_DOMAINE_OPTIONS = [
+  { value: '24', label: 'Administration' },
+  { value: '19', label: 'Agriculture - agroalimentaire' },
+  { value: '11', label: 'Architecture, urbanisme et aménagement du territoire' },
+  { value: '6', label: 'Arts, culture, design et mode' },
+  { value: '25', label: 'Banque/Economie/Gestion' },
+  { value: '7', label: 'Biologie' },
+  { value: '27', label: 'BTP/Géomètre Topo' },
+  { value: '17', label: 'Chimie' },
+  { value: '14', label: 'Communication et journalisme' },
+  { value: '15', label: 'Droit' },
+  { value: '3', label: 'Enseignement secondaire - Lycée Français' },
+  { value: '12', label: 'Environnement et sciences de la terre' },
+  { value: '29', label: 'Formation' },
+  { value: '28', label: 'Industrie' },
+  { value: '2', label: 'Informatique' },
+  { value: '5', label: 'Langues et lettres' },
+  { value: '1', label: 'Management, gestion, finances et commerce' },
+  { value: '20', label: 'Mathématiques' },
+  { value: '22', label: 'Physique' },
+  { value: '4', label: 'Santé et professions sociales' },
+  { value: '16', label: "Sciences de l'éducation" },
+  { value: '10', label: "Sciences de l'ingénieur" },
+  { value: '8', label: 'Sciences économiques et politiques' },
+  { value: '13', label: 'Sciences humaines et sociales' },
+  { value: '26', label: 'Social' },
+  { value: '18', label: 'Sports' },
+  { value: '30', label: 'Technique' },
+  { value: '9', label: 'Tourisme, hôtellerie et restauration' },
+  { value: '21', label: 'Transport et logistique' },
+  { value: '23', label: 'Autre' },
 ]
 const PLAN_RETOUR_OPTIONS: PlanRetourType[] = ['Dans 2 ans', 'Dans 5 ans', 'Déjà en Guinée', 'Autre']
 const NATIONALITE_OPTIONS: NationaliteType[] = ['Guinéenne', 'Franco-Guinéenne', 'Guinéenne-Autre']
@@ -40,6 +82,14 @@ function extractAlumniPhotoPath(photoUrl: string | null | undefined): string | n
   return path || null
 }
 
+function getFormationDomaineLabel(value: string | null | undefined): string {
+  if (!value) return ''
+  const fromValue = FORMATION_DOMAINE_OPTIONS.find((item) => item.value === value)
+  if (fromValue) return fromValue.label
+  const fromLabel = FORMATION_DOMAINE_OPTIONS.find((item) => item.label === value)
+  return fromLabel ? fromLabel.label : value
+}
+
 export default function ProfilPage() {
   const [user, setUser] = useState<any>(null)
   const [alumniProfile, setAlumniProfile] = useState<AlumniProfile | null>(null)
@@ -52,6 +102,7 @@ export default function ProfilPage() {
   const [photoFile, setPhotoFile] = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
   const [isDiplomeOpen, setIsDiplomeOpen] = useState(false)
+  const [isFormationDomaineOpen, setIsFormationDomaineOpen] = useState(false)
   const [isStatutOpen, setIsStatutOpen] = useState(false)
   const [isSecteurOpen, setIsSecteurOpen] = useState(false)
   const [isPlanRetourOpen, setIsPlanRetourOpen] = useState(false)
@@ -321,6 +372,7 @@ export default function ProfilPage() {
 
   const isAlumni = user.role === 'alumni'
   const selectedDiplomeLabel = getDiplomeLabel(formData.diplome)
+  const selectedFormationDomaineLabel = getFormationDomaineLabel(formData.formation_domaine)
   const selectedStatutLabel = getStatutLibelle(formData.statut_professionnel_id || null)
   const selectedSecteurLabel = getSecteurLibelle(formData.secteur_id || null)
   const selectedPlanRetourLabel = (formData.plan_retour as string) || 'Non renseigné'
@@ -696,14 +748,47 @@ export default function ProfilPage() {
                             )}
                           </div>
                           <div>
-                            <Label htmlFor="formation_domaine" className="mb-0.5 block">Domaine de formation</Label>
-                            <Input
-                              id="formation_domaine"
-                              value={formData.formation_domaine || ''}
-                              onChange={(e) => setFormData({...formData, formation_domaine: e.target.value})}
-                              disabled={!isEditing}
-                              placeholder="Informatique, Droit, Médecine..."
-                            />
+                            <Label htmlFor="formation_domaine" className="mb-0.5 block">Discipline</Label>
+                            {isEditing ? (
+                              <Popover open={isFormationDomaineOpen} onOpenChange={setIsFormationDomaineOpen}>
+                                <PopoverTrigger asChild>
+                                  <button type="button" className="inline-flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm">
+                                    {selectedFormationDomaineLabel || "Sélectionner un domaine"}
+                                    <ChevronDown className="h-4 w-4 opacity-70" />
+                                  </button>
+                                </PopoverTrigger>
+                                <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] p-0">
+                                  <Command>
+                                    <CommandInput placeholder="Rechercher un domaine..." />
+                                    <CommandList className="max-h-56">
+                                      <CommandEmpty>Aucun domaine trouvé.</CommandEmpty>
+                                      <CommandGroup>
+                                        {FORMATION_DOMAINE_OPTIONS.map((option) => {
+                                          const isSelected =
+                                            formData.formation_domaine === option.value ||
+                                            formData.formation_domaine === option.label
+                                          return (
+                                            <CommandItem
+                                              key={option.value}
+                                              value={option.label}
+                                              onSelect={() => {
+                                                setFormData({ ...formData, formation_domaine: option.value })
+                                                setIsFormationDomaineOpen(false)
+                                              }}
+                                            >
+                                              <Check className={cn("h-4 w-4", isSelected ? "opacity-100" : "opacity-0")} />
+                                              {option.label}
+                                            </CommandItem>
+                                          )
+                                        })}
+                                      </CommandGroup>
+                                    </CommandList>
+                                  </Command>
+                                </PopoverContent>
+                              </Popover>
+                            ) : (
+                              <Input value={selectedFormationDomaineLabel} disabled />
+                            )}
                           </div>
                         </div>
                       </div>

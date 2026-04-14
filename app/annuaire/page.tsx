@@ -10,7 +10,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { supabase } from "@/lib/supabase"
-import { alumniMembers } from "@/lib/fake-data"
 import { Search, GraduationCap, Briefcase, MapPin, Mail, Users, Loader2, ChevronDown, Check } from "lucide-react"
 import type { AlumniProfile } from "@/types/database.types"
 import { cn } from "@/lib/utils"
@@ -206,41 +205,11 @@ export default function AnnuairePage() {
     return filteredAlumni.slice(start, start + PAGE_SIZE)
   }, [filteredAlumni, isAuthenticated, currentPage])
 
-  // Base historique (comme avant) - utilisée en fallback si les stats DB ne sont pas disponibles
-  const staticStats = useMemo(() => {
-    const totalAlumni = alumniMembers.length
-    const sectorCount: Record<string, number> = {}
-    alumniMembers.forEach((member) => {
-      sectorCount[member.sector] = (sectorCount[member.sector] || 0) + 1
-    })
-    const sectorData = Object.entries(sectorCount)
-      .map(([name, value]) => ({ name, value }))
-      .sort((a, b) => b.value - a.value)
-      .slice(0, 5)
-    const statusData = [
-      { name: "Employé", value: Math.floor(totalAlumni * 0.65) },
-      { name: "Étudiant", value: Math.floor(totalAlumni * 0.20) },
-      { name: "Entrepreneur", value: Math.floor(totalAlumni * 0.10) },
-      { name: "Sans emploi", value: Math.floor(totalAlumni * 0.05) },
-    ]
-    return {
-      totalAlumni,
-      sectorData,
-      statusData,
-    }
-  }, [])
-
-  const effectiveStats = useMemo(() => ({
-    totalAlumni: stats.totalAlumni > 0 ? stats.totalAlumni : staticStats.totalAlumni,
-    sectorData: stats.sectorData.length > 0 ? stats.sectorData : staticStats.sectorData,
-    statusData: stats.statusData.length > 0 ? stats.statusData : staticStats.statusData,
-  }), [stats, staticStats])
-
   const communityStats = useMemo(() => {
-    const total = effectiveStats.totalAlumni || 1
+    const total = stats.totalAlumni || 1
     const norm = (s: string) => s.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "")
     const statusPct = (keyword: string) => {
-      const found = effectiveStats.statusData.find(d => norm(d.name).includes(keyword))
+      const found = stats.statusData.find(d => norm(d.name).includes(keyword))
       return found ? Math.round((found.value / total) * 100) : 0
     }
     return {
@@ -249,10 +218,10 @@ export default function AnnuairePage() {
       recherchePct: statusPct("recherche"),
       dejaEnGuineeRatio: Math.min(10, Math.round((stats.dejaEnGuineeCount / total) * 10)),
     }
-  }, [effectiveStats, stats.dejaEnGuineeCount])
+  }, [stats])
 
   const sectorCloudWords = useMemo(() => {
-    const items = effectiveStats.sectorData
+    const items = stats.sectorData
       .filter((item) => item.name.toLowerCase() !== "non renseigné")
       .slice(0, 5)
     if (items.length === 0) return []
@@ -278,7 +247,7 @@ export default function AnnuairePage() {
       top: slots[index].top,
       left: slots[index].left,
     }))
-  }, [effectiveStats.sectorData])
+  }, [stats.sectorData])
 
   return (
     <div className="min-h-screen">
@@ -634,7 +603,7 @@ export default function AnnuairePage() {
             <div className="order-first lg:order-2 flex items-center justify-center pt-2">
               <div className="w-52 h-52 sm:w-60 sm:h-60 rounded-full bg-[#8ba4c9] flex flex-col items-center justify-center shadow-md">
                 <span className="text-[3.8rem] sm:text-[4.4rem] font-extrabold text-white leading-none drop-shadow-[0_6px_14px_rgba(0,0,0,0.55)]">
-                  {effectiveStats.totalAlumni.toLocaleString("fr-FR")}
+                  {stats.totalAlumni.toLocaleString("fr-FR")}
                 </span>
                 <span className="text-white font-semibold text-xl mt-1">Alumni</span>
               </div>
@@ -681,7 +650,7 @@ export default function AnnuairePage() {
                   ))}
                 </div>
                 <p className="font-bold text-[#ffffff] text-lg leading-snug">
-                  {stats.dejaEnGuineeCount.toLocaleString("fr-FR")}/{effectiveStats.totalAlumni.toLocaleString("fr-FR")} Alumni
+                  {stats.dejaEnGuineeCount.toLocaleString("fr-FR")}/{stats.totalAlumni.toLocaleString("fr-FR")} Alumni
                   <br />
                   <span className="text-[#ffffff]">déjà de retour en Guinée</span>
                 </p>
@@ -706,16 +675,18 @@ export default function AnnuairePage() {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <section className="py-16">
+        <div className="max-w-2xl mx-auto px-4 text-center">
           <Button
-            size="lg"
-            className="h-14 rounded-full bg-[#ea292c] px-10 text-lg font-semibold hover:bg-[#f48988]/90"
-            asChild
-          >
-            <Link href="/inscription">rejoignez l&apos;annuaire</Link>
+              size="lg"
+              className="h-14 rounded-full bg-[#ea292c] px-10 text-lg font-semibold hover:bg-[#f48988]/90"
+              asChild
+            >
+              <Link href="/inscription">rejoignez l&apos;annuaire</Link>
           </Button>
+          <p className="text-base text-muted-foreground mt-8">
+          Vous êtes alumni ? Accédez à l’annuaire pour rester en lien avec la communauté et prolonger les échanges.
+          </p>
         </div>
       </section>
     </div>
