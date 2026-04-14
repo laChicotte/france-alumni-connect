@@ -37,7 +37,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Search, MoreHorizontal, Eye, EyeOff, Loader2, Download } from "lucide-react"
+import { Search, MoreHorizontal, Eye, EyeOff, Loader2, Download, User, Phone, MapPin, GraduationCap, Briefcase, FileText, Calendar, Globe, ExternalLink } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import type { AlumniProfile, Secteur } from "@/types/database.types"
 import { downloadCsv } from "@/lib/export/csv"
@@ -45,6 +45,17 @@ import { downloadCsv } from "@/lib/export/csv"
 interface AlumniWithSecteur extends AlumniProfile {
   secteurs?: { libelle: string } | null
   users?: { email: string } | null
+  statuts_professionnels?: { libelle: string } | null
+}
+
+const DIPLOME_LABELS: Record<string, string> = {
+  bts: 'BTS', dut: 'DUT', du: 'DU', de: 'DE', deug: 'DEUG',
+  prepa: 'Classe Prépa', ecole_ingenieur: "École d'ingénieur",
+  ecole_specialisee: 'École spécialisée', licence_pro: 'Licence professionnelle',
+  licence: 'Licence', master1: 'Master 1', master2: 'Master 2',
+  maitrise: 'Maîtrise', master: 'Master', doctorat: 'Doctorat',
+  post_doctorat: 'Post Doctorat', mba: 'MBA', ingenieur: 'Ingénieur',
+  professorat: 'Professorat', autre: 'Autre',
 }
 
 export default function AlumniPage() {
@@ -69,7 +80,7 @@ export default function AlumniPage() {
     setIsLoading(true)
     const { data, error } = await supabase
       .from('alumni_profiles')
-      .select('*, secteurs(libelle), users(email)')
+      .select('*, secteurs(libelle), users(email), statuts_professionnels(libelle)')
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -276,6 +287,16 @@ export default function AlumniPage() {
                           <DropdownMenuContent align="end">
                             <DropdownMenuLabel>Actions</DropdownMenuLabel>
                             <DropdownMenuSeparator />
+                            <DropdownMenuItem
+                              onClick={() => {
+                                setSelectedAlumni(profile)
+                                setDialogAction('view')
+                              }}
+                            >
+                              <User className="mr-2 h-4 w-4" />
+                              Voir le profil
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator />
                             {profile.visible_annuaire ? (
                               <DropdownMenuItem
                                 onClick={() => {
@@ -308,6 +329,160 @@ export default function AlumniPage() {
           )}
         </CardContent>
       </Card>
+
+      {/* Dialog Voir profil */}
+      <Dialog open={dialogAction === 'view'} onOpenChange={() => { setDialogAction(null); setSelectedAlumni(null) }}>
+        <DialogContent className="max-w-3xl max-h-[70vh] overflow-y-auto mt-[5vh]">
+          <DialogHeader>
+            <DialogTitle>Profil complet</DialogTitle>
+          </DialogHeader>
+          {selectedAlumni && (
+            <div className="space-y-6 py-2">
+              {/* En-tête photo + nom */}
+              <div className="flex items-center gap-4">
+                {selectedAlumni.photo_url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={selectedAlumni.photo_url}
+                    alt={`${selectedAlumni.prenom} ${selectedAlumni.nom}`}
+                    className="w-16 h-16 rounded-full object-cover border"
+                  />
+                ) : (
+                  <div className="w-16 h-16 rounded-full bg-gray-200 flex items-center justify-center">
+                    <User className="h-8 w-8 text-gray-400" />
+                  </div>
+                )}
+                <div>
+                  <p className="text-xl font-bold">{selectedAlumni.prenom} {selectedAlumni.nom}</p>
+                  <p className="text-sm text-gray-500">{selectedAlumni.users?.email || '-'}</p>
+                  <div className="flex gap-2 mt-1">
+                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${selectedAlumni.visible_annuaire ? 'bg-green-100 text-green-700' : 'bg-gray-100 text-gray-600'}`}>
+                      {selectedAlumni.visible_annuaire ? 'Visible annuaire' : 'Masqué annuaire'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Informations personnelles */}
+              <div>
+                <h3 className="text-xs font-semibold uppercase tracking-wide text-[#3558A2] border-b border-[#3558A2]/20 pb-1 mb-3">Informations personnelles</h3>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div className="flex items-start gap-2">
+                    <User className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />
+                    <div><p className="text-xs text-gray-400">Genre</p><p>{selectedAlumni.genre || '-'}</p></div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Globe className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />
+                    <div><p className="text-xs text-gray-400">Nationalité</p><p>{selectedAlumni.nationalite || '-'}</p></div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Phone className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />
+                    <div><p className="text-xs text-gray-400">Téléphone</p><p>{selectedAlumni.telephone || '-'}</p></div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <MapPin className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />
+                    <div><p className="text-xs text-gray-400">Ville</p><p>{selectedAlumni.ville || '-'}</p></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Formation */}
+              <div>
+                <h3 className="text-xs font-semibold uppercase tracking-wide text-[#3558A2] border-b border-[#3558A2]/20 pb-1 mb-3">Formation</h3>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div className="flex items-start gap-2">
+                    <GraduationCap className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />
+                    <div><p className="text-xs text-gray-400">Université</p><p>{selectedAlumni.universite || '-'}</p></div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Calendar className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />
+                    <div><p className="text-xs text-gray-400">Promotion</p><p>{selectedAlumni.annee_promotion || '-'}</p></div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <GraduationCap className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />
+                    <div><p className="text-xs text-gray-400">Diplôme</p><p>{DIPLOME_LABELS[selectedAlumni.diplome] || selectedAlumni.diplome || '-'}</p></div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <GraduationCap className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />
+                    <div><p className="text-xs text-gray-400">Domaine</p><p>{selectedAlumni.formation_domaine || '-'}</p></div>
+                  </div>
+                  <div className="col-span-2 flex items-start gap-2">
+                    <GraduationCap className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />
+                    <div><p className="text-xs text-gray-400">Bourse</p><p>{selectedAlumni.bourse || 'Non renseigné'}</p></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Situation professionnelle */}
+              <div>
+                <h3 className="text-xs font-semibold uppercase tracking-wide text-[#3558A2] border-b border-[#3558A2]/20 pb-1 mb-3">Situation professionnelle</h3>
+                <div className="grid grid-cols-2 gap-3 text-sm">
+                  <div className="flex items-start gap-2">
+                    <Briefcase className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />
+                    <div><p className="text-xs text-gray-400">Statut</p><p>{selectedAlumni.statuts_professionnels?.libelle || '-'}</p></div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Briefcase className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />
+                    <div><p className="text-xs text-gray-400">Secteur</p><p>{selectedAlumni.secteurs?.libelle || '-'}</p></div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Briefcase className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />
+                    <div><p className="text-xs text-gray-400">Entreprise</p><p>{selectedAlumni.entreprise || '-'}</p></div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <Briefcase className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />
+                    <div><p className="text-xs text-gray-400">Poste actuel</p><p>{selectedAlumni.poste_actuel || '-'}</p></div>
+                  </div>
+                  <div className="col-span-2 flex items-start gap-2">
+                    <MapPin className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />
+                    <div><p className="text-xs text-gray-400">Plan de retour</p><p>{selectedAlumni.plan_retour || '-'}</p></div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Biographie */}
+              {selectedAlumni.bio && (
+                <div>
+                  <h3 className="text-xs font-semibold uppercase tracking-wide text-[#3558A2] border-b border-[#3558A2]/20 pb-1 mb-3">Biographie</h3>
+                  <p className="text-sm text-gray-700 whitespace-pre-wrap">{selectedAlumni.bio}</p>
+                </div>
+              )}
+
+              {/* Liens */}
+              <div className="flex flex-wrap gap-3">
+                {selectedAlumni.linkedin_url && (
+                  <a
+                    href={selectedAlumni.linkedin_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 text-sm text-[#3558A2] hover:underline"
+                  >
+                    <ExternalLink className="h-4 w-4" /> LinkedIn
+                  </a>
+                )}
+                {selectedAlumni.document_diplome_url && (
+                  <a
+                    href={selectedAlumni.document_diplome_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1.5 text-sm text-[#3558A2] hover:underline"
+                  >
+                    <FileText className="h-4 w-4" /> Voir le diplôme
+                  </a>
+                )}
+              </div>
+
+              {/* Date d'inscription */}
+              <p className="text-xs text-gray-400">
+                Inscrit le {new Date(selectedAlumni.created_at).toLocaleDateString('fr-FR', { day: '2-digit', month: 'long', year: 'numeric' })}
+              </p>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => { setDialogAction(null); setSelectedAlumni(null) }}>Fermer</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Dialog Hide */}
       <Dialog open={dialogAction === 'hide'} onOpenChange={() => setDialogAction(null)}>
