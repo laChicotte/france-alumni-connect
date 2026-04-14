@@ -174,11 +174,11 @@ export default function HomePage() {
                 soutient les initiatives collectives et met en lumière les parcours de ses alumni.
                 <br />
                 <br />
-                Plus qu&apos;un simple réseau, France Alumni Guinée constitue un véritable espace d'échangeset d'opportunités : 
+                Plus qu&apos;un simple réseau, France Alumni Guinée constitue un véritable espace d'échanges et d'opportunités : 
                 un trait d&apos;union vivant entre la Guinée et la France, au service de la coopération, de l&apos;innovation
                 et de la mobilité.
               </p>
-              <div className="mt-5 flex justify-end">
+              <div className="mt-10 flex justify-end">
                 <a
                   href="https://drive.google.com/file/d/1v4PrnKUW_eTmPXP5X03zGinuCYAWjz6I/view?usp=sharing"
                   target="_blank"
@@ -202,35 +202,36 @@ export default function HomePage() {
           </h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 lg:gap-28 gap-10">
             <div>
-              <h3 className="font-serif text-xl sm:text-2xl font-bold text-white mb-3">représentation et <br />influence</h3>
+              <h3 className="font-serif text-xl sm:text-2xl font-bold text-white mb-3">valoriser</h3>
               <p
                 lang="fr"
                 className="text-white sm:text-lg leading-relaxed max-w-md"
               >
-                Fédérer la communauté autour d&apos;une voix structurée, capable de dialoguer avec les entreprises et institutions. L&apos;objectif : créer des passerelles concrètes vers l&apos;emploi, les partenariats et les opportunités économiques.
+                Mettre en lumière les talents et réussites guinéennes, renforcer la visibilité du réseau et porter une voix structurée 
+                capable d&apos;influencer entreprises et institutions.
               </p>
             </div>
             <div>
-              <h3 className="font-serif text-xl sm:text-2xl font-bold text-white mb-3">développement <br />local</h3>
+              <h3 className="font-serif text-xl sm:text-2xl font-bold text-white mb-3">connecter</h3>
               <p
                 lang="fr"
                 className="text-white sm:text-lg leading-relaxed max-w-md"
               >
-                Mobiliser les compétences pour répondre à des besoins précis en Guinée : accompagnement d&apos;entrepreneurs, interventions d&apos;experts, programmes de formation et appui à des projets à fort impact.
-              </p>
+                  Mobiliser les compétences pour répondre à des besoins précis en Guinée : accompagnement d&apos;entrepreneurs, interventions 
+                  d&apos;experts, programmes de formation et appui à des projets à fort impact.
+                </p>
             </div>
             <div>
               <h3 className="font-serif text-xl sm:text-2xl font-bold text-white mb-3">
-                solidarité et <br />soutien
+                impacter
               </h3>
 
               <p
                 lang="fr"
                 className="text-white sm:text-lg leading-relaxed max-w-md"
               >
-                Structurer un réseau d&apos;entraide efficace basé sur le mentorat, le partage
-                d&apos;expériences et l&apos;accès à des ressources utiles, afin d&apos;accompagner les
-                parcours professionnels et encourager l&apos;engagement collectif.
+                Mobiliser les compétences pour agir concrètement sur le développement local : accompagner les entrepreneurs, 
+                soutenir des projets à fort impact et répondre aux besoins du terrain.
               </p>
             </div>
             <div>
