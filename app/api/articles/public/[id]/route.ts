@@ -24,7 +24,7 @@ export async function GET(
     const { data: articleRaw, error } = await supabase
       .from("articles")
       .select(`
-        id, titre, extrait, contenu, image_couverture_url, date_publication, created_at,
+        id, titre, extrait, contenu, image_couverture_url, date_publication, created_at, auteur_nom,
         users(nom, prenom),
         article_media(id, media_type, media_url, ordre)
       `)
@@ -44,7 +44,11 @@ export async function GET(
         date_publication: raw.date_publication,
         created_at: raw.created_at,
       }
-      const author = raw.users ? { nom: raw.users.nom, prenom: raw.users.prenom } : null
+      const author = {
+        nom: raw.users?.nom ?? null,
+        prenom: raw.users?.prenom ?? null,
+        auteur_nom: raw.auteur_nom ?? null,
+      }
       const media = Array.isArray(raw.article_media)
         ? [...raw.article_media].sort((a: { ordre: number }, b: { ordre: number }) => a.ordre - b.ordre)
         : []

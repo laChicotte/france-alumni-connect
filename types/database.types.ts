@@ -158,6 +158,7 @@ export interface Database {
           image_couverture_url: string
           categorie_id: string | null
           auteur_id: string | null
+          auteur_nom: string | null
           status: ArticleStatus
           date_publication: string | null
           vues: number
@@ -174,6 +175,7 @@ export interface Database {
           image_couverture_url: string
           categorie_id?: string | null
           auteur_id?: string | null
+          auteur_nom?: string | null
           status?: ArticleStatus
           date_publication?: string | null
           vues?: number
@@ -189,6 +191,7 @@ export interface Database {
           image_couverture_url?: string
           categorie_id?: string | null
           auteur_id?: string | null
+          auteur_nom?: string | null
           status?: ArticleStatus
           date_publication?: string | null
           vues?: number

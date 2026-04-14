@@ -56,6 +56,7 @@ export function ArticleEditorScreen({ articleId }: ArticleEditorScreenProps) {
     contenu: "<p></p>",
     image_couverture_url: "",
     categorie_id: "",
+    auteur_nom: "",
     status: "brouillon" as "brouillon" | "publie",
   })
 
@@ -94,6 +95,7 @@ export function ArticleEditorScreen({ articleId }: ArticleEditorScreenProps) {
         contenu: article.contenu || "<p></p>",
         image_couverture_url: article.image_couverture_url || "",
         categorie_id: article.categorie_id || "",
+        auteur_nom: article.auteur_nom || "",
         status: article.status,
       })
       setCoverPreviewUrl(article.image_couverture_url || null)
@@ -236,6 +238,7 @@ export function ArticleEditorScreen({ articleId }: ArticleEditorScreenProps) {
         contenu: formData.contenu,
         image_couverture_url: coverUrl,
         categorie_id: formData.categorie_id || null,
+        auteur_nom: formData.auteur_nom.trim() || null,
         status: finalStatus,
       }
 
@@ -455,7 +458,7 @@ export function ArticleEditorScreen({ articleId }: ArticleEditorScreenProps) {
                   <div className="mb-5 flex flex-wrap items-center justify-center gap-4 text-sm text-gray-600">
                     <span className="inline-flex items-center gap-1">
                       <UserCircle2 className="h-4 w-4 text-[#3558A2]" />
-                      {authorLabel}
+                      {formData.auteur_nom.trim() || authorLabel}
                     </span>
                     <span className="inline-flex items-center gap-1">
                       <CalendarDays className="h-4 w-4 text-[#3558A2]" />
@@ -531,6 +534,14 @@ export function ArticleEditorScreen({ articleId }: ArticleEditorScreenProps) {
                     <SelectItem value="publie">Publié</SelectItem>
                   </SelectContent>
                 </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Auteur affiché <span className="text-muted-foreground font-normal">(optionnel)</span></Label>
+                <Input
+                  placeholder={authorLabel}
+                  value={formData.auteur_nom}
+                  onChange={(e) => setFormData((prev) => ({ ...prev, auteur_nom: e.target.value }))}
+                />
               </div>
             </div>
             <div className="mt-4 flex flex-wrap gap-2">

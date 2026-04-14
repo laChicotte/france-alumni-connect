@@ -30,7 +30,7 @@ export async function GET() {
     const { data: articles, error: articlesError } = await supabase
       .from("articles")
       .select(`
-        id, titre, image_couverture_url, created_at, date_publication, epingle,
+        id, titre, image_couverture_url, created_at, date_publication, auteur_nom, epingle,
         categories_articles(id, libelle),
         users(id, nom, prenom)
       `)
@@ -58,9 +58,10 @@ export async function GET() {
       id: article.id,
       title: article.titre,
       image: article.image_couverture_url || "/placeholder.svg",
-      author: article.users
-        ? `${article.users.prenom || ""} ${article.users.nom || ""}`.trim() || "France Alumni"
-        : "France Alumni",
+      author: article.auteur_nom?.trim() ||
+        (article.users
+          ? `${article.users.prenom || ""} ${article.users.nom || ""}`.trim() || "France Alumni"
+          : "France Alumni"),
       category: article.categories_articles?.libelle || "Actualités",
       created_at: article.date_publication || article.created_at,
       href: `/actualites/${article.id}`,

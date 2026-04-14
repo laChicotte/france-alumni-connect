@@ -73,6 +73,7 @@ export default function ArticlePage() {
           content: apiArticle.contenu || "",
           image: apiArticle.image_couverture_url || "/placeholder.svg",
           author:
+            data?.author?.auteur_nom?.trim() ||
             `${data?.author?.prenom || ""} ${data?.author?.nom || ""}`.trim() ||
             "France Alumni",
           date: new Date(apiArticle.date_publication || apiArticle.created_at).toLocaleDateString(
