@@ -30,7 +30,7 @@ export async function GET() {
     const { data: articles, error: articlesError } = await supabase
       .from("articles")
       .select(`
-        id, titre, image_couverture_url, created_at, epingle,
+        id, titre, image_couverture_url, created_at, date_publication, epingle,
         categories_articles(id, libelle),
         users(id, nom, prenom)
       `)
@@ -45,7 +45,7 @@ export async function GET() {
 
     const { data: events, error: eventsError } = await supabase
       .from("evenements")
-      .select("id, titre, image_url, created_at")
+      .select("id, titre, image_url, date, created_at")
       .order("created_at", { ascending: false })
       .limit(100)
 
@@ -62,7 +62,7 @@ export async function GET() {
         ? `${article.users.prenom || ""} ${article.users.nom || ""}`.trim() || "France Alumni"
         : "France Alumni",
       category: article.categories_articles?.libelle || "Actualités",
-      created_at: article.created_at,
+      created_at: article.date_publication || article.created_at,
       href: `/actualites/${article.id}`,
       epingle: article.epingle ?? false,
     }))
@@ -74,7 +74,7 @@ export async function GET() {
       image: event.image_url || "/placeholder.svg",
       author: "France Alumni",
       category: "Événements",
-      created_at: event.created_at,
+      created_at: event.date || event.created_at,
       href: `/actualites/${event.id}`,
     }))
 
