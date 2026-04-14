@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseAdmin } from '@/lib/supabase-admin'
-import type { Database, DiplomeType, GenreType, NationaliteType, PlanRetourType } from '@/types/database.types'
+import type { Database, DiplomeType, GenreType, NationaliteType, PlanRetourType, BourseType } from '@/types/database.types'
 import { parsePhoneNumberFromString } from 'libphonenumber-js'
 
 // Rate limiting : max 5 tentatives par IP par fenêtre de 60s
@@ -27,6 +27,7 @@ const ALLOWED_PHOTO_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp
 const ALLOWED_GENRES: GenreType[] = ['Homme', 'Femme', 'Autre']
 const ALLOWED_NATIONALITES: NationaliteType[] = ['Guinéenne', 'Franco-Guinéenne', 'Guinéenne-Autre']
 const ALLOWED_PLAN_RETOUR: PlanRetourType[] = ['Dans 2 ans', 'Dans 5 ans', 'Déjà en Guinée', 'Autre']
+const ALLOWED_BOURSES: BourseType[] = ['Non boursier', 'Boursier Etat français', 'Boursier Etat guinéen', 'Boursier Etats français et guinéen']
 const ALLOWED_DIPLOMES: DiplomeType[] = [
   'bts',
   'dut',
@@ -77,6 +78,7 @@ export async function POST(request: NextRequest) {
     const linkedinUrlRaw = formData.get('linkedin_url') as string | null
     const linkedinUrl = linkedinUrlRaw?.trim() || null
     const planRetour = formData.get('plan_retour') as string
+    const bourse = formData.get('bourse') as string
     const visibleAnnuaireRaw = formData.get('visible_annuaire') as string
     const diplomeFile = formData.get('diplome_file') as File | null
     const photoFile = formData.get('photo') as File | null
@@ -99,6 +101,7 @@ export async function POST(request: NextRequest) {
       !entreprise ||
       !posteActuel ||
       !planRetour ||
+      !bourse ||
       !diplomeFile?.size ||
       !photoFile?.size
     ) {
@@ -124,6 +127,10 @@ export async function POST(request: NextRequest) {
 
     if (!ALLOWED_PLAN_RETOUR.includes(planRetour as PlanRetourType)) {
       return NextResponse.json({ error: 'Plan de retour invalide.' }, { status: 400 })
+    }
+
+    if (!ALLOWED_BOURSES.includes(bourse as BourseType)) {
+      return NextResponse.json({ error: 'Type de bourse invalide.' }, { status: 400 })
     }
 
     if (!ALLOWED_DIPLOMES.includes(diplome as DiplomeType)) {
@@ -330,6 +337,7 @@ export async function POST(request: NextRequest) {
       document_diplome_url: diplomeUrl,
       photo_url: photoUrl,
       plan_retour: planRetour,
+      bourse: bourse as BourseType,
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

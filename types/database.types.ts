@@ -23,6 +23,7 @@ export type DiplomeType =
   | 'professorat'
   | 'autre'
 export type GenreType = 'Homme' | 'Femme' | 'Autre'
+export type BourseType = 'Non boursier' | 'Boursier Etat français' | 'Boursier Etat guinéen' | 'Boursier Etats français et guinéen'
 export type NationaliteType = 'Guinéenne' | 'Franco-Guinéenne' | 'Guinéenne-Autre'
 export type PlanRetourType = 'Dans 2 ans' | 'Dans 5 ans' | 'Déjà en Guinée' | 'Autre'
 export type ArticleStatus = 'brouillon' | 'publie'
@@ -90,6 +91,7 @@ export interface Database {
           visible_annuaire: boolean
           document_diplome_url: string | null
           plan_retour: string | null
+          bourse: BourseType | null
           created_at: string
           updated_at: string
         }
@@ -116,6 +118,7 @@ export interface Database {
           visible_annuaire?: boolean
           document_diplome_url?: string | null
           plan_retour?: string | null
+          bourse?: BourseType | null
           created_at?: string
           updated_at?: string
         }
@@ -141,6 +144,7 @@ export interface Database {
           visible_annuaire?: boolean
           document_diplome_url?: string | null
           plan_retour?: string | null
+          bourse?: BourseType | null
           updated_at?: string
         }
       }

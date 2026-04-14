@@ -15,7 +15,7 @@ import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { User, Mail, Phone, MapPin, Building, GraduationCap, Edit2, Save, X, Loader2, Linkedin, CheckCircle, AlertCircle, FileText, Eye, EyeOff, Lock, ChevronDown, Check } from "lucide-react"
 import { supabase } from "@/lib/supabase"
-import { AlumniProfile, Secteur, StatutProfessionnel, DiplomeType, GenreType, NationaliteType, PlanRetourType } from "@/types/database.types"
+import { AlumniProfile, Secteur, StatutProfessionnel, DiplomeType, GenreType, NationaliteType, PlanRetourType, BourseType } from "@/types/database.types"
 import { cn } from "@/lib/utils"
 
 
@@ -69,6 +69,7 @@ const FORMATION_DOMAINE_OPTIONS = [
   { value: '23', label: 'Autre' },
 ]
 const PLAN_RETOUR_OPTIONS: PlanRetourType[] = ['Dans 2 ans', 'Dans 5 ans', 'Déjà en Guinée', 'Autre']
+const BOURSE_OPTIONS: BourseType[] = ['Non boursier', 'Boursier Etat français', 'Boursier Etat guinéen', 'Boursier Etats français et guinéen']
 const NATIONALITE_OPTIONS: NationaliteType[] = ['Guinéenne', 'Franco-Guinéenne', 'Guinéenne-Autre']
 
 function extractAlumniPhotoPath(photoUrl: string | null | undefined): string | null {
@@ -107,6 +108,7 @@ export default function ProfilPage() {
   const [isSecteurOpen, setIsSecteurOpen] = useState(false)
   const [isPlanRetourOpen, setIsPlanRetourOpen] = useState(false)
   const [isNationaliteOpen, setIsNationaliteOpen] = useState(false)
+  const [isBourseOpen, setIsBourseOpen] = useState(false)
 
   // Options pour les selects
   const [secteurs, setSecteurs] = useState<Secteur[]>([])
@@ -265,6 +267,7 @@ export default function ProfilPage() {
           linkedin_url: formData.linkedin_url || null,
           nationalite: formData.nationalite || 'Guinéenne',
           plan_retour: (formData.plan_retour as string) || null,
+          bourse: (formData.bourse as BourseType) || null,
           updated_at: new Date().toISOString(),
         })
         .eq('user_id', user.id)
@@ -707,6 +710,52 @@ export default function ProfilPage() {
                               max={new Date().getFullYear()}
                             />
                           </div>
+                        </div>
+                        <div>
+                          <Label className="mb-0.5 block">Type de bourse</Label>
+                          {isEditing ? (
+                            <Popover open={isBourseOpen} onOpenChange={setIsBourseOpen}>
+                              <PopoverTrigger asChild>
+                                <button type="button" className="inline-flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 text-sm">
+                                  {(formData.bourse as string) || 'Non renseigné'}
+                                  <ChevronDown className="h-4 w-4 opacity-70" />
+                                </button>
+                              </PopoverTrigger>
+                              <PopoverContent align="start" className="w-[var(--radix-popover-trigger-width)] p-0">
+                                <Command>
+                                  <CommandList className="max-h-48">
+                                    <CommandGroup>
+                                      <CommandItem
+                                        value="Non renseigné"
+                                        onSelect={() => {
+                                          setFormData({ ...formData, bourse: null })
+                                          setIsBourseOpen(false)
+                                        }}
+                                      >
+                                        <Check className={cn("h-4 w-4", !formData.bourse ? "opacity-100" : "opacity-0")} />
+                                        Non renseigné
+                                      </CommandItem>
+                                      {BOURSE_OPTIONS.map((option) => (
+                                        <CommandItem
+                                          key={option}
+                                          value={option}
+                                          onSelect={() => {
+                                            setFormData({ ...formData, bourse: option })
+                                            setIsBourseOpen(false)
+                                          }}
+                                        >
+                                          <Check className={cn("h-4 w-4", formData.bourse === option ? "opacity-100" : "opacity-0")} />
+                                          {option}
+                                        </CommandItem>
+                                      ))}
+                                    </CommandGroup>
+                                  </CommandList>
+                                </Command>
+                              </PopoverContent>
+                            </Popover>
+                          ) : (
+                            <Input value={(formData.bourse as string) || 'Non renseigné'} disabled />
+                          )}
                         </div>
                         <div className="grid md:grid-cols-2 gap-4">
                           <div>

@@ -13,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { AlertCircle, Loader2, CheckCircle, ChevronDown, Check } from "lucide-react"
-import type { DiplomeType, GenreType, NationaliteType, PlanRetourType } from "@/types/database.types"
+import type { DiplomeType, GenreType, NationaliteType, PlanRetourType, BourseType } from "@/types/database.types"
 import { cn } from "@/lib/utils"
 import { getCountries, getCountryCallingCode, type CountryCode } from "libphonenumber-js"
 
@@ -111,6 +111,7 @@ export default function InscriptionPage() {
     bio: "",
     linkedin_url: "",
     plan_retour: "",
+    bourse: "",
     visible_annuaire: true,
     terms: false,
   })
@@ -119,6 +120,7 @@ export default function InscriptionPage() {
   const genreOptions: GenreType[] = ["Homme", "Femme", "Autre"]
   const nationaliteOptions: NationaliteType[] = ["Guinéenne", "Franco-Guinéenne", "Guinéenne-Autre"]
   const planRetourOptions: PlanRetourType[] = ["Dans 2 ans", "Dans 5 ans", "Déjà en Guinée", "Autre"]
+  const bourseOptions: BourseType[] = ["Non boursier", "Boursier Etat français", "Boursier Etat guinéen", "Boursier Etats français et guinéen"]
   const genreSelectOptions: UiOption[] = genreOptions.map((item) => ({ value: item, label: item }))
   const nationaliteSelectOptions: UiOption[] = nationaliteOptions.map((item) => ({ value: item, label: item }))
   const diplomeSelectOptions: UiOption[] = DIPLOME_OPTIONS.map((item) => ({ value: item.value, label: item.label }))
@@ -126,6 +128,7 @@ export default function InscriptionPage() {
   const statutSelectOptions: UiOption[] = statuts.map((item) => ({ value: item.id, label: item.libelle }))
   const secteurSelectOptions: UiOption[] = secteurs.map((item) => ({ value: item.id, label: item.libelle }))
   const planRetourSelectOptions: UiOption[] = planRetourOptions.map((item) => ({ value: item, label: item }))
+  const bourseSelectOptions: UiOption[] = bourseOptions.map((item) => ({ value: item, label: item }))
   const telephoneCountrySelectOptions: UiOption[] = useMemo(() => {
     const displayNames =
       typeof Intl !== "undefined" && typeof Intl.DisplayNames !== "undefined"
@@ -291,6 +294,7 @@ export default function InscriptionPage() {
       "entreprise",
       "poste_actuel",
       "plan_retour",
+      "bourse",
     ]
     const hasMissingRequired = requiredTextFields.some((key) => {
       const value = formData[key]
@@ -351,6 +355,7 @@ export default function InscriptionPage() {
       body.append('bio', formData.bio)
       body.append('linkedin_url', formData.linkedin_url)
       body.append('plan_retour', formData.plan_retour)
+      body.append('bourse', formData.bourse)
       body.append('visible_annuaire', String(formData.visible_annuaire))
       body.append('diplome_file', diplomeFile)
       body.append('photo', photoFile)
@@ -505,11 +510,11 @@ export default function InscriptionPage() {
                   <Input id="universite" placeholder="Ex: Université Paris-Saclay" value={formData.universite} onChange={handleInputChange} required />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="annee_promotion">Année de promotion <span className="text-red-500">*</span></Label>
+                  <Label htmlFor="annee_promotion">Année d'obtention du diplôme <span className="text-red-500">*</span></Label>
                   <Input id="annee_promotion" type="number" min="1950" max={new Date().getFullYear()} value={formData.annee_promotion} onChange={handleInputChange} required />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="diplome">Niveau de diplôme <span className="text-red-500">*</span></Label>
+                  <Label htmlFor="diplome">Niveau d'études <span className="text-red-500">*</span></Label>
                   {renderSearchableSelect({
                     id: "diplome",
                     value: formData.diplome,
@@ -521,7 +526,7 @@ export default function InscriptionPage() {
                   })}
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="formation_domaine">Domaine de formation <span className="text-red-500">*</span></Label>
+                  <Label htmlFor="formation_domaine">Discipline <span className="text-red-500">*</span></Label>
                   {renderSearchableSelect({
                     id: "formation_domaine",
                     value: formData.formation_domaine,
@@ -530,6 +535,18 @@ export default function InscriptionPage() {
                     placeholder: "Sélectionner",
                     searchPlaceholder: "Rechercher un domaine...",
                     emptyLabel: "Aucun domaine trouvé.",
+                  })}
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="bourse">Bourse <span className="text-red-500">*</span></Label>
+                  {renderSearchableSelect({
+                    id: "bourse",
+                    value: formData.bourse,
+                    options: bourseSelectOptions,
+                    onSelect: (newValue) => setFormData((prev) => ({ ...prev, bourse: newValue })),
+                    placeholder: "Sélectionner",
+                    searchPlaceholder: "Rechercher...",
+                    emptyLabel: "Aucune option trouvée.",
                   })}
                 </div>
               </div>
@@ -587,7 +604,7 @@ export default function InscriptionPage() {
                   />
                 </div>
                 <div className="space-y-2 md:col-span-2">
-                  <Label htmlFor="plan_retour">Plan de retour <span className="text-red-500">*</span></Label>
+                  <Label htmlFor="plan_retour">Plan de retour au pays<span className="text-red-500">*</span></Label>
                   {renderSearchableSelect({
                     id: "plan_retour",
                     value: formData.plan_retour,
