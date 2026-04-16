@@ -85,39 +85,6 @@ function extractAlumniPhotoPath(photoUrl: string | null | undefined): string | n
 
 function getFormationDomaineLabel(value: string | null | undefined): string {
   if (!value) return ''
-  const legacyMap: Record<string, string> = {
-    '24': 'Administration',
-    '19': 'Agriculture - agroalimentaire',
-    '11': 'Architecture, urbanisme et aménagement du territoire',
-    '6': 'Arts, culture, design et mode',
-    '25': 'Banque/Economie/Gestion',
-    '7': 'Biologie',
-    '27': 'BTP/Géomètre Topo',
-    '17': 'Chimie',
-    '14': 'Communication et journalisme',
-    '15': 'Droit',
-    '3': 'Enseignement secondaire - Lycée Français',
-    '12': 'Environnement et sciences de la terre',
-    '29': 'Formation',
-    '28': 'Industrie',
-    '2': 'Informatique',
-    '5': 'Langues et lettres',
-    '1': 'Management, gestion, finances et commerce',
-    '20': 'Mathématiques',
-    '22': 'Physique',
-    '4': 'Santé et professions sociales',
-    '16': "Sciences de l'éducation",
-    '10': "Sciences de l'ingénieur",
-    '8': 'Sciences économiques et politiques',
-    '13': 'Sciences humaines et sociales',
-    '26': 'Social',
-    '18': 'Sports',
-    '30': 'Technique',
-    '9': 'Tourisme, hôtellerie et restauration',
-    '21': 'Transport et logistique',
-    '23': 'Autre',
-  }
-  if (legacyMap[value]) return legacyMap[value]
   return value
 }
 

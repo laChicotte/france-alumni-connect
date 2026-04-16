@@ -420,7 +420,7 @@ export default function AnnuairePage() {
                 {displayedAlumni.map((member) => (
                   <Card key={member.id} className="h-full hover:shadow-lg transition-shadow group">
                     <CardContent className="pt-6">
-                      <div className="flex flex-col items-center text-center mb-4">
+                      <div className="flex flex-col items-center text-center mb-2">
                         <div className="w-24 h-24 rounded-full overflow-hidden bg-muted mb-1">
                           <img
                             src={member.photo_url || "/placeholder.svg"}
@@ -436,11 +436,19 @@ export default function AnnuairePage() {
                         </p>
                       </div>
 
+                      <div className="space-y-2 mb-1 text-center">
+                        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                          <GraduationCap className="h-4 w-4 flex-shrink-0" />
+                          <span className="line-clamp-1">
+                            {member.formation_domaine}
+                          </span>
+                        </div>
+                      </div>
                       <div className="space-y-2 mb-4">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
                           <GraduationCap className="h-4 w-4 flex-shrink-0" />
                           <span className="line-clamp-1">
-                            {member.formation_domaine} - {member.universite} ({member.annee_promotion})
+                            {member.universite} ({member.annee_promotion})
                           </span>
                         </div>
                       </div>
@@ -482,7 +490,7 @@ export default function AnnuairePage() {
                                       <div className="flex items-center gap-2 text-sm">
                                         <GraduationCap className="h-4 w-4 text-[#3558A2]" />
                                         <span>
-                                          <strong>{member.formation_domaine}</strong> - {member.universite} (
+                                          <strong>{member.formation_domaine}</strong> <br></br>- {member.universite} (
                                           {member.annee_promotion})
                                         </span>
                                       </div>
