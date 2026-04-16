@@ -2,7 +2,7 @@
 
 import { Card, CardContent } from "@/components/ui/card"
 import { partners } from "@/lib/fake-data"
-import { Users, Briefcase, MapPin, Trophy, Network, Target } from "lucide-react"
+import { Users, Briefcase, MapPin, Trophy, Network, Target, Play } from "lucide-react"
 import { useEffect, useRef, useState } from "react"
 
 function useCountUp(target: number, duration = 1400) {
@@ -28,6 +28,8 @@ function useCountUp(target: number, duration = 1400) {
 
 export default function HomePage() {
   type PublicPartner = { name: string; logo: string; site_web?: string | null }
+  const presentationVideoId = "eMMfnuiGjCE"
+  const presentationThumbnail = "/accueil/miniature.jpeg"
   const quiSommesNousImages = [
     "/accueil/quisommesnous/a.jpg",
     "/accueil/quisommesnous/b.jpg",
@@ -41,6 +43,7 @@ export default function HomePage() {
   const [totalReturned, setTotalReturned] = useState(0)
   const [entrepreneurPercentage, setEntrepreneurPercentage] = useState(0)
   const [activeQuiSommesNousImageIndex, setActiveQuiSommesNousImageIndex] = useState(0)
+  const [isPresentationPlaying, setIsPresentationPlaying] = useState(false)
   const statsRef = useRef<HTMLElement | null>(null)
   const [statsVisible, setStatsVisible] = useState(false)
 
@@ -252,7 +255,39 @@ export default function HomePage() {
           <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-[#3558A2] text-center mb-8">
               le réseau en bref
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="stat-card-video relative min-h-[220px] overflow-hidden rounded-2xl p-[18px] text-white sm:min-h-[250px]">
+              {!isPresentationPlaying ? (
+                <button
+                  type="button"
+                  onClick={() => setIsPresentationPlaying(true)}
+                  className="group relative block w-full h-full overflow-hidden rounded-xl"
+                  aria-label="Lire la vidéo de présentation"
+                >
+                  <img
+                    src={presentationThumbnail}
+                    alt="Miniature de la vidéo de présentation"
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-black/35 transition-colors group-hover:bg-black/45" />
+                  <span className="absolute inset-0 flex items-center justify-center">
+                    <span className="inline-flex items-center gap-2 rounded-full bg-white/95 px-4 py-2 text-sm font-semibold text-[#3558A2] shadow">
+                      <Play className="h-4 w-4 fill-current" />
+                      Lire la vidéo
+                    </span>
+                  </span>
+                </button>
+              ) : (
+                <iframe
+                  className="absolute inset-[18px] h-[calc(100%-36px)] w-[calc(100%-36px)] rounded-xl"
+                  src={`https://www.youtube-nocookie.com/embed/${presentationVideoId}?autoplay=1&rel=0&modestbranding=1`}
+                  title="Vidéo de présentation France Alumni Guinée"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  referrerPolicy="strict-origin-when-cross-origin"
+                  allowFullScreen
+                />
+              )}
+            </div>
             <div className="stat-card-1 flex min-h-[220px] flex-col items-center justify-center gap-5 rounded-2xl p-10 text-white sm:min-h-[250px]">
               <Users className="h-16 w-16 opacity-90 sm:h-[4.5rem] sm:w-[4.5rem]" strokeWidth={1.5} />
               <span className="text-7xl font-extrabold tracking-tight sm:text-8xl">{countAlumni.toLocaleString("fr-FR")}</span>
@@ -277,7 +312,7 @@ export default function HomePage() {
       </section>
 
       {/* Partners */}
-      <section className="lg:pb-12">
+      <section className="lg:pb-12 lg:pt-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row items-center gap-0 lg:gap-6">
             <div className="mt-4 w-36 flex-shrink-0 self-start text-left sm:mt-6 lg:mt-0 lg:w-48">
@@ -364,6 +399,9 @@ export default function HomePage() {
           background: #3558A2;
         }
         .stat-card-3 {
+          background: #3558A2;
+        }
+        .stat-card-video {
           background: #3558A2;
         }
 
