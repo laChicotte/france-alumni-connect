@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from "@/components/ui/command"
 import { supabase } from "@/lib/supabase"
-import { Search, GraduationCap, Briefcase, MapPin, Mail, Users, Loader2, ChevronDown, Check } from "lucide-react"
+import { Search, GraduationCap, Briefcase, MapPin, Mail, Users, Loader2, ChevronDown, Check, Building2 } from "lucide-react"
 import type { AlumniProfile } from "@/types/database.types"
 import { cn } from "@/lib/utils"
 
@@ -273,7 +273,7 @@ export default function AnnuairePage() {
                     <input
                       type="text"
                       placeholder="Nom, université, entreprise..."
-                      className="w-full bg-transparent text-sm text-white placeholder:text-white/75 outline-none"
+                      className="w-full bg-transparent text-sm text-white placeholder:text-[11px] sm:placeholder:text-sm placeholder:text-white/75 outline-none"
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       disabled={filtersDisabled}
@@ -446,7 +446,7 @@ export default function AnnuairePage() {
                       </div>
                       <div className="space-y-2 mb-4">
                         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <GraduationCap className="h-4 w-4 flex-shrink-0" />
+                          <Building2 className="h-4 w-4 flex-shrink-0" />
                           <span className="line-clamp-1">
                             {member.universite} ({member.annee_promotion})
                           </span>

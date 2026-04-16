@@ -280,7 +280,7 @@ export default function HomePage() {
       <section className="lg:pb-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row items-center gap-0 lg:gap-6">
-            <div className="flex-shrink-0 w-36 lg:w-48 lg:text-left mt-10 lg:mt-0">
+            <div className="mt-4 w-36 flex-shrink-0 self-start text-left sm:mt-6 lg:mt-0 lg:w-48">
               <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-[#da281c] leading-none">
                 nos <br />partenaires
               </h2>
@@ -292,7 +292,7 @@ export default function HomePage() {
                     <img
                       src={partner.logo || "/placeholder.svg"}
                       alt={partner.name}
-                      className="h-72 w-full object-contain opacity-85 transition-opacity duration-200 hover:opacity-100 sm:h-64"
+                      className="h-28 w-full object-contain opacity-85 transition-opacity duration-200 hover:opacity-100 sm:h-64"
                     />
                   </div>
                 ))}
