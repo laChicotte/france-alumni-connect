@@ -4,6 +4,12 @@
 
 Pour configurer Supabase de zéro, exécutez les scripts dans cet ordre :
 
+### 0. **FINAL_SCHEMA.sql** ← À exécuter EN PREMIER
+- Crée tous les types ENUM (`diplome_type`, `genre_type`, `nationalite_type`, etc.)
+- Crée toutes les tables avec leurs colonnes, contraintes et index
+- Active RLS sur chaque table
+- Idempotent (`IF NOT EXISTS` partout)
+
 ### 1. **FINAL_FUNCTIONS.sql**
 - Créer toutes les fonctions personnalisées
 - Notamment `delete_user_completely()` et `update_updated_at()`
@@ -60,6 +66,18 @@ Ces scripts ne modifient rien, ils permettent de lister ce qui existe :
 - Formats acceptés : **JPG, PNG, WEBP**
 - Stocké dans le bucket `alumni-photos` avec le path `{user_id}/photo_{timestamp}.{ext}`
 - URL sauvegardée dans `alumni_profiles.photo_url`
+
+### Champ diplome (alumni_profiles)
+- Colonne: `alumni_profiles.diplome`
+- Type: ENUM `diplome_type`
+- Valeurs (15): `bts`, `dut`, `du`, `de`, `deug`, `prepa`, `ecole_ingenieur`, `ecole_specialisee`, `licence_pro`, `licence`, `master1`, `master2`, `doctorat`, `post_doctorat`, `autre`
+- Obligatoire (`NOT NULL`)
+
+### Champ bourse (alumni_profiles)
+- Colonne: `alumni_profiles.bourse`
+- Type: TEXT avec contrainte CHECK
+- Valeurs: `Non boursier`, `Boursier Etat français`, `Boursier Etat guinéen`, `Boursier Etats français et guinéen`
+- Optionnel (nullable)
 
 ### Champ genre (alumni_profiles)
 - Colonne: `alumni_profiles.genre`

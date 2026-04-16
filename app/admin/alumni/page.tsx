@@ -53,9 +53,7 @@ const DIPLOME_LABELS: Record<string, string> = {
   prepa: 'Classe Prépa', ecole_ingenieur: "École d'ingénieur",
   ecole_specialisee: 'École spécialisée', licence_pro: 'Licence professionnelle',
   licence: 'Licence', master1: 'Master 1', master2: 'Master 2',
-  maitrise: 'Maîtrise', master: 'Master', doctorat: 'Doctorat',
-  post_doctorat: 'Post Doctorat', mba: 'MBA', ingenieur: 'Ingénieur',
-  professorat: 'Professorat', autre: 'Autre',
+  doctorat: 'Doctorat', post_doctorat: 'Post Doctorat', autre: 'Autre',
 }
 
 export default function AlumniPage() {

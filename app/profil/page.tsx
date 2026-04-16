@@ -37,37 +37,37 @@ const DIPLOME_OPTIONS: { value: DiplomeType; label: string }[] = [
   { value: 'post_doctorat', label: 'Post Doctorat' },
 ]
 const FORMATION_DOMAINE_OPTIONS = [
-  { value: '24', label: 'Administration' },
-  { value: '19', label: 'Agriculture - agroalimentaire' },
-  { value: '11', label: 'Architecture, urbanisme et aménagement du territoire' },
-  { value: '6', label: 'Arts, culture, design et mode' },
-  { value: '25', label: 'Banque/Economie/Gestion' },
-  { value: '7', label: 'Biologie' },
-  { value: '27', label: 'BTP/Géomètre Topo' },
-  { value: '17', label: 'Chimie' },
-  { value: '14', label: 'Communication et journalisme' },
-  { value: '15', label: 'Droit' },
-  { value: '3', label: 'Enseignement secondaire - Lycée Français' },
-  { value: '12', label: 'Environnement et sciences de la terre' },
-  { value: '29', label: 'Formation' },
-  { value: '28', label: 'Industrie' },
-  { value: '2', label: 'Informatique' },
-  { value: '5', label: 'Langues et lettres' },
-  { value: '1', label: 'Management, gestion, finances et commerce' },
-  { value: '20', label: 'Mathématiques' },
-  { value: '22', label: 'Physique' },
-  { value: '4', label: 'Santé et professions sociales' },
-  { value: '16', label: "Sciences de l'éducation" },
-  { value: '10', label: "Sciences de l'ingénieur" },
-  { value: '8', label: 'Sciences économiques et politiques' },
-  { value: '13', label: 'Sciences humaines et sociales' },
-  { value: '26', label: 'Social' },
-  { value: '18', label: 'Sports' },
-  { value: '30', label: 'Technique' },
-  { value: '9', label: 'Tourisme, hôtellerie et restauration' },
-  { value: '21', label: 'Transport et logistique' },
-  { value: '23', label: 'Autre' },
-]
+  'Administration',
+  'Agriculture - agroalimentaire',
+  'Architecture, urbanisme et aménagement du territoire',
+  'Arts, culture, design et mode',
+  'Banque/Economie/Gestion',
+  'Biologie',
+  'BTP/Géomètre Topo',
+  'Chimie',
+  'Communication et journalisme',
+  'Droit',
+  'Enseignement secondaire - Lycée Français',
+  'Environnement et sciences de la terre',
+  'Formation',
+  'Industrie',
+  'Informatique',
+  'Langues et lettres',
+  'Management, gestion, finances et commerce',
+  'Mathématiques',
+  'Physique',
+  'Santé et professions sociales',
+  "Sciences de l'éducation",
+  "Sciences de l'ingénieur",
+  'Sciences économiques et politiques',
+  'Sciences humaines et sociales',
+  'Social',
+  'Sports',
+  'Technique',
+  'Tourisme, hôtellerie et restauration',
+  'Transport et logistique',
+  'Autre',
+] as const
 const PLAN_RETOUR_OPTIONS: PlanRetourType[] = ['Dans 2 ans', 'Dans 5 ans', 'Déjà en Guinée', 'Autre']
 const BOURSE_OPTIONS: BourseType[] = ['Non boursier', 'Boursier Etat français', 'Boursier Etat guinéen', 'Boursier Etats français et guinéen']
 const NATIONALITE_OPTIONS: NationaliteType[] = ['Guinéenne', 'Franco-Guinéenne', 'Guinéenne-Autre']
@@ -85,10 +85,40 @@ function extractAlumniPhotoPath(photoUrl: string | null | undefined): string | n
 
 function getFormationDomaineLabel(value: string | null | undefined): string {
   if (!value) return ''
-  const fromValue = FORMATION_DOMAINE_OPTIONS.find((item) => item.value === value)
-  if (fromValue) return fromValue.label
-  const fromLabel = FORMATION_DOMAINE_OPTIONS.find((item) => item.label === value)
-  return fromLabel ? fromLabel.label : value
+  const legacyMap: Record<string, string> = {
+    '24': 'Administration',
+    '19': 'Agriculture - agroalimentaire',
+    '11': 'Architecture, urbanisme et aménagement du territoire',
+    '6': 'Arts, culture, design et mode',
+    '25': 'Banque/Economie/Gestion',
+    '7': 'Biologie',
+    '27': 'BTP/Géomètre Topo',
+    '17': 'Chimie',
+    '14': 'Communication et journalisme',
+    '15': 'Droit',
+    '3': 'Enseignement secondaire - Lycée Français',
+    '12': 'Environnement et sciences de la terre',
+    '29': 'Formation',
+    '28': 'Industrie',
+    '2': 'Informatique',
+    '5': 'Langues et lettres',
+    '1': 'Management, gestion, finances et commerce',
+    '20': 'Mathématiques',
+    '22': 'Physique',
+    '4': 'Santé et professions sociales',
+    '16': "Sciences de l'éducation",
+    '10': "Sciences de l'ingénieur",
+    '8': 'Sciences économiques et politiques',
+    '13': 'Sciences humaines et sociales',
+    '26': 'Social',
+    '18': 'Sports',
+    '30': 'Technique',
+    '9': 'Tourisme, hôtellerie et restauration',
+    '21': 'Transport et logistique',
+    '23': 'Autre',
+  }
+  if (legacyMap[value]) return legacyMap[value]
+  return value
 }
 
 export default function ProfilPage() {
@@ -257,7 +287,7 @@ export default function ProfilPage() {
           universite: formData.universite,
           annee_promotion: formData.annee_promotion,
           diplome: formData.diplome,
-          formation_domaine: formData.formation_domaine,
+          formation_domaine: getFormationDomaineLabel(formData.formation_domaine),
           secteur_id: secteurId,
           statut_professionnel_id: statutId,
           entreprise: formData.entreprise || null,
@@ -814,19 +844,18 @@ export default function ProfilPage() {
                                       <CommandGroup>
                                         {FORMATION_DOMAINE_OPTIONS.map((option) => {
                                           const isSelected =
-                                            formData.formation_domaine === option.value ||
-                                            formData.formation_domaine === option.label
+                                            selectedFormationDomaineLabel === option
                                           return (
                                             <CommandItem
-                                              key={option.value}
-                                              value={option.label}
+                                              key={option}
+                                              value={option}
                                               onSelect={() => {
-                                                setFormData({ ...formData, formation_domaine: option.value })
+                                                setFormData({ ...formData, formation_domaine: option })
                                                 setIsFormationDomaineOpen(false)
                                               }}
                                             >
                                               <Check className={cn("h-4 w-4", isSelected ? "opacity-100" : "opacity-0")} />
-                                              {option.label}
+                                              {option}
                                             </CommandItem>
                                           )
                                         })}
