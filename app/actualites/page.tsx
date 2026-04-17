@@ -8,7 +8,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { articles } from "@/lib/fake-data"
 import { supabase } from "@/lib/supabase"
 import { Calendar, User, ChevronLeft, ChevronRight, Loader2, Clock3, MapPin } from "lucide-react"
 import { useEffect, useState } from "react"
@@ -40,16 +39,7 @@ type EventRegistrationDetails = {
 }
 
 export default function ActualitesPage() {
-  const fallbackItems: FeedItem[] = articles.map((article) => ({
-    id: article.id,
-    title: article.title,
-    image: article.image || "/placeholder.svg",
-    category: article.category,
-    author: article.author,
-    date: article.date,
-    href: `/actualites/${article.id}`,
-  }))
-  const [feedItems, setFeedItems] = useState<FeedItem[]>(fallbackItems)
+  const [feedItems, setFeedItems] = useState<FeedItem[]>([])
   const [selectedCategory, setSelectedCategory] = useState<string>("Tous")
   const [currentPage, setCurrentPage] = useState(1)
   const [isLoadingFeed, setIsLoadingFeed] = useState(true)

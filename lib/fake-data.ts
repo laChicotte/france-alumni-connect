@@ -260,13 +260,7 @@ export const teamMembers = [
   },
 ]
 
-export const partners = [
-  { name: "Ambassade de France en Guinée et en Sierra Leone", logo: "/partenaires/ambassade.png" },
-  { name: "Institut français de Guinée", logo: "/partenaires/ifg.png" },
-  { name: "Campus France Guinée", logo: "/partenaires/campusfrance.png" },
-  { name: "Association des Jeunes Guinéens de France", logo: "/partenaires/ajgf.jpg" },
-  { name: "Salon de l'Emploi et de l'Entrepreneuriat des Guinéens de France", logo: "/partenaires/seegf.png" },
-]
+export const partners: { name: string; logo: string }[] = []
 
 export const jobPostings: JobPosting[] = [
   {

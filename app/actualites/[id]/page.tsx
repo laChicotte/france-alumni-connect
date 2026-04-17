@@ -5,9 +5,8 @@ import Image from "next/image"
 import Link from "next/link"
 import { useParams } from "next/navigation"
 import { Button } from "@/components/ui/button"
-import { articles } from "@/lib/fake-data"
 import { ArrowLeft, CalendarDays, Loader2, UserCircle2 } from "lucide-react"
-import { useEffect, useMemo, useState } from "react"
+import { useEffect, useState } from "react"
 import { ArticleContentRenderer } from "@/components/admin/articles/article-content-renderer"
 
 type PublicArticle = {
@@ -29,27 +28,11 @@ type PublicArticle = {
 export default function ArticlePage() {
   const params = useParams()
   const articleId = params.id as string
-  const fallbackArticle = useMemo(() => articles.find((a) => a.id === articleId), [articleId])
 
-  const [article, setArticle] = useState<PublicArticle | null>(
-    fallbackArticle
-      ? {
-          id: fallbackArticle.id,
-          title: fallbackArticle.title,
-          excerpt: fallbackArticle.excerpt,
-          content: fallbackArticle.content,
-          image: fallbackArticle.image || "/placeholder.svg",
-          author: fallbackArticle.author,
-          date: fallbackArticle.date,
-          media: [],
-        }
-      : null
-  )
-  const [isLoading, setIsLoading] = useState(!fallbackArticle)
+  const [article, setArticle] = useState<PublicArticle | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    if (fallbackArticle) return
-
     const loadArticle = async () => {
       try {
         const res = await fetch(`/api/articles/public/${articleId}`, { cache: "no-store" })
@@ -90,7 +73,7 @@ export default function ArticlePage() {
     }
 
     loadArticle()
-  }, [articleId, fallbackArticle])
+  }, [articleId])
 
   useEffect(() => {
     fetch(`/api/articles/public/${articleId}/view`, { method: "POST" }).catch(() => null)
