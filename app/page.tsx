@@ -316,7 +316,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row items-center gap-0 lg:gap-6">
             <div className="mt-4 w-36 flex-shrink-0 self-start text-left sm:mt-6 lg:mt-0 lg:w-48">
-              <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-[#da281c] leading-none">
+              <h2 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-bold text-[#da281c] leading-none lg:mt-10">
                 nos <br />partenaires
               </h2>
             </div>
