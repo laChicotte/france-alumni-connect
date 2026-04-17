@@ -204,6 +204,18 @@ export default function HomePage() {
             nos objectifs
           </h2>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 lg:gap-28 gap-10">
+          <div>
+              <h3 className="mb-3 inline-flex items-center gap-2 font-serif text-xl font-bold text-white sm:text-2xl">
+                <Network className="h-7 w-7 sm:h-8 sm:w-8" aria-hidden />
+                connecter
+              </h3>
+              <p
+                lang="fr"
+                className="text-white sm:text-lg leading-relaxed max-w-md"
+              >
+                Organiser des temps d'échanges, créer du lien et associer des compétences complémentaires pour imaginer de nouvelles opportunités ensemble.
+              </p>
+            </div>
             <div>
               <h3 className="mb-3 inline-flex items-center gap-2 font-serif text-xl font-bold text-white sm:text-2xl">
                 <Trophy className="h-7 w-7 sm:h-8 sm:w-8" aria-hidden />
@@ -217,18 +229,7 @@ export default function HomePage() {
                 capable d&apos;influencer entreprises et institutions.
               </p>
             </div>
-            <div>
-              <h3 className="mb-3 inline-flex items-center gap-2 font-serif text-xl font-bold text-white sm:text-2xl">
-                <Network className="h-7 w-7 sm:h-8 sm:w-8" aria-hidden />
-                connecter
-              </h3>
-              <p
-                lang="fr"
-                className="text-white sm:text-lg leading-relaxed max-w-md"
-              >
-                Organiser des temps d'échanges, créer du lien et associer des compétences complémentaires pour imaginer de nouvelles opportunités ensemble.
-              </p>
-            </div>
+            
             <div>
               <h3 className="mb-3 inline-flex items-center gap-2 font-serif text-xl font-bold text-white sm:text-2xl">
                 <Target className="h-7 w-7 sm:h-8 sm:w-8" aria-hidden />
