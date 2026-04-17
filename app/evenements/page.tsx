@@ -408,9 +408,9 @@ export default function EvenementsPublicPage() {
               proposez votre événement
             </Button>
           </a>
-          {/* <p className="text-base text-muted-foreground">
-            Vous avez une idee d&apos;événement ? Soumettez votre proposition pour la partager avec la communaute.
-          </p> */}
+          <p className="text-base text-muted-foreground">
+          Vous êtes alumni ? Partagez vos idées d'événements utiles à la communauté qui pourraient être organisés par France Alumni Guinée
+          </p>
         </div>
       </section>
 
