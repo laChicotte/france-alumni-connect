@@ -28,7 +28,7 @@ function useCountUp(target: number, duration = 1400) {
 
 export default function HomePage() {
   type PublicPartner = { name: string; logo: string; site_web?: string | null }
-  const presentationVideoId = "eMMfnuiGjCE"
+  const presentationVideoId = "ErNrCZvUS8k"
   const presentationThumbnail = "/accueil/miniature.jpeg"
   const quiSommesNousImages = [
     "/accueil/quisommesnous/a.jpg",
