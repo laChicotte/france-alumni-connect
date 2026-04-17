@@ -693,7 +693,7 @@ export default function AnnuairePage() {
               <Link href="/inscription">rejoignez l&apos;annuaire</Link>
           </Button>
           <p className="text-base text-muted-foreground mt-8">
-          Vous êtes alumni ? Accédez à l’annuaire pour rester en lien avec la communauté et prolonger les échanges.
+          Vous êtes alumni ? Accédez à l&apos;annuaire pour rester en lien <br></br> avec la communauté et prolonger les échanges.
           </p>
         </div>
       </section>
