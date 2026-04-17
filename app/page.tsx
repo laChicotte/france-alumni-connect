@@ -171,10 +171,10 @@ export default function HomePage() {
                 supérieur français. 
                 <br />
                 <br />
-                Service de l&apos;Institut français, rattaché à l&apos;Ambassade de France en Guinée et héritié
-                de la dynamique Campus France, il anime un réseau engagé et résolument tourné vers l&apos;avenir. Fondé sur des
-                valeurs de solidarité, d&apos;entraide et d&apos;engagement, ce réseau favorise les échanges entre ses membres, 
-                soutient les initiatives collectives et met en lumière les parcours de ses alumni.
+                Service de l&apos;Institut français, rattaché à l&apos;Ambassade de France en Guinée et
+                prolongement de l&apos;expérience Campus France, France Alumni est un réseau engagé et résolument tourné vers l&apos;avenir. Fondé sur des
+                valeurs de solidarité, d&apos;entraide et d&apos;engagement, cette communauté favorise les échanges entre ses membres, 
+                soutient les initiatives collectives et met en lumière les parcours des alumni.
                 <br />
                 <br />
                 Plus qu&apos;un simple réseau, France Alumni Guinée constitue un véritable espace d'échanges et d'opportunités : 
@@ -226,9 +226,8 @@ export default function HomePage() {
                 lang="fr"
                 className="text-white sm:text-lg leading-relaxed max-w-md"
               >
-                  Mobiliser les compétences pour répondre à des besoins précis en Guinée : accompagnement d&apos;entrepreneurs, interventions 
-                  d&apos;experts, programmes de formation et appui à des projets à fort impact.
-                </p>
+                Organiser des temps d'échanges, créer du lien et associer des compétences complémentaires pour imaginer de nouvelles opportunités ensemble.
+              </p>
             </div>
             <div>
               <h3 className="mb-3 inline-flex items-center gap-2 font-serif text-xl font-bold text-white sm:text-2xl">
@@ -240,8 +239,8 @@ export default function HomePage() {
                 lang="fr"
                 className="text-white sm:text-lg leading-relaxed max-w-md"
               >
-                Mobiliser les compétences pour agir concrètement sur le développement local : accompagner les entrepreneurs, 
-                soutenir des projets à fort impact et répondre aux besoins du terrain.
+                Susciter des initiatives ambitieuses pour agir concrètement sur le développement local : accompagner les entrepreneurs, soutenir 
+                des projets à fort impact et répondre aux besoins du terrain.
               </p>
             </div>
   
