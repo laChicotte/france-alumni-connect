@@ -35,7 +35,7 @@ export async function GET() {
   try {
     const supabase = createSupabaseAdmin()
 
-    // Requête unique : jointure !inner sur users filtre directement les alumni actifs
+    // Côté visiteur, on affiche un aperçu public basé sur les profils visibles.
     const { data: profilesData, error: profilesError } = await supabase
       .from("alumni_profiles")
       .select(`
@@ -52,11 +52,9 @@ export async function GET() {
         poste_actuel,
         bio,
         secteurs(libelle),
-        statuts_professionnels(libelle),
-        users!inner(id)
+        statuts_professionnels(libelle)
       `)
       .eq("visible_annuaire", true)
-      .eq("users.status", "actif")
 
     if (profilesError) {
       return NextResponse.json({ error: profilesError.message }, { status: 500 })
