@@ -490,6 +490,13 @@ ON types_formations FOR SELECT
 TO authenticated
 USING (true);
 
+-- SELECT: types formations visibles sans connexion (pour les filtres publics)
+DROP POLICY IF EXISTS "Types formations visibles publiquement" ON types_formations;
+CREATE POLICY "Types formations visibles publiquement"
+ON types_formations FOR SELECT
+TO anon
+USING (true);
+
 DROP POLICY IF EXISTS "Seuls les admins gèrent les types formations" ON types_formations;
 CREATE POLICY "Seuls les admins gèrent les types formations"
 ON types_formations FOR ALL
@@ -510,6 +517,13 @@ DROP POLICY IF EXISTS "Formations publiées visibles par les authentifiés" ON f
 CREATE POLICY "Formations publiées visibles par les authentifiés"
 ON formations FOR SELECT
 TO authenticated
+USING (statut = 'publiee' AND actif = true);
+
+-- SELECT: formations publiées visibles sans connexion
+DROP POLICY IF EXISTS "Formations publiées visibles publiquement" ON formations;
+CREATE POLICY "Formations publiées visibles publiquement"
+ON formations FOR SELECT
+TO anon
 USING (statut = 'publiee' AND actif = true);
 
 -- SELECT: admin voit tout

@@ -206,19 +206,14 @@ export default function FormationPage() {
                         alt={formation.titre}
                         className="h-44 w-full object-cover"
                       />
-                      <div className="absolute top-4 left-4 flex gap-2">
+                      <div className="absolute top-4 left-4">
                         <span className="inline-block rounded-full bg-[#3558A2] px-3 py-1 text-xs font-semibold text-white">
                           {formation.types_formations?.libelle || "Formation"}
                         </span>
-                        {formation.niveau && (
-                          <span className="inline-block rounded-full bg-white/90 px-3 py-1 text-xs font-semibold text-[#3558A2]">
-                            {formation.niveau}
-                          </span>
-                        )}
                       </div>
                       <div className="absolute top-4 right-4">
                         <span className={`inline-block rounded-full px-3 py-1 text-xs font-semibold ${formation.gratuit ? "bg-green-500 text-white" : "bg-amber-500 text-white"}`}>
-                          {formation.gratuit ? "Gratuit" : formation.prix ? `${formation.prix} €` : "Payant"}
+                          {formation.gratuit ? "Gratuit" : formation.prix ? `${formation.prix.toLocaleString("fr-FR")} GNF` : "Payant"}
                         </span>
                       </div>
                     </div>
@@ -228,19 +223,17 @@ export default function FormationPage() {
                       </h2>
                       <p className="text-sm text-muted-foreground line-clamp-2">{formation.description}</p>
 
-                      <div className="space-y-1 text-sm text-muted-foreground">
+                      <div className="flex flex-col gap-2 text-sm text-muted-foreground">
                         <div className="flex items-center gap-2">
                           <CalendarDays className="h-4 w-4 text-[#3558A2] shrink-0" />
                           <span className="text-xs">{formatDateRange(formation.date_debut, formation.date_fin)}</span>
                         </div>
-                        <div className="grid grid-cols-2 gap-2 text-xs">
+                        <div className="flex items-center justify-between gap-2 text-xs">
                           <span className="inline-flex items-center gap-1">
                             <Clock3 className="h-4 w-4 text-[#3558A2]" />
-                            {formatHeures(formation.heure_debut, formation.heure_fin)}
+                            {formatHeures(formation.heure_debut, formation.heure_fin)} <span className="text-muted-foreground/60">(GMT)</span>
                           </span>
-                          <span className="text-right">
-                            {formation.places_max ? `${formation.places_max} places` : "illimité"}
-                          </span>
+                          <span>{formation.places_max ? `${formation.places_max} places` : "illimité"}</span>
                         </div>
                         <div className="flex items-center gap-2">
                           <MapPin className="h-4 w-4 text-[#3558A2] shrink-0" />
@@ -280,11 +273,11 @@ export default function FormationPage() {
       {/* Dialog détail formation */}
       <Dialog open={!!selectedFormation} onOpenChange={(open) => !open && setSelectedFormation(null)}>
         <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
+          <DialogHeader className="pb-2">
             <DialogTitle>Détails de la formation</DialogTitle>
           </DialogHeader>
           {selectedFormation && (
-            <div className="space-y-4">
+            <div className="space-y-5 pt-1">
               <div className="overflow-hidden rounded-lg">
                 <img
                   src={selectedFormation.image_url || "/placeholder.svg"}
@@ -297,11 +290,8 @@ export default function FormationPage() {
                 {selectedFormation.types_formations?.libelle && (
                   <Badge className="bg-[#3558A2] text-white">{selectedFormation.types_formations.libelle}</Badge>
                 )}
-                {selectedFormation.niveau && (
-                  <Badge variant="outline" className="text-[#3558A2] border-[#3558A2]">{selectedFormation.niveau}</Badge>
-                )}
                 <Badge className={selectedFormation.gratuit ? "bg-green-500 text-white" : "bg-amber-500 text-white"}>
-                  {selectedFormation.gratuit ? "Gratuit" : selectedFormation.prix ? `${selectedFormation.prix} €` : "Payant"}
+                  {selectedFormation.gratuit ? "Gratuit" : selectedFormation.prix ? `${selectedFormation.prix.toLocaleString("fr-FR")} GNF` : "Payant"}
                 </Badge>
               </div>
 
@@ -312,30 +302,30 @@ export default function FormationPage() {
 
               {selectedFormation.programme && (
                 <div className="rounded-lg bg-gray-50 p-3">
-                  <p className="text-xs font-semibold uppercase text-[#3558A2] mb-1 flex items-center gap-1">
+                  <p className="text-xs font-semibold uppercase text-[#3558A2] mb-2 flex items-center gap-1">
                     <BookOpen className="h-3 w-3" /> Programme
                   </p>
                   <p className="text-sm text-muted-foreground whitespace-pre-line">{selectedFormation.programme}</p>
                 </div>
               )}
 
-              <div className="space-y-1 text-sm text-muted-foreground">
-                <p className="inline-flex items-center gap-2">
-                  <CalendarDays className="h-4 w-4 text-[#3558A2]" />
-                  {formatDateRange(selectedFormation.date_debut, selectedFormation.date_fin)}
-                </p>
-                <p className="inline-flex items-center gap-2">
-                  <Clock3 className="h-4 w-4 text-[#3558A2]" />
-                  {formatHeures(selectedFormation.heure_debut, selectedFormation.heure_fin)}
-                </p>
-                <p className="inline-flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-[#3558A2]" />
-                  {selectedFormation.lieu}
-                </p>
-                <p className="text-sm">
+              <div className="flex flex-col gap-3 text-sm text-muted-foreground">
+                <div className="flex items-center gap-3">
+                  <CalendarDays className="h-4 w-4 text-[#3558A2] shrink-0" />
+                  <span>{formatDateRange(selectedFormation.date_debut, selectedFormation.date_fin)}</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Clock3 className="h-4 w-4 text-[#3558A2] shrink-0" />
+                  <span>{formatHeures(selectedFormation.heure_debut, selectedFormation.heure_fin)} <span className="text-muted-foreground/60 text-xs">(GMT)</span></span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <MapPin className="h-4 w-4 text-[#3558A2] shrink-0" />
+                  <span>{selectedFormation.lieu}</span>
+                </div>
+                <div className="text-sm">
                   <span className="font-medium">Places :</span>{" "}
                   {selectedFormation.places_max ? `${selectedFormation.places_max} max` : "illimitées"}
-                </p>
+                </div>
               </div>
 
               {selectedFormation.lien_visio && (

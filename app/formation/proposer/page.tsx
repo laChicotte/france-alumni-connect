@@ -157,7 +157,7 @@ export default function ProposerFormationPage() {
 
   return (
     <div className="min-h-screen">
-      <section className="relative mx-4 mt-4 h-[220px] overflow-hidden rounded-3xl sm:mx-6 lg:mx-8">
+      <section className="relative mx-4 mt-6 h-[220px] overflow-hidden rounded-3xl sm:mx-6 lg:mx-8">
         <Image src="/formation/formation1.jpg" alt="Proposer une formation" fill className="object-cover" priority />
         <div className="absolute inset-0 bg-black/40" />
         <div className="relative z-10 flex h-full flex-col justify-end pb-8 px-10 sm:px-20 lg:px-32">
@@ -167,7 +167,7 @@ export default function ProposerFormationPage() {
         </div>
       </section>
 
-      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10">
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 py-14 mt-2">
         <Link href="/formation" className="inline-flex items-center text-sm text-muted-foreground hover:text-[#3558A2] mb-6">
           <ArrowLeft className="h-4 w-4 mr-1" /> Retour aux formations
         </Link>
@@ -209,11 +209,11 @@ export default function ProposerFormationPage() {
               {/* Heures */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="heure_debut">Heure début *</Label>
+                  <Label htmlFor="heure_debut">Heure début * <span className="text-muted-foreground text-xs font-normal">(GMT)</span></Label>
                   <Input id="heure_debut" type="time" value={formData.heure_debut} onChange={(e) => setFormData({ ...formData, heure_debut: e.target.value })} required />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="heure_fin">Heure fin</Label>
+                  <Label htmlFor="heure_fin">Heure fin <span className="text-muted-foreground text-xs font-normal">(GMT)</span></Label>
                   <Input id="heure_fin" type="time" value={formData.heure_fin} onChange={(e) => setFormData({ ...formData, heure_fin: e.target.value })} />
                 </div>
               </div>
@@ -273,8 +273,8 @@ export default function ProposerFormationPage() {
               {/* Prix si payant */}
               {!formData.gratuit && (
                 <div className="space-y-2">
-                  <Label htmlFor="prix">Prix (€) *</Label>
-                  <Input id="prix" type="number" step="0.01" min="0" value={formData.prix} onChange={(e) => setFormData({ ...formData, prix: e.target.value })} placeholder="Ex: 50" required={!formData.gratuit} />
+                  <Label htmlFor="prix">Montant (GNF) *</Label>
+                  <Input id="prix" type="number" step="1" min="0" value={formData.prix} onChange={(e) => setFormData({ ...formData, prix: e.target.value })} placeholder="Ex: 500000" required={!formData.gratuit} />
                 </div>
               )}
 
