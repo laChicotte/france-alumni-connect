@@ -10,6 +10,7 @@ import {
   FileText,
   Briefcase,
   Calendar,
+  BookOpen,
   Handshake,
   Settings,
   ChevronDown,
@@ -41,6 +42,7 @@ const navItems: NavItem[] = [
   { href: "/admin/articles", label: "Articles", icon: FileText },
   { href: "/admin/emplois", label: "Emplois", icon: Briefcase },
   { href: "/admin/evenements", label: "Événements", icon: Calendar },
+  { href: "/admin/formations", label: "Formations", icon: BookOpen },
   { href: "/admin/partenaires", label: "Partenaires", icon: Handshake },
   {
     href: "/admin/config",
@@ -51,6 +53,7 @@ const navItems: NavItem[] = [
       { href: "/admin/config/statuts-professionnels", label: "Statuts professionnels", icon: Tags },
       { href: "/admin/config/categories-articles", label: "Catégories articles", icon: FolderCog },
       { href: "/admin/config/types-evenements", label: "Types événements", icon: CalendarCog },
+      { href: "/admin/config/types-formations", label: "Types formations", icon: BookOpen },
     ],
   },
 ]

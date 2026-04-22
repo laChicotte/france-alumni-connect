@@ -45,7 +45,38 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- ================================================
--- 3. FONCTION CHECK_EVENT_CAPACITY (inscriptions)
+-- 3. FONCTION CHECK_FORMATION_CAPACITY (inscriptions formations)
+-- ================================================
+CREATE OR REPLACE FUNCTION public.check_formation_capacity()
+RETURNS trigger AS $$
+DECLARE
+  v_places_max integer;
+  v_current_count integer;
+BEGIN
+  SELECT f.places_max
+  INTO v_places_max
+  FROM public.formations f
+  WHERE f.id = NEW.formation_id;
+
+  IF v_places_max IS NULL THEN
+    RETURN NEW;
+  END IF;
+
+  SELECT count(*)
+  INTO v_current_count
+  FROM public.inscriptions_formations inf
+  WHERE inf.formation_id = NEW.formation_id;
+
+  IF v_current_count >= v_places_max THEN
+    RAISE EXCEPTION 'Cette formation est complète';
+  END IF;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql;
+
+-- ================================================
+-- 4. FONCTION CHECK_EVENT_CAPACITY (inscriptions événements)
 -- ================================================
 CREATE OR REPLACE FUNCTION public.check_event_capacity()
 RETURNS trigger AS $$

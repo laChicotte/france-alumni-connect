@@ -331,6 +331,67 @@ USING (
 );
 
 -- ================================================
+-- 11. CRÉER LE BUCKET "formations-media"
+-- ================================================
+
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'formations-media',
+  'formations-media',
+  true,  -- Public pour affichage direct des images de formation
+  5242880,  -- 5MB max
+  ARRAY['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+)
+ON CONFLICT (id) DO NOTHING;
+
+-- ================================================
+-- 12. POLICIES POUR LE BUCKET "formations-media"
+-- ================================================
+
+-- SELECT: lecture publique
+DROP POLICY IF EXISTS "Lecture publique formations-media" ON storage.objects;
+CREATE POLICY "Lecture publique formations-media"
+ON storage.objects FOR SELECT
+TO public
+USING (bucket_id = 'formations-media');
+
+-- INSERT: utilisateur authentifié peut uploader dans son dossier
+DROP POLICY IF EXISTS "Upload formations-media" ON storage.objects;
+CREATE POLICY "Upload formations-media"
+ON storage.objects FOR INSERT
+TO authenticated
+WITH CHECK (
+  bucket_id = 'formations-media'
+  AND (storage.foldername(name))[1] = auth.uid()::text
+);
+
+-- UPDATE: propriétaire ou admin
+DROP POLICY IF EXISTS "Modification formations-media" ON storage.objects;
+CREATE POLICY "Modification formations-media"
+ON storage.objects FOR UPDATE
+TO authenticated
+USING (
+  bucket_id = 'formations-media'
+  AND (
+    auth.uid()::text = (storage.foldername(name))[1]
+    OR EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin')
+  )
+);
+
+-- DELETE: propriétaire ou admin
+DROP POLICY IF EXISTS "Suppression formations-media" ON storage.objects;
+CREATE POLICY "Suppression formations-media"
+ON storage.objects FOR DELETE
+TO authenticated
+USING (
+  bucket_id = 'formations-media'
+  AND (
+    auth.uid()::text = (storage.foldername(name))[1]
+    OR EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin')
+  )
+);
+
+-- ================================================
 -- VÉRIFICATION
 -- ================================================
 SELECT
@@ -338,5 +399,5 @@ SELECT
   name as policy_name,
   definition
 FROM storage.policies
-WHERE bucket_id IN ('diplomes', 'alumni-photos', 'articles-media', 'evenements-media', 'logo-partenaire')
+WHERE bucket_id IN ('diplomes', 'alumni-photos', 'articles-media', 'evenements-media', 'logo-partenaire', 'formations-media')
 ORDER BY name;

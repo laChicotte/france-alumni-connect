@@ -23,6 +23,8 @@ export type PlanRetourType = 'Dans 2 ans' | 'Dans 5 ans' | 'Déjà en Guinée' |
 export type ArticleStatus = 'brouillon' | 'publie'
 export type ArticleMediaType = 'image' | 'video'
 export type JobType = 'cdi' | 'cdd' | 'stage' | 'freelance' | 'alternance'
+export type FormationStatut = 'en_attente' | 'publiee' | 'archivee'
+export type FormationNiveau = 'Débutant' | 'Intermédiaire' | 'Avancé' | 'Tous niveaux'
 
 export interface Database {
   public: {
@@ -475,6 +477,132 @@ export interface Database {
           updated_at?: string
         }
       }
+      types_formations: {
+        Row: {
+          id: string
+          libelle: string
+          ordre: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          libelle: string
+          ordre?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          libelle?: string
+          ordre?: number
+          updated_at?: string
+        }
+      }
+      formations: {
+        Row: {
+          id: string
+          titre: string
+          slug: string
+          date_debut: string
+          date_fin: string | null
+          heure_debut: string
+          heure_fin: string | null
+          lieu: string
+          lien_visio: string | null
+          type_formation_id: string | null
+          description: string
+          programme: string | null
+          image_url: string
+          places_max: number | null
+          niveau: FormationNiveau | null
+          gratuit: boolean
+          prix: number | null
+          proposee_par: string | null
+          statut: FormationStatut
+          actif: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          titre: string
+          slug: string
+          date_debut: string
+          date_fin?: string | null
+          heure_debut: string
+          heure_fin?: string | null
+          lieu: string
+          lien_visio?: string | null
+          type_formation_id?: string | null
+          description: string
+          programme?: string | null
+          image_url?: string
+          places_max?: number | null
+          niveau?: FormationNiveau | null
+          gratuit?: boolean
+          prix?: number | null
+          proposee_par?: string | null
+          statut?: FormationStatut
+          actif?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          titre?: string
+          slug?: string
+          date_debut?: string
+          date_fin?: string | null
+          heure_debut?: string
+          heure_fin?: string | null
+          lieu?: string
+          lien_visio?: string | null
+          type_formation_id?: string | null
+          description?: string
+          programme?: string | null
+          image_url?: string
+          places_max?: number | null
+          niveau?: FormationNiveau | null
+          gratuit?: boolean
+          prix?: number | null
+          proposee_par?: string | null
+          statut?: FormationStatut
+          actif?: boolean
+          updated_at?: string
+        }
+      }
+      inscriptions_formations: {
+        Row: {
+          id: string
+          formation_id: string
+          user_id: string | null
+          nom_externe: string | null
+          prenom_externe: string | null
+          email_externe: string | null
+          telephone_externe: string | null
+          organisation_externe: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          formation_id: string
+          user_id?: string | null
+          nom_externe?: string | null
+          prenom_externe?: string | null
+          email_externe?: string | null
+          telephone_externe?: string | null
+          organisation_externe?: string | null
+          created_at?: string
+        }
+        Update: {
+          formation_id?: string
+          user_id?: string | null
+          nom_externe?: string | null
+          prenom_externe?: string | null
+          email_externe?: string | null
+          telephone_externe?: string | null
+          organisation_externe?: string | null
+        }
+      }
     }
   }
 }
@@ -492,3 +620,6 @@ export type Secteur = Database['public']['Tables']['secteurs']['Row']
 export type StatutProfessionnel = Database['public']['Tables']['statuts_professionnels']['Row']
 export type CategorieArticle = Database['public']['Tables']['categories_articles']['Row']
 export type TypeEvenement = Database['public']['Tables']['types_evenements']['Row']
+export type TypeFormation = Database['public']['Tables']['types_formations']['Row']
+export type Formation = Database['public']['Tables']['formations']['Row']
+export type InscriptionFormation = Database['public']['Tables']['inscriptions_formations']['Row']

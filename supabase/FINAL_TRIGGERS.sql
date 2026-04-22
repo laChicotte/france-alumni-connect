@@ -60,6 +60,28 @@ CREATE TRIGGER trg_check_event_capacity
   FOR EACH ROW
   EXECUTE FUNCTION check_event_capacity();
 
+-- Table: formations
+DROP TRIGGER IF EXISTS update_formations_updated_at ON formations;
+CREATE TRIGGER update_formations_updated_at
+  BEFORE UPDATE ON formations
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at();
+
+-- Table: types_formations
+DROP TRIGGER IF EXISTS update_types_formations_updated_at ON types_formations;
+CREATE TRIGGER update_types_formations_updated_at
+  BEFORE UPDATE ON types_formations
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at();
+
+-- Table: inscriptions_formations
+-- Vérifie la capacité max avant inscription
+DROP TRIGGER IF EXISTS trg_check_formation_capacity ON inscriptions_formations;
+CREATE TRIGGER trg_check_formation_capacity
+  BEFORE INSERT ON inscriptions_formations
+  FOR EACH ROW
+  EXECUTE FUNCTION check_formation_capacity();
+
 -- ================================================
 -- NOTE IMPORTANTE:
 -- Il n'y a PAS de trigger sur auth.users

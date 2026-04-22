@@ -270,6 +270,78 @@ CREATE INDEX IF NOT EXISTS idx_inscriptions_user_id
   ON public.inscriptions_evenements (user_id);
 
 -- ================================================
+-- TABLE: types_formations
+-- ================================================
+
+CREATE TABLE IF NOT EXISTS public.types_formations (
+  id          UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  libelle     TEXT        NOT NULL,
+  ordre       INTEGER     NOT NULL DEFAULT 0,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+ALTER TABLE public.types_formations ENABLE ROW LEVEL SECURITY;
+
+-- ================================================
+-- TABLE: formations
+-- ================================================
+
+CREATE TABLE IF NOT EXISTS public.formations (
+  id                UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  titre             TEXT        NOT NULL,
+  slug              TEXT        NOT NULL UNIQUE,
+  date_debut        DATE        NOT NULL,
+  date_fin          DATE,
+  heure_debut       TEXT        NOT NULL,
+  heure_fin         TEXT,
+  lieu              TEXT        NOT NULL,
+  lien_visio        TEXT,
+  type_formation_id UUID        REFERENCES public.types_formations(id),
+  description       TEXT        NOT NULL,
+  programme         TEXT,
+  image_url         TEXT        NOT NULL DEFAULT '',
+  places_max        INTEGER,
+  niveau            TEXT        CHECK (niveau IN ('Débutant', 'Intermédiaire', 'Avancé', 'Tous niveaux')),
+  gratuit           BOOLEAN     NOT NULL DEFAULT true,
+  prix              NUMERIC(10,2),
+  proposee_par      UUID        REFERENCES public.users(id),
+  statut            TEXT        NOT NULL DEFAULT 'en_attente'
+                    CHECK (statut IN ('en_attente', 'publiee', 'archivee')),
+  actif             BOOLEAN     NOT NULL DEFAULT true,
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at        TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+ALTER TABLE public.formations ENABLE ROW LEVEL SECURITY;
+
+-- ================================================
+-- TABLE: inscriptions_formations
+-- ================================================
+
+CREATE TABLE IF NOT EXISTS public.inscriptions_formations (
+  id                    UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  formation_id          UUID        NOT NULL REFERENCES public.formations(id) ON DELETE CASCADE,
+  user_id               UUID        REFERENCES public.users(id),
+  nom_externe           TEXT,
+  prenom_externe        TEXT,
+  email_externe         TEXT,
+  telephone_externe     TEXT,
+  organisation_externe  TEXT,
+  created_at            TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+ALTER TABLE public.inscriptions_formations ENABLE ROW LEVEL SECURITY;
+
+-- Anti-doublon : un utilisateur connecté ne peut s'inscrire qu'une fois par formation
+CREATE UNIQUE INDEX IF NOT EXISTS uq_inscriptions_formation_user
+  ON public.inscriptions_formations (formation_id, user_id)
+  WHERE user_id IS NOT NULL;
+
+CREATE INDEX IF NOT EXISTS idx_inscriptions_formation_id
+  ON public.inscriptions_formations (formation_id);
+
+CREATE INDEX IF NOT EXISTS idx_inscriptions_formation_user_id
+  ON public.inscriptions_formations (user_id);
+
+-- ================================================
 -- VÉRIFICATION
 -- ================================================
 SELECT table_name

@@ -2,7 +2,7 @@
 
 import { AdminWrapper } from "@/components/admin/admin-wrapper"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Building, Tags, FolderCog, CalendarCog } from "lucide-react"
+import { Building, Tags, FolderCog, CalendarCog, BookOpen } from "lucide-react"
 import Link from "next/link"
 
 const configItems = [
@@ -37,6 +37,14 @@ const configItems = [
     href: "/admin/config/types-evenements",
     color: "text-orange-600",
     bgColor: "bg-orange-100"
+  },
+  {
+    title: "Types de formations",
+    description: "Gérez les types de formations (Atelier, Masterclass, Webinaire, etc.)",
+    icon: BookOpen,
+    href: "/admin/config/types-formations",
+    color: "text-teal-600",
+    bgColor: "bg-teal-100"
   }
 ]
 

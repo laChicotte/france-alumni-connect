@@ -481,6 +481,184 @@ USING (
 );
 
 -- ================================================
+-- TABLE: types_formations
+-- ================================================
+
+DROP POLICY IF EXISTS "Types formations visibles par tous les authentifiés" ON types_formations;
+CREATE POLICY "Types formations visibles par tous les authentifiés"
+ON types_formations FOR SELECT
+TO authenticated
+USING (true);
+
+DROP POLICY IF EXISTS "Seuls les admins gèrent les types formations" ON types_formations;
+CREATE POLICY "Seuls les admins gèrent les types formations"
+ON types_formations FOR ALL
+TO authenticated
+USING (
+  EXISTS (SELECT 1 FROM users u WHERE u.id = auth.uid() AND u.role = 'admin')
+)
+WITH CHECK (
+  EXISTS (SELECT 1 FROM users u WHERE u.id = auth.uid() AND u.role = 'admin')
+);
+
+-- ================================================
+-- TABLE: formations
+-- ================================================
+
+-- SELECT: formations publiées visibles par les authentifiés
+DROP POLICY IF EXISTS "Formations publiées visibles par les authentifiés" ON formations;
+CREATE POLICY "Formations publiées visibles par les authentifiés"
+ON formations FOR SELECT
+TO authenticated
+USING (statut = 'publiee' AND actif = true);
+
+-- SELECT: admin voit tout
+DROP POLICY IF EXISTS "Admin voit toutes les formations" ON formations;
+CREATE POLICY "Admin voit toutes les formations"
+ON formations FOR SELECT
+TO authenticated
+USING (
+  EXISTS (SELECT 1 FROM users u WHERE u.id = auth.uid() AND u.role = 'admin')
+);
+
+-- SELECT: modérateur voit ses formations
+DROP POLICY IF EXISTS "Modérateur voit ses formations" ON formations;
+CREATE POLICY "Modérateur voit ses formations"
+ON formations FOR SELECT
+TO authenticated
+USING (
+  EXISTS (SELECT 1 FROM users u WHERE u.id = auth.uid() AND u.role = 'moderateur')
+  AND proposee_par = auth.uid()
+);
+
+-- SELECT: alumni voit ses propres propositions
+DROP POLICY IF EXISTS "Alumni voit ses propres propositions" ON formations;
+CREATE POLICY "Alumni voit ses propres propositions"
+ON formations FOR SELECT
+TO authenticated
+USING (proposee_par = auth.uid());
+
+-- INSERT: admin/modérateur créent directement
+DROP POLICY IF EXISTS "Admin et modérateur peuvent créer des formations" ON formations;
+CREATE POLICY "Admin et modérateur peuvent créer des formations"
+ON formations FOR INSERT
+TO authenticated
+WITH CHECK (
+  EXISTS (
+    SELECT 1 FROM users u
+    WHERE u.id = auth.uid()
+    AND u.role IN ('admin', 'moderateur')
+  )
+);
+
+-- INSERT: alumni propose (statut en_attente forcé)
+DROP POLICY IF EXISTS "Alumni peuvent proposer une formation" ON formations;
+CREATE POLICY "Alumni peuvent proposer une formation"
+ON formations FOR INSERT
+TO authenticated
+WITH CHECK (
+  EXISTS (SELECT 1 FROM users u WHERE u.id = auth.uid() AND u.role = 'alumni')
+  AND statut = 'en_attente'
+  AND proposee_par = auth.uid()
+);
+
+-- UPDATE: admin tout
+DROP POLICY IF EXISTS "Admin peut modifier toutes les formations" ON formations;
+CREATE POLICY "Admin peut modifier toutes les formations"
+ON formations FOR UPDATE
+TO authenticated
+USING (
+  EXISTS (SELECT 1 FROM users u WHERE u.id = auth.uid() AND u.role = 'admin')
+);
+
+-- UPDATE: modérateur ses formations
+DROP POLICY IF EXISTS "Modérateur modifie ses formations" ON formations;
+CREATE POLICY "Modérateur modifie ses formations"
+ON formations FOR UPDATE
+TO authenticated
+USING (
+  EXISTS (SELECT 1 FROM users u WHERE u.id = auth.uid() AND u.role = 'moderateur')
+  AND proposee_par = auth.uid()
+);
+
+-- UPDATE: alumni modifie ses propositions en attente
+DROP POLICY IF EXISTS "Alumni modifie ses propositions en attente" ON formations;
+CREATE POLICY "Alumni modifie ses propositions en attente"
+ON formations FOR UPDATE
+TO authenticated
+USING (
+  proposee_par = auth.uid()
+  AND statut = 'en_attente'
+);
+
+-- DELETE: admin uniquement
+DROP POLICY IF EXISTS "Seul admin peut supprimer une formation" ON formations;
+CREATE POLICY "Seul admin peut supprimer une formation"
+ON formations FOR DELETE
+TO authenticated
+USING (
+  EXISTS (SELECT 1 FROM users u WHERE u.id = auth.uid() AND u.role = 'admin')
+);
+
+-- ================================================
+-- TABLE: inscriptions_formations
+-- ================================================
+
+-- UPDATE non autorisé
+REVOKE UPDATE ON inscriptions_formations FROM authenticated;
+
+-- SELECT: utilisateur voit ses inscriptions
+DROP POLICY IF EXISTS "Utilisateur voit ses inscriptions formations" ON inscriptions_formations;
+CREATE POLICY "Utilisateur voit ses inscriptions formations"
+ON inscriptions_formations FOR SELECT
+TO authenticated
+USING (user_id = auth.uid());
+
+-- SELECT: admin/modérateur voient tout
+DROP POLICY IF EXISTS "Admin et modérateur voient toutes les inscriptions formations" ON inscriptions_formations;
+CREATE POLICY "Admin et modérateur voient toutes les inscriptions formations"
+ON inscriptions_formations FOR SELECT
+TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM users u
+    WHERE u.id = auth.uid()
+    AND u.role IN ('admin', 'moderateur')
+  )
+);
+
+-- INSERT: s'inscrire à une formation publiée
+DROP POLICY IF EXISTS "Utilisateur peut s'inscrire à une formation publiée" ON inscriptions_formations;
+CREATE POLICY "Utilisateur peut s'inscrire à une formation publiée"
+ON inscriptions_formations FOR INSERT
+TO authenticated
+WITH CHECK (
+  user_id = auth.uid()
+  AND EXISTS (
+    SELECT 1 FROM formations f
+    WHERE f.id = inscriptions_formations.formation_id
+    AND f.statut = 'publiee'
+    AND f.actif = true
+  )
+);
+
+-- DELETE: annuler sa propre inscription
+DROP POLICY IF EXISTS "Utilisateur peut annuler son inscription formation" ON inscriptions_formations;
+CREATE POLICY "Utilisateur peut annuler son inscription formation"
+ON inscriptions_formations FOR DELETE
+TO authenticated
+USING (user_id = auth.uid());
+
+-- DELETE: admin peut supprimer une inscription
+DROP POLICY IF EXISTS "Admin peut supprimer une inscription formation" ON inscriptions_formations;
+CREATE POLICY "Admin peut supprimer une inscription formation"
+ON inscriptions_formations FOR DELETE
+TO authenticated
+USING (
+  EXISTS (SELECT 1 FROM users u WHERE u.id = auth.uid() AND u.role = 'admin')
+);
+
+-- ================================================
 -- TABLE: emplois
 -- ================================================
 
