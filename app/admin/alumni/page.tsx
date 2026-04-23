@@ -37,7 +37,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import { Search, MoreHorizontal, Eye, EyeOff, Loader2, Download, User, Phone, MapPin, GraduationCap, Briefcase, FileText, Calendar, Globe, ExternalLink } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Search, MoreHorizontal, Eye, EyeOff, Loader2, Download, User, Phone, MapPin, GraduationCap, Briefcase, FileText, Calendar, Globe, ExternalLink, AlertCircle, CheckCircle2 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import type { AlumniProfile, Secteur } from "@/types/database.types"
 import { downloadCsv } from "@/lib/export/csv"
@@ -68,6 +69,7 @@ export default function AlumniPage() {
   const [selectedAlumni, setSelectedAlumni] = useState<AlumniWithSecteur | null>(null)
   const [dialogAction, setDialogAction] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null)
 
   useEffect(() => {
     fetchAlumni()
@@ -99,12 +101,15 @@ export default function AlumniPage() {
 
   const handleVisibilityChange = async (profile: AlumniWithSecteur, visible: boolean) => {
     setIsSubmitting(true)
-    const { error } = await supabase
-      .from('alumni_profiles')
+    setFeedback(null)
+    const { error } = await (supabase.from('alumni_profiles') as any)
       .update({ visible_annuaire: visible })
       .eq('id', profile.id)
 
-    if (!error) {
+    if (error) {
+      setFeedback({ type: "error", message: `Modification échouée: ${error.message}` })
+    } else {
+      setFeedback({ type: "success", message: `Visibilité de ${profile.prenom} ${profile.nom} mise à jour.` })
       fetchAlumni()
     }
     setIsSubmitting(false)
@@ -169,6 +174,13 @@ export default function AlumniPage() {
             </Button>
           </div>
         </div>
+
+      {feedback && (
+        <Alert variant={feedback.type === "error" ? "destructive" : "default"} className="mb-4">
+          {feedback.type === "error" ? <AlertCircle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4 text-green-600" />}
+          <AlertDescription>{feedback.message}</AlertDescription>
+        </Alert>
+      )}
 
       {/* Filters */}
       <Card className="mb-6">

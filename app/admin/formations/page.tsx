@@ -15,7 +15,8 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
-import { Search, Plus, Pencil, Trash2, Archive, Loader2, CalendarDays, MapPin, Clock3, Eye, Download, CheckCircle2, UserCircle } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Search, Plus, Pencil, Trash2, Archive, Loader2, CalendarDays, MapPin, Clock3, Eye, Download, CheckCircle2, UserCircle, AlertCircle } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import type { Formation, TypeFormation, FormationStatut } from "@/types/database.types"
 import { downloadCsv } from "@/lib/export/csv"
@@ -53,6 +54,7 @@ export default function FormationsAdminPage() {
   const [selectedFormation, setSelectedFormation] = useState<FormationWithType | null>(null)
   const [dialogAction, setDialogAction] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null)
   const [currentUser, setCurrentUser] = useState<any>(null)
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null)
@@ -137,50 +139,84 @@ export default function FormationsAdminPage() {
 
   const handleCreate = async () => {
     setIsSubmitting(true)
+    setFeedback(null)
     try {
       let imageUrl = "/placeholder.svg"
       if (imageFile) imageUrl = await uploadImage(imageFile)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error } = await (supabase.from("formations") as any).insert(buildPayload(imageUrl))
-      if (!error) { fetchFormations(); setDialogAction(null); resetForm() }
-      else alert(error.message)
-    } catch (e) { console.error(e) }
+      if (error) {
+        setFeedback({ type: "error", message: `Création échouée: ${error.message}` })
+      } else {
+        setFeedback({ type: "success", message: "Formation créée avec succès." })
+        fetchFormations(); setDialogAction(null); resetForm()
+      }
+    } catch (e) {
+      setFeedback({ type: "error", message: "Erreur lors de la création de la formation." })
+      console.error(e)
+    }
     setIsSubmitting(false)
   }
 
   const handleUpdate = async () => {
     if (!selectedFormation) return
     setIsSubmitting(true)
+    setFeedback(null)
     try {
       let imageUrl = formData.image_url || selectedFormation.image_url || "/placeholder.svg"
       if (imageFile) imageUrl = await uploadImage(imageFile)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const { error } = await (supabase.from("formations") as any).update(buildPayload(imageUrl)).eq("id", selectedFormation.id)
-      if (!error) { fetchFormations(); setDialogAction(null); resetForm() }
-      else alert(error.message)
-    } catch (e) { console.error(e) }
+      if (error) {
+        setFeedback({ type: "error", message: `Modification échouée: ${error.message}` })
+      } else {
+        setFeedback({ type: "success", message: `Formation "${selectedFormation.titre}" mise à jour.` })
+        fetchFormations(); setDialogAction(null); resetForm()
+      }
+    } catch (e) {
+      setFeedback({ type: "error", message: "Erreur lors de la modification de la formation." })
+      console.error(e)
+    }
     setIsSubmitting(false)
   }
 
   const handleDelete = async () => {
     if (!selectedFormation) return
     setIsSubmitting(true)
+    setFeedback(null)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (supabase.from("formations") as any).delete().eq("id", selectedFormation.id)
-    if (!error) { fetchFormations(); setDialogAction(null); setSelectedFormation(null) }
+    if (error) {
+      setFeedback({ type: "error", message: `Suppression échouée: ${error.message}` })
+    } else {
+      setFeedback({ type: "success", message: "Formation supprimée." })
+      fetchFormations(); setDialogAction(null); setSelectedFormation(null)
+    }
     setIsSubmitting(false)
   }
 
   const handlePublier = async (f: FormationWithType) => {
+    setFeedback(null)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase.from("formations") as any).update({ statut: "publiee" }).eq("id", f.id)
-    fetchFormations()
+    const { error } = await (supabase.from("formations") as any).update({ statut: "publiee" }).eq("id", f.id)
+    if (error) {
+      setFeedback({ type: "error", message: `Publication échouée: ${error.message}` })
+    } else {
+      setFeedback({ type: "success", message: `Formation "${f.titre}" publiée.` })
+      fetchFormations()
+    }
   }
 
   const handleArchiver = async (f: FormationWithType) => {
+    setFeedback(null)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await (supabase.from("formations") as any).update({ statut: "archivee", actif: false }).eq("id", f.id)
-    fetchFormations()
+    const { error } = await (supabase.from("formations") as any).update({ statut: "archivee", actif: false }).eq("id", f.id)
+    if (error) {
+      setFeedback({ type: "error", message: `Archivage échoué: ${error.message}` })
+    } else {
+      setFeedback({ type: "success", message: `Formation "${f.titre}" archivée.` })
+      fetchFormations()
+    }
   }
 
   const resetForm = () => {
@@ -298,6 +334,13 @@ export default function FormationsAdminPage() {
             </Button>
           </div>
         </div>
+
+        {feedback && (
+          <Alert variant={feedback.type === "error" ? "destructive" : "default"} className="mb-4">
+            {feedback.type === "error" ? <AlertCircle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4 text-green-600" />}
+            <AlertDescription>{feedback.message}</AlertDescription>
+          </Alert>
+        )}
 
         {/* Filtres */}
         <Card className="mb-6">

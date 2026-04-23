@@ -18,7 +18,8 @@ import {
 import {
   Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog"
-import { Search, MoreHorizontal, Plus, Pencil, Trash2, Eye, EyeOff, Loader2 } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Search, MoreHorizontal, Plus, Pencil, Trash2, Eye, EyeOff, Loader2, AlertCircle, CheckCircle2 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import type { Partenaire } from "@/types/database.types"
 
@@ -30,6 +31,7 @@ export default function PartenairesPage() {
   const [selectedPartenaire, setSelectedPartenaire] = useState<Partenaire | null>(null)
   const [dialogAction, setDialogAction] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null)
 
   const [formData, setFormData] = useState({
     nom: "", logo_url: "", site_web: "", description: "", actif: true
@@ -67,10 +69,12 @@ export default function PartenairesPage() {
   const handleCreate = async () => {
     if (!formData.nom || !logoFile) return
     setIsSubmitting(true)
+    setFeedback(null)
     let uploadedLogoUrl = formData.logo_url
     try {
       uploadedLogoUrl = await uploadLogoToStorage(logoFile)
     } catch (error) {
+      setFeedback({ type: "error", message: "Erreur lors de l'upload du logo." })
       console.error("Erreur upload logo partenaire:", error)
       setIsSubmitting(false)
       return
@@ -83,18 +87,25 @@ export default function PartenairesPage() {
       actif: formData.actif,
       ordre: partenaires.length + 1,
     })
-    if (!error) { fetchPartenaires(); setDialogAction(null); resetForm() }
+    if (error) {
+      setFeedback({ type: "error", message: `Création échouée: ${error.message}` })
+    } else {
+      setFeedback({ type: "success", message: "Partenaire créé avec succès." })
+      fetchPartenaires(); setDialogAction(null); resetForm()
+    }
     setIsSubmitting(false)
   }
 
   const handleUpdate = async () => {
     if (!selectedPartenaire) return
     setIsSubmitting(true)
+    setFeedback(null)
     let uploadedLogoUrl = formData.logo_url
     if (logoFile) {
       try {
         uploadedLogoUrl = await uploadLogoToStorage(logoFile)
       } catch (error) {
+        setFeedback({ type: "error", message: "Erreur lors de l'upload du logo." })
         console.error("Erreur upload logo partenaire:", error)
         setIsSubmitting(false)
         return
@@ -110,21 +121,38 @@ export default function PartenairesPage() {
         actif: formData.actif
       })
       .eq('id', selectedPartenaire.id)
-    if (!error) { fetchPartenaires(); setDialogAction(null); resetForm() }
+    if (error) {
+      setFeedback({ type: "error", message: `Modification échouée: ${error.message}` })
+    } else {
+      setFeedback({ type: "success", message: `Partenaire "${selectedPartenaire.nom}" mis à jour.` })
+      fetchPartenaires(); setDialogAction(null); resetForm()
+    }
     setIsSubmitting(false)
   }
 
   const handleDelete = async () => {
     if (!selectedPartenaire) return
     setIsSubmitting(true)
+    setFeedback(null)
     const { error } = await supabase.from('partenaires').delete().eq('id', selectedPartenaire.id)
-    if (!error) { fetchPartenaires(); setDialogAction(null); setSelectedPartenaire(null) }
+    if (error) {
+      setFeedback({ type: "error", message: `Suppression échouée: ${error.message}` })
+    } else {
+      setFeedback({ type: "success", message: `Partenaire "${selectedPartenaire.nom}" supprimé.` })
+      fetchPartenaires(); setDialogAction(null); setSelectedPartenaire(null)
+    }
     setIsSubmitting(false)
   }
 
   const handleToggleActif = async (partenaire: Partenaire) => {
-    await supabase.from('partenaires').update({ actif: !partenaire.actif }).eq('id', partenaire.id)
-    fetchPartenaires()
+    setFeedback(null)
+    const { error } = await supabase.from('partenaires').update({ actif: !partenaire.actif }).eq('id', partenaire.id)
+    if (error) {
+      setFeedback({ type: "error", message: `Modification échouée: ${error.message}` })
+    } else {
+      setFeedback({ type: "success", message: `Partenaire "${partenaire.nom}" ${partenaire.actif ? 'masqué' : 'affiché'}.` })
+      fetchPartenaires()
+    }
   }
 
   const resetForm = () => {
@@ -175,6 +203,13 @@ export default function PartenairesPage() {
           <Plus className="h-4 w-4 mr-2" /> Nouveau partenaire
         </Button>
       </div>
+
+      {feedback && (
+        <Alert variant={feedback.type === "error" ? "destructive" : "default"} className="mb-4">
+          {feedback.type === "error" ? <AlertCircle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4 text-green-600" />}
+          <AlertDescription>{feedback.message}</AlertDescription>
+        </Alert>
+      )}
 
       <Card className="mb-6">
         <CardContent className="pt-6">

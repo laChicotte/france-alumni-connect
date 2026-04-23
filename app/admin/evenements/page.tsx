@@ -15,7 +15,8 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
-import { Search, Plus, Pencil, Trash2, Archive, Loader2, CalendarDays, MapPin, Clock3, Eye, Download } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Search, Plus, Pencil, Trash2, Archive, Loader2, CalendarDays, MapPin, Clock3, Eye, Download, AlertCircle, CheckCircle2 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import type { Evenement, TypeEvenement } from "@/types/database.types"
 import { downloadCsv } from "@/lib/export/csv"
@@ -39,6 +40,7 @@ export default function EvenementsPage() {
   const [selectedEvent, setSelectedEvent] = useState<EvenementWithType | null>(null)
   const [dialogAction, setDialogAction] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null)
   const [currentUser, setCurrentUser] = useState<any>(null)
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null)
@@ -112,6 +114,7 @@ export default function EvenementsPage() {
 
   const handleCreate = async () => {
     setIsSubmitting(true)
+    setFeedback(null)
     try {
       let imageUrl = formData.image_url || ""
       if (imageFile) {
@@ -128,8 +131,14 @@ export default function EvenementsPage() {
         places_max: formData.places_max ? parseInt(formData.places_max) : null,
         organisateur_id: currentUser?.id
       })
-      if (!error) { fetchEvenements(); setDialogAction(null); resetForm() }
+      if (error) {
+        setFeedback({ type: "error", message: `Création échouée: ${error.message}` })
+      } else {
+        setFeedback({ type: "success", message: "Événement créé avec succès." })
+        fetchEvenements(); setDialogAction(null); resetForm()
+      }
     } catch (error) {
+      setFeedback({ type: "error", message: "Erreur lors de la création de l'événement." })
       console.error("Erreur création événement:", error)
     }
     setIsSubmitting(false)
@@ -138,6 +147,7 @@ export default function EvenementsPage() {
   const handleUpdate = async () => {
     if (!selectedEvent) return
     setIsSubmitting(true)
+    setFeedback(null)
     try {
       let imageUrl = formData.image_url || selectedEvent.image_url || "/placeholder.svg"
       if (imageFile) {
@@ -150,8 +160,14 @@ export default function EvenementsPage() {
         slug: formData.slug || generateSlug(formData.titre),
         places_max: formData.places_max ? parseInt(formData.places_max) : null
       }).eq('id', selectedEvent.id)
-      if (!error) { fetchEvenements(); setDialogAction(null); resetForm() }
+      if (error) {
+        setFeedback({ type: "error", message: `Modification échouée: ${error.message}` })
+      } else {
+        setFeedback({ type: "success", message: `Événement "${selectedEvent.titre}" mis à jour.` })
+        fetchEvenements(); setDialogAction(null); resetForm()
+      }
     } catch (error) {
+      setFeedback({ type: "error", message: "Erreur lors de la modification de l'événement." })
       console.error("Erreur update événement:", error)
     }
     setIsSubmitting(false)
@@ -160,14 +176,26 @@ export default function EvenementsPage() {
   const handleDelete = async () => {
     if (!selectedEvent) return
     setIsSubmitting(true)
+    setFeedback(null)
     const { error } = await (supabase.from('evenements') as any).delete().eq('id', selectedEvent.id)
-    if (!error) { fetchEvenements(); setDialogAction(null); setSelectedEvent(null) }
+    if (error) {
+      setFeedback({ type: "error", message: `Suppression échouée: ${error.message}` })
+    } else {
+      setFeedback({ type: "success", message: "Événement supprimé." })
+      fetchEvenements(); setDialogAction(null); setSelectedEvent(null)
+    }
     setIsSubmitting(false)
   }
 
   const handleMarkTerminated = async (event: EvenementWithType) => {
-    await (supabase.from('evenements') as any).update({ archive: true, actif: false }).eq('id', event.id)
-    fetchEvenements()
+    setFeedback(null)
+    const { error } = await (supabase.from('evenements') as any).update({ archive: true, actif: false }).eq('id', event.id)
+    if (error) {
+      setFeedback({ type: "error", message: `Modification échouée: ${error.message}` })
+    } else {
+      setFeedback({ type: "success", message: `Événement "${event.titre}" marqué comme terminé.` })
+      fetchEvenements()
+    }
   }
 
   const resetForm = () => {
@@ -333,6 +361,13 @@ export default function EvenementsPage() {
             </Button>
           </div>
       </div>
+
+      {feedback && (
+        <Alert variant={feedback.type === "error" ? "destructive" : "default"} className="mb-4">
+          {feedback.type === "error" ? <AlertCircle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4 text-green-600" />}
+          <AlertDescription>{feedback.message}</AlertDescription>
+        </Alert>
+      )}
 
       <Card className="mb-6">
         <CardContent className="pt-6">

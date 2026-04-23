@@ -21,7 +21,8 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
-import { Search, MoreHorizontal, Plus, Pencil, Trash2, Power, Loader2 } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Search, MoreHorizontal, Plus, Pencil, Trash2, Power, Loader2, AlertCircle, CheckCircle2 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import type { Emploi, Secteur } from "@/types/database.types"
 
@@ -47,6 +48,7 @@ export default function EmploisPage() {
   const [selectedEmploi, setSelectedEmploi] = useState<EmploiWithSecteur | null>(null)
   const [dialogAction, setDialogAction] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null)
 
   const [formData, setFormData] = useState({
     titre: "", entreprise: "", localisation: "", type_contrat: "cdi" as any,
@@ -76,30 +78,54 @@ export default function EmploisPage() {
 
   const handleCreate = async () => {
     setIsSubmitting(true)
+    setFeedback(null)
     const { error } = await supabase.from('emplois').insert(formData)
-    if (!error) { fetchEmplois(); setDialogAction(null); resetForm() }
+    if (error) {
+      setFeedback({ type: "error", message: `Création échouée: ${error.message}` })
+    } else {
+      setFeedback({ type: "success", message: "Offre créée avec succès." })
+      fetchEmplois(); setDialogAction(null); resetForm()
+    }
     setIsSubmitting(false)
   }
 
   const handleUpdate = async () => {
     if (!selectedEmploi) return
     setIsSubmitting(true)
+    setFeedback(null)
     const { error } = await supabase.from('emplois').update(formData).eq('id', selectedEmploi.id)
-    if (!error) { fetchEmplois(); setDialogAction(null); resetForm() }
+    if (error) {
+      setFeedback({ type: "error", message: `Modification échouée: ${error.message}` })
+    } else {
+      setFeedback({ type: "success", message: `Offre "${selectedEmploi.titre}" mise à jour.` })
+      fetchEmplois(); setDialogAction(null); resetForm()
+    }
     setIsSubmitting(false)
   }
 
   const handleDelete = async () => {
     if (!selectedEmploi) return
     setIsSubmitting(true)
+    setFeedback(null)
     const { error } = await supabase.from('emplois').delete().eq('id', selectedEmploi.id)
-    if (!error) { fetchEmplois(); setDialogAction(null); setSelectedEmploi(null) }
+    if (error) {
+      setFeedback({ type: "error", message: `Suppression échouée: ${error.message}` })
+    } else {
+      setFeedback({ type: "success", message: `Offre "${selectedEmploi.titre}" supprimée.` })
+      fetchEmplois(); setDialogAction(null); setSelectedEmploi(null)
+    }
     setIsSubmitting(false)
   }
 
   const handleToggleActif = async (emploi: EmploiWithSecteur) => {
-    await supabase.from('emplois').update({ actif: !emploi.actif }).eq('id', emploi.id)
-    fetchEmplois()
+    setFeedback(null)
+    const { error } = await supabase.from('emplois').update({ actif: !emploi.actif }).eq('id', emploi.id)
+    if (error) {
+      setFeedback({ type: "error", message: `Modification échouée: ${error.message}` })
+    } else {
+      setFeedback({ type: "success", message: `Offre "${emploi.titre}" ${emploi.actif ? 'désactivée' : 'activée'}.` })
+      fetchEmplois()
+    }
   }
 
   const resetForm = () => {
@@ -143,6 +169,13 @@ export default function EmploisPage() {
           <Plus className="h-4 w-4 mr-2" /> Nouvelle offre
         </Button>
       </div>
+
+      {feedback && (
+        <Alert variant={feedback.type === "error" ? "destructive" : "default"} className="mb-4">
+          {feedback.type === "error" ? <AlertCircle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4 text-green-600" />}
+          <AlertDescription>{feedback.message}</AlertDescription>
+        </Alert>
+      )}
 
       <Card className="mb-6">
         <CardContent className="pt-6">

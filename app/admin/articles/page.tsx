@@ -10,7 +10,8 @@ import { Badge } from "@/components/ui/badge"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
-import { Search, Plus, Pencil, Trash2, Eye, EyeOff, Loader2, Download, Pin, PinOff, MoreVertical, CalendarClock } from "lucide-react"
+import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Search, Plus, Pencil, Trash2, Eye, EyeOff, Loader2, Download, Pin, PinOff, MoreVertical, CalendarClock, AlertCircle, CheckCircle2 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import type { Article } from "@/types/database.types"
 import { downloadCsv } from "@/lib/export/csv"
@@ -22,6 +23,7 @@ export default function ArticlesPage() {
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null)
   const [antidateArticle, setAntidateArticle] = useState<Article | null>(null)
   const [antidateValue, setAntidateValue] = useState("")
 
@@ -42,8 +44,14 @@ export default function ArticlesPage() {
 
   const handleDelete = async (id: string) => {
     setIsSubmitting(true)
+    setFeedback(null)
     const { error } = await (supabase.from("articles") as any).delete().eq("id", id)
-    if (!error) fetchArticles()
+    if (error) {
+      setFeedback({ type: "error", message: `Suppression échouée: ${error.message}` })
+    } else {
+      setFeedback({ type: "success", message: "Article supprimé." })
+      fetchArticles()
+    }
     setIsSubmitting(false)
   }
 
@@ -51,14 +59,20 @@ export default function ArticlesPage() {
     if (!article.epingle) {
       const pinnedCount = articles.filter((a) => a.epingle).length
       if (pinnedCount >= 3) {
-        alert("Vous ne pouvez pas épingler plus de 3 articles. Désépinglez un article d'abord.")
+        setFeedback({ type: "error", message: "Vous ne pouvez pas épingler plus de 3 articles. Désépinglez un article d'abord." })
         return
       }
     }
+    setFeedback(null)
     const { error } = await (supabase.from("articles") as any)
       .update({ epingle: !article.epingle })
       .eq("id", article.id)
-    if (!error) fetchArticles()
+    if (error) {
+      setFeedback({ type: "error", message: `Modification échouée: ${error.message}` })
+    } else {
+      setFeedback({ type: "success", message: article.epingle ? "Article désépinglé." : "Article épinglé." })
+      fetchArticles()
+    }
   }
 
   const openAntidateDialog = (article: Article) => {
@@ -72,10 +86,14 @@ export default function ArticlesPage() {
   const handleAntidate = async () => {
     if (!antidateArticle || !antidateValue) return
     setIsSubmitting(true)
+    setFeedback(null)
     const { error } = await (supabase.from("articles") as any)
       .update({ date_publication: new Date(antidateValue).toISOString() })
       .eq("id", antidateArticle.id)
-    if (!error) {
+    if (error) {
+      setFeedback({ type: "error", message: `Antidatage échoué: ${error.message}` })
+    } else {
+      setFeedback({ type: "success", message: "Date de publication mise à jour." })
       fetchArticles()
       setAntidateArticle(null)
     }
@@ -83,6 +101,7 @@ export default function ArticlesPage() {
   }
 
   const handleToggleStatus = async (article: Article) => {
+    setFeedback(null)
     const newStatus = article.status === "publie" ? "brouillon" : "publie"
     const { error } = await (supabase.from("articles") as any)
       .update({
@@ -90,7 +109,12 @@ export default function ArticlesPage() {
         date_publication: newStatus === "publie" ? new Date().toISOString() : article.date_publication,
       })
       .eq("id", article.id)
-    if (!error) fetchArticles()
+    if (error) {
+      setFeedback({ type: "error", message: `Modification échouée: ${error.message}` })
+    } else {
+      setFeedback({ type: "success", message: newStatus === "publie" ? "Article publié." : "Article suspendu." })
+      fetchArticles()
+    }
   }
 
   const filteredArticles = articles.filter((article) => {
@@ -129,6 +153,13 @@ export default function ArticlesPage() {
             Exporter CSV
           </Button>
         </div>
+
+        {feedback && (
+          <Alert variant={feedback.type === "error" ? "destructive" : "default"} className="mb-4">
+            {feedback.type === "error" ? <AlertCircle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4 text-green-600" />}
+            <AlertDescription>{feedback.message}</AlertDescription>
+          </Alert>
+        )}
 
         <Card>
           <CardContent className="pt-6">
