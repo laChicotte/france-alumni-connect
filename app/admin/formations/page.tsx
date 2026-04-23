@@ -15,7 +15,7 @@ import {
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
-import { Search, Plus, Pencil, Trash2, Archive, Loader2, CalendarDays, MapPin, Clock3, Eye, Download, CheckCircle2 } from "lucide-react"
+import { Search, Plus, Pencil, Trash2, Archive, Loader2, CalendarDays, MapPin, Clock3, Eye, Download, CheckCircle2, UserCircle } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import type { Formation, TypeFormation, FormationStatut } from "@/types/database.types"
 import { downloadCsv } from "@/lib/export/csv"
@@ -23,9 +23,9 @@ import { downloadCsv } from "@/lib/export/csv"
 interface FormationWithType extends Formation {
   types_formations?: { libelle: string } | null
   inscriptions_count?: number
+  proposant?: { prenom: string | null; nom: string | null; email: string } | null
 }
 
-const NIVEAUX = ["Débutant", "Intermédiaire", "Avancé", "Tous niveaux"]
 const PAGE_SIZE = 4
 
 function statutBadge(statut: FormationStatut) {
@@ -47,7 +47,6 @@ export default function FormationsAdminPage() {
   const [searchTerm, setSearchTerm] = useState("")
   const [filterType, setFilterType] = useState("all")
   const [filterStatut, setFilterStatut] = useState("all")
-  const [filterNiveau, setFilterNiveau] = useState("all")
   const [startDate, setStartDate] = useState("")
   const [endDate, setEndDate] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
@@ -77,12 +76,12 @@ export default function FormationsAdminPage() {
     if (user) setCurrentUser(JSON.parse(user))
   }, [])
 
-  useEffect(() => { setCurrentPage(1) }, [searchTerm, filterType, filterStatut, filterNiveau, startDate, endDate])
+  useEffect(() => { setCurrentPage(1) }, [searchTerm, filterType, filterStatut, startDate, endDate])
 
   const fetchFormations = async () => {
     setIsLoading(true)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { data, error } = await (supabase.from("formations").select("*, types_formations(libelle)") as any)
+    const { data, error } = await (supabase.from("formations").select("*, types_formations(libelle), proposant:proposee_par(prenom, nom, email)") as any)
       .order("date_debut", { ascending: true })
     if (!error) {
       const list = (data || []) as FormationWithType[]
@@ -216,11 +215,10 @@ export default function FormationsAdminPage() {
     const matchSearch = f.titre.toLowerCase().includes(searchTerm.toLowerCase()) || f.lieu.toLowerCase().includes(searchTerm.toLowerCase())
     const matchType = filterType === "all" || f.type_formation_id === filterType
     const matchStatut = filterStatut === "all" || f.statut === filterStatut
-    const matchNiveau = filterNiveau === "all" || f.niveau === filterNiveau
     const fDate = new Date(f.date_debut)
     const matchStart = !startDate || fDate >= new Date(`${startDate}T00:00:00`)
     const matchEnd = !endDate || fDate <= new Date(`${endDate}T23:59:59`)
-    return matchSearch && matchType && matchStatut && matchNiveau && matchStart && matchEnd
+    return matchSearch && matchType && matchStatut && matchStart && matchEnd
   })
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
@@ -325,13 +323,6 @@ export default function FormationsAdminPage() {
                   <SelectItem value="archivee">Archivées</SelectItem>
                 </SelectContent>
               </Select>
-              <Select value={filterNiveau} onValueChange={setFilterNiveau}>
-                <SelectTrigger className="w-full sm:w-[160px]"><SelectValue placeholder="Niveau" /></SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">Tous niveaux</SelectItem>
-                  {NIVEAUX.map((n) => <SelectItem key={n} value={n}>{n}</SelectItem>)}
-                </SelectContent>
-              </Select>
               <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="w-full sm:w-[170px]" />
               <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="w-full sm:w-[170px]" />
             </div>
@@ -384,6 +375,17 @@ export default function FormationsAdminPage() {
                           <MapPin className="h-4 w-4 text-[#3558A2]" />
                           {f.lieu}
                         </div>
+                        {f.proposant && (
+                          <div className={`flex items-start gap-1 font-medium ${f.statut === "en_attente" ? "text-amber-700" : "text-[#3558A2]"}`}>
+                            <UserCircle className="h-4 w-4 shrink-0 mt-0.5" />
+                            <div className="flex flex-col">
+                              <span>{f.statut === "en_attente" ? "Proposé par" : "Auteur :"} {f.proposant.prenom} {f.proposant.nom}</span>
+                              {f.statut === "en_attente" && (
+                                <span className="font-normal text-muted-foreground">{f.proposant.email}</span>
+                              )}
+                            </div>
+                          </div>
+                        )}
                       </div>
 
                       <div className="flex items-center justify-between gap-2 pt-1">
@@ -472,21 +474,12 @@ export default function FormationsAdminPage() {
                   <Input value={formData.lien_visio} onChange={(e) => setFormData({ ...formData, lien_visio: e.target.value })} placeholder="https://..." />
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Type</Label>
-                  <Select value={formData.type_formation_id} onValueChange={(v) => setFormData({ ...formData, type_formation_id: v })}>
-                    <SelectTrigger><SelectValue placeholder="Sélectionner" /></SelectTrigger>
-                    <SelectContent>{types.map((t) => <SelectItem key={t.id} value={t.id}>{t.libelle}</SelectItem>)}</SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Niveau</Label>
-                  <Select value={formData.niveau} onValueChange={(v) => setFormData({ ...formData, niveau: v })}>
-                    <SelectTrigger><SelectValue placeholder="Sélectionner" /></SelectTrigger>
-                    <SelectContent>{NIVEAUX.map((n) => <SelectItem key={n} value={n}>{n}</SelectItem>)}</SelectContent>
-                  </Select>
-                </div>
+              <div className="space-y-2">
+                <Label>Type *</Label>
+                <Select value={formData.type_formation_id} onValueChange={(v) => setFormData({ ...formData, type_formation_id: v })}>
+                  <SelectTrigger><SelectValue placeholder="Sélectionner" /></SelectTrigger>
+                  <SelectContent>{types.map((t) => <SelectItem key={t.id} value={t.id}>{t.libelle}</SelectItem>)}</SelectContent>
+                </Select>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -519,12 +512,12 @@ export default function FormationsAdminPage() {
                 {!formData.gratuit && (
                   <div className="space-y-2">
                     <Label>Prix (GNF)</Label>
-                    <Input type="number" step="0.01" value={formData.prix} onChange={(e) => setFormData({ ...formData, prix: e.target.value })} placeholder="Ex: 50" />
+                    <Input type="number" step="0.01" value={formData.prix} onChange={(e) => setFormData({ ...formData, prix: e.target.value })} placeholder="Ex: 500 000" />
                   </div>
                 )}
               </div>
               <div className="space-y-2">
-                <Label>Photo (optionnel)</Label>
+                <Label>Photo *</Label>
                 <Input type="file" accept="image/png,image/jpeg,image/jpg,image/webp" onChange={(e) => handleImageSelect(e.target.files?.[0] || null)} />
                 {imagePreviewUrl && <img src={imagePreviewUrl} alt="Aperçu" className="w-full max-h-48 rounded-md border object-cover" />}
               </div>
@@ -541,7 +534,7 @@ export default function FormationsAdminPage() {
               <Button variant="outline" onClick={() => { setDialogAction(null); resetForm() }}>Annuler</Button>
               <Button
                 onClick={dialogAction === "create" ? handleCreate : handleUpdate}
-                disabled={isSubmitting || !formData.titre || !formData.date_debut || !formData.heure_debut || !formData.lieu || !formData.description}
+                disabled={isSubmitting || !formData.titre || !formData.date_debut || !formData.heure_debut || !formData.lieu || !formData.description || !formData.type_formation_id || !(imageFile || formData.image_url)}
               >
                 {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : dialogAction === "create" ? "Créer" : "Enregistrer"}
               </Button>

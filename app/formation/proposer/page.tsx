@@ -14,8 +14,6 @@ import { Loader2, ArrowLeft, CheckCircle2 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import type { TypeFormation } from "@/types/database.types"
 
-const NIVEAUX = ["Débutant", "Intermédiaire", "Avancé", "Tous niveaux"]
-
 function generateSlug(titre: string) {
   return titre.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") + "-" + Date.now()
 }
@@ -230,26 +228,15 @@ export default function ProposerFormationPage() {
                 <Input id="lien_visio" type="url" value={formData.lien_visio} onChange={(e) => setFormData({ ...formData, lien_visio: e.target.value })} placeholder="https://..." />
               </div>
 
-              {/* Type + Niveau */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Type de formation</Label>
-                  <Select value={formData.type_formation_id} onValueChange={(v) => setFormData({ ...formData, type_formation_id: v })}>
-                    <SelectTrigger><SelectValue placeholder="Sélectionner" /></SelectTrigger>
-                    <SelectContent>
-                      {types.map((t) => <SelectItem key={t.id} value={t.id}>{t.libelle}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label>Niveau</Label>
-                  <Select value={formData.niveau} onValueChange={(v) => setFormData({ ...formData, niveau: v })}>
-                    <SelectTrigger><SelectValue placeholder="Sélectionner" /></SelectTrigger>
-                    <SelectContent>
-                      {NIVEAUX.map((n) => <SelectItem key={n} value={n}>{n}</SelectItem>)}
-                    </SelectContent>
-                  </Select>
-                </div>
+              {/* Type */}
+              <div className="space-y-2">
+                <Label>Type de formation *</Label>
+                <Select value={formData.type_formation_id} onValueChange={(v) => setFormData({ ...formData, type_formation_id: v })}>
+                  <SelectTrigger><SelectValue placeholder="Sélectionner" /></SelectTrigger>
+                  <SelectContent>
+                    {types.map((t) => <SelectItem key={t.id} value={t.id}>{t.libelle}</SelectItem>)}
+                  </SelectContent>
+                </Select>
               </div>
 
               {/* Places + Tarif */}
@@ -274,13 +261,13 @@ export default function ProposerFormationPage() {
               {!formData.gratuit && (
                 <div className="space-y-2">
                   <Label htmlFor="prix">Montant (GNF) *</Label>
-                  <Input id="prix" type="number" step="1" min="0" value={formData.prix} onChange={(e) => setFormData({ ...formData, prix: e.target.value })} placeholder="Ex: 500000" required={!formData.gratuit} />
+                  <Input id="prix" type="number" step="1" min="0" value={formData.prix} onChange={(e) => setFormData({ ...formData, prix: e.target.value })} placeholder="Ex: 500 000" required={!formData.gratuit} />
                 </div>
               )}
 
               {/* Photo */}
               <div className="space-y-2">
-                <Label>Photo de la formation <span className="text-muted-foreground text-xs">(optionnel)</span></Label>
+                <Label>Photo de la formation *</Label>
                 <Input type="file" accept="image/png,image/jpeg,image/jpg,image/webp" onChange={(e) => handleImageSelect(e.target.files?.[0] || null)} />
                 {imagePreviewUrl && (
                   <img src={imagePreviewUrl} alt="Aperçu" className="w-full max-h-48 rounded-md border object-cover" />
@@ -323,7 +310,7 @@ export default function ProposerFormationPage() {
                 <Button
                   type="submit"
                   className="flex-1 bg-[#3558A2] hover:bg-[#3558A2]/90"
-                  disabled={isSubmitting || !formData.titre || !formData.date_debut || !formData.heure_debut || !formData.lieu || !formData.description}
+                  disabled={isSubmitting || !formData.titre || !formData.date_debut || !formData.heure_debut || !formData.lieu || !formData.description || !formData.type_formation_id || !imageFile}
                 >
                   {isSubmitting ? <><Loader2 className="mr-2 h-4 w-4 animate-spin" /> Envoi en cours...</> : "Soumettre ma proposition"}
                 </Button>
