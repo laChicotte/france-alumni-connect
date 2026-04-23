@@ -355,9 +355,9 @@ export default function FormationsAdminPage() {
                       <div className="flex items-center justify-between gap-2 flex-wrap">
                         <Badge variant="outline">{f.types_formations?.libelle || "Formation"}</Badge>
                         <div className="flex gap-1.5">
-                          {f.niveau && <Badge variant="outline" className="text-[#3558A2] border-[#3558A2]">{f.niveau}</Badge>}
+                          
                           <Badge className={f.gratuit ? "bg-green-100 text-green-700 hover:bg-green-100" : "bg-amber-100 text-amber-700 hover:bg-amber-100"}>
-                            {f.gratuit ? "Gratuit" : f.prix ? `${f.prix} €` : "Payant"}
+                          {f.gratuit ? "Gratuit" : f.prix ? `${f.prix} GNF` : "Payant"}
                           </Badge>
                           {statutBadge(f.statut)}
                         </div>
@@ -518,7 +518,7 @@ export default function FormationsAdminPage() {
                 </div>
                 {!formData.gratuit && (
                   <div className="space-y-2">
-                    <Label>Prix (€)</Label>
+                    <Label>Prix (GNF)</Label>
                     <Input type="number" step="0.01" value={formData.prix} onChange={(e) => setFormData({ ...formData, prix: e.target.value })} placeholder="Ex: 50" />
                   </div>
                 )}
