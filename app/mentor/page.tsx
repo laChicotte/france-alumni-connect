@@ -114,7 +114,6 @@ export default function DevenirMentorPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
-    setSuccess(null)
     if (!validate()) return
 
     setIsSubmitting(true)
