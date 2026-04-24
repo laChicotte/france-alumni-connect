@@ -25,6 +25,20 @@ export type ArticleMediaType = 'image' | 'video'
 export type JobType = 'cdi' | 'cdd' | 'stage' | 'freelance' | 'alternance'
 export type FormationStatut = 'en_attente' | 'publiee' | 'archivee'
 export type FormationNiveau = 'Débutant' | 'Intermédiaire' | 'Avancé' | 'Tous niveaux'
+export type MentorStatut = 'en_attente' | 'approuve' | 'refuse'
+
+export interface MentorDemande {
+  id: string
+  user_id: string
+  aides_proposees: string[]
+  max_personnes: number
+  canaux_echange: string[]
+  disponibilites: string[]
+  statut: MentorStatut
+  note_admin: string | null
+  created_at: string
+  updated_at: string
+}
 
 export interface Database {
   public: {

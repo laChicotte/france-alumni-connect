@@ -19,7 +19,8 @@ import {
   Building,
   Tags,
   FolderCog,
-  CalendarCog
+  CalendarCog,
+  Award,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -43,6 +44,7 @@ const navItems: NavItem[] = [
   { href: "/admin/emplois", label: "Emplois", icon: Briefcase },
   { href: "/admin/evenements", label: "Événements", icon: Calendar },
   { href: "/admin/formations", label: "Formations", icon: BookOpen },
+  { href: "/admin/mentors", label: "Mentors", icon: Award },
   { href: "/admin/partenaires", label: "Partenaires", icon: Handshake },
   {
     href: "/admin/config",

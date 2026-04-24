@@ -82,6 +82,13 @@ CREATE TRIGGER trg_check_formation_capacity
   FOR EACH ROW
   EXECUTE FUNCTION check_formation_capacity();
 
+-- Table: mentor_demandes
+DROP TRIGGER IF EXISTS update_mentor_demandes_updated_at ON mentor_demandes;
+CREATE TRIGGER update_mentor_demandes_updated_at
+  BEFORE UPDATE ON mentor_demandes
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at();
+
 -- ================================================
 -- NOTE IMPORTANTE:
 -- Il n'y a PAS de trigger sur auth.users

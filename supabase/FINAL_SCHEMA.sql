@@ -342,6 +342,27 @@ CREATE INDEX IF NOT EXISTS idx_inscriptions_formation_user_id
   ON public.inscriptions_formations (user_id);
 
 -- ================================================
+-- TABLE: mentor_demandes
+-- ================================================
+
+CREATE TABLE IF NOT EXISTS public.mentor_demandes (
+  id                UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id           UUID        NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
+  aides_proposees   TEXT[]      NOT NULL DEFAULT '{}',
+  max_personnes     INTEGER     NOT NULL CHECK (max_personnes >= 1),
+  canaux_echange    TEXT[]      NOT NULL DEFAULT '{}',
+  disponibilites    TEXT[]      NOT NULL DEFAULT '{}',
+  statut            TEXT        NOT NULL DEFAULT 'en_attente'
+                    CHECK (statut IN ('en_attente', 'approuve', 'refuse')),
+  note_admin        TEXT,
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+
+  CONSTRAINT uq_mentor_demande_per_user UNIQUE (user_id)
+);
+ALTER TABLE public.mentor_demandes ENABLE ROW LEVEL SECURITY;
+
+-- ================================================
 -- VÉRIFICATION
 -- ================================================
 SELECT table_name

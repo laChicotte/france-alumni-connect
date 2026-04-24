@@ -4,6 +4,7 @@ import "./globals.css"
 import { Navigation } from "@/components/navigation"
 import { Footer } from "@/components/footer"
 import { CookieBanner } from "@/components/cookie-banner"
+import { Toaster } from "@/components/ui/sonner"
 
 export const metadata: Metadata = {
   title: "France Alumni Connect - Réseau des Alumni Guinée",
@@ -23,6 +24,7 @@ export default function RootLayout({
         <main>{children}</main>
         <Footer />
         <CookieBanner />
+        <Toaster richColors position="top-right" />
       </body>
     </html>
   )

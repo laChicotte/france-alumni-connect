@@ -825,6 +825,86 @@ USING (
 );
 
 -- ================================================
+-- TABLE: mentor_demandes
+-- ================================================
+
+-- SELECT: alumni voit sa propre demande
+DROP POLICY IF EXISTS "Alumni voit sa propre demande mentor" ON mentor_demandes;
+CREATE POLICY "Alumni voit sa propre demande mentor"
+ON mentor_demandes FOR SELECT
+TO authenticated
+USING (user_id = auth.uid());
+
+-- SELECT: admin et modérateur voient tout
+DROP POLICY IF EXISTS "Admin et modérateur voient toutes les demandes mentor" ON mentor_demandes;
+CREATE POLICY "Admin et modérateur voient toutes les demandes mentor"
+ON mentor_demandes FOR SELECT
+TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM users u
+    WHERE u.id = auth.uid()
+    AND u.role IN ('admin', 'moderateur')
+  )
+);
+
+-- INSERT: alumni actif, statut forcé à en_attente, un seul dépôt possible (UNIQUE)
+DROP POLICY IF EXISTS "Alumni peut soumettre une demande mentor" ON mentor_demandes;
+CREATE POLICY "Alumni peut soumettre une demande mentor"
+ON mentor_demandes FOR INSERT
+TO authenticated
+WITH CHECK (
+  user_id = auth.uid()
+  AND statut = 'en_attente'
+  AND EXISTS (
+    SELECT 1 FROM users u
+    WHERE u.id = auth.uid()
+    AND u.role = 'alumni'
+    AND u.status = 'actif'
+  )
+);
+
+-- UPDATE: alumni modifie sa propre demande approuvée (sans pouvoir changer le statut)
+DROP POLICY IF EXISTS "Alumni peut modifier sa demande mentor approuvée" ON mentor_demandes;
+CREATE POLICY "Alumni peut modifier sa demande mentor approuvée"
+ON mentor_demandes FOR UPDATE
+TO authenticated
+USING (
+  user_id = auth.uid()
+  AND statut = 'approuve'
+)
+WITH CHECK (
+  user_id = auth.uid()
+  AND statut = 'approuve'
+);
+
+-- UPDATE: admin et modérateur changent le statut / ajoutent une note
+DROP POLICY IF EXISTS "Admin et modérateur traitent les demandes mentor" ON mentor_demandes;
+CREATE POLICY "Admin et modérateur traitent les demandes mentor"
+ON mentor_demandes FOR UPDATE
+TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM users u
+    WHERE u.id = auth.uid()
+    AND u.role IN ('admin', 'moderateur')
+  )
+);
+
+-- DELETE: admin uniquement
+DROP POLICY IF EXISTS "Admin peut supprimer une demande mentor" ON mentor_demandes;
+CREATE POLICY "Admin peut supprimer une demande mentor"
+ON mentor_demandes FOR DELETE
+TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM users u
+    WHERE u.id = auth.uid()
+    AND u.role = 'admin'
+  )
+);
+
+-- ================================================
 -- VÉRIFICATION
 -- ================================================
 SELECT

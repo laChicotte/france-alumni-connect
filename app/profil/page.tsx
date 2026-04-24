@@ -13,7 +13,7 @@ import { Switch } from "@/components/ui/switch"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { User, Mail, Phone, MapPin, Building, GraduationCap, Edit2, Save, X, Loader2, Linkedin, CheckCircle, AlertCircle, FileText, Eye, EyeOff, Lock, ChevronDown, Check } from "lucide-react"
+import { User, Users, Mail, Phone, MapPin, Building, GraduationCap, Edit2, Save, X, Loader2, Linkedin, CheckCircle, AlertCircle, FileText, Eye, EyeOff, Lock, ChevronDown, Check } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { AlumniProfile, Secteur, StatutProfessionnel, DiplomeType, GenreType, NationaliteType, PlanRetourType, BourseType } from "@/types/database.types"
 import { cn } from "@/lib/utils"
@@ -107,6 +107,8 @@ export default function ProfilPage() {
   const [isNationaliteOpen, setIsNationaliteOpen] = useState(false)
   const [isBourseOpen, setIsBourseOpen] = useState(false)
 
+  const [mentorStatut, setMentorStatut] = useState<string | null>(null)
+
   // Options pour les selects
   const [secteurs, setSecteurs] = useState<Secteur[]>([])
   const [statutsPro, setStatutsPro] = useState<StatutProfessionnel[]>([])
@@ -174,6 +176,18 @@ export default function ProfilPage() {
 
           if (statutsData) {
             setStatutsPro(statutsData)
+          }
+
+          // Charger le statut de la demande mentor
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const { data: mentorData } = await (supabase
+            .from('mentor_demandes') as any)
+            .select('statut')
+            .eq('user_id', parsedUser.id)
+            .single()
+
+          if (mentorData) {
+            setMentorStatut(mentorData.statut)
           }
         } catch (err) {
           console.error('Erreur:', err)
@@ -487,17 +501,26 @@ export default function ProfilPage() {
                   )}
                 </div>
 
-                {isAlumni && formData.document_diplome_url && (
-                  <div className="mt-6">
+                {isAlumni && (
+                  <div className="mt-6 space-y-2">
                     <a
-                      href={formData.document_diplome_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      href="/mentor"
                       className="w-full flex items-center justify-center gap-2 bg-[#3558A2] hover:bg-[#3558A2]/90 text-white font-medium py-2.5 px-4 rounded-lg transition-colors"
                     >
-                      <FileText className="h-4 w-4" />
-                      Voir mon diplôme
+                      <Users className="h-4 w-4" />
+                      {mentorStatut === 'approuve' ? 'Infos mentor' : 'Devenir mentor'}
                     </a>
+                    {formData.document_diplome_url && (
+                      <a
+                        href={formData.document_diplome_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full flex items-center justify-center gap-2 border border-[#3558A2] text-[#3558A2] hover:bg-[#3558A2]/5 font-medium py-2.5 px-4 rounded-lg transition-colors"
+                      >
+                        <FileText className="h-4 w-4" />
+                        Voir mon diplôme
+                      </a>
+                    )}
                   </div>
                 )}
               </CardContent>
