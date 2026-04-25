@@ -457,13 +457,6 @@ export default function ProfilPage() {
                   <Badge className="bg-[#3558A2] hover:bg-[#3558A2]/90">
                     {user.role === 'admin' ? 'Administrateur' : user.role === 'moderateur' ? 'Modérateur' : 'Alumni'}
                   </Badge>
-                  {isAlumni && (
-                    <div className="mt-2">
-                      <Badge variant={user.status === 'actif' ? 'default' : 'secondary'} className={user.status === 'actif' ? 'bg-green-600' : ''}>
-                        {user.status === 'actif' ? 'Compte actif' : user.status === 'en_attente' ? 'En attente de validation' : 'Banni'}
-                      </Badge>
-                    </div>
-                  )}
                 </div>
 
                 <div className="space-y-3 text-sm">

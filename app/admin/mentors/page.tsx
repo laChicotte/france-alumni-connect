@@ -320,7 +320,7 @@ export default function MentorsAdminPage() {
                     <h3 className="font-bold text-lg">{displayName(viewDemande.alumni)}</h3>
                     {statutBadge(viewDemande.statut)}
                   </div>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1 text-sm text-muted-foreground">
+                  <div className="grid grid-cols-1 gap-1 text-sm text-muted-foreground">
                     {viewDemande.alumni?.email && (
                       <span className="flex items-center gap-1.5">
                         <Mail className="h-3.5 w-3.5 text-[#3558A2]" />
