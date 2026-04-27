@@ -39,9 +39,10 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Search, MoreHorizontal, Check, Ban, UserCog, Loader2, Plus, AlertCircle, Trash2, CheckCircle2 } from "lucide-react"
+import { Search, MoreHorizontal, Check, Ban, UserCog, Loader2, Plus, AlertCircle, Trash2 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import type { User, UserRole } from "@/types/database.types"
+import { toast } from "sonner"
 
 export default function UtilisateursPage() {
   const [users, setUsers] = useState<User[]>([])
@@ -52,7 +53,6 @@ export default function UtilisateursPage() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null)
   const [dialogAction, setDialogAction] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null)
 
   // État pour le formulaire d'ajout admin/moderateur
   const [currentPage, setCurrentPage] = useState(1)
@@ -90,19 +90,47 @@ export default function UtilisateursPage() {
 
   const handleStatusChange = async (user: User, newStatus: 'actif' | 'banni') => {
     setIsSubmitting(true)
-    setFeedback(null)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase.from('users') as any)
-      .update({ status: newStatus })
-      .eq('id', user.id)
 
-    if (error) {
-      setFeedback({ type: "error", message: `Modification échouée: ${error.message}` })
-    } else {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        toast.error("Session expirée. Veuillez vous reconnecter.")
+        setIsSubmitting(false)
+        return
+      }
+
+      const response = await fetch('/api/admin/utilisateurs/status', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          userId: user.id,
+          status: newStatus,
+        }),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        toast.error(`Modification échouée: ${result.error || 'Erreur inconnue'}`)
+        setIsSubmitting(false)
+        return
+      }
+
       const label = newStatus === 'banni' ? 'Utilisateur banni.' : user.status === 'banni' ? 'Utilisateur débanni.' : 'Compte validé.'
-      setFeedback({ type: "success", message: label })
+      toast.success(
+        result.emailSent
+          ? `${label} Email envoyé.`
+          : `${label} Email non envoyé: ${result.emailError || 'vérifiez la configuration Resend.'}`
+      )
       fetchUsers()
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Erreur inconnue'
+      toast.error(`Modification échouée: ${message}`)
     }
+
     setIsSubmitting(false)
     setDialogAction(null)
     setSelectedUser(null)
@@ -110,16 +138,15 @@ export default function UtilisateursPage() {
 
   const handleRoleChange = async (user: User, newRole: UserRole) => {
     setIsSubmitting(true)
-    setFeedback(null)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const { error } = await (supabase.from('users') as any)
       .update({ role: newRole })
       .eq('id', user.id)
 
     if (error) {
-      setFeedback({ type: "error", message: `Modification échouée: ${error.message}` })
+      toast.error(`Modification échouée: ${error.message}`)
     } else {
-      setFeedback({ type: "success", message: `Rôle de ${user.email} mis à jour.` })
+      toast.success(`Rôle de ${user.email} mis à jour.`)
       fetchUsers()
     }
     setIsSubmitting(false)
@@ -149,7 +176,7 @@ export default function UtilisateursPage() {
       }
 
       // Succès
-      setFeedback({ type: "success", message: `Utilisateur ${user.email} supprimé définitivement.` })
+      toast.success(`Utilisateur ${user.email} supprimé définitivement.`)
       fetchUsers()
       setDialogAction(null)
       setSelectedUser(null)
@@ -211,7 +238,7 @@ export default function UtilisateursPage() {
       }
 
       // Succès
-      setFeedback({ type: "success", message: `Compte créé pour ${newUser.email}.` })
+      toast.success(`Compte créé pour ${newUser.email}.`)
       setShowAddDialog(false)
       setNewUser({
         email: "",
@@ -286,13 +313,6 @@ export default function UtilisateursPage() {
             Ajouter un administrateur
           </Button>
         </div>
-
-      {feedback && (
-        <Alert variant={feedback.type === "error" ? "destructive" : "default"} className="mb-4">
-          {feedback.type === "error" ? <AlertCircle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4 text-green-600" />}
-          <AlertDescription>{feedback.message}</AlertDescription>
-        </Alert>
-      )}
 
       {/* Filters */}
       <Card>

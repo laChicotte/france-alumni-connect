@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createSupabaseAdmin } from '@/lib/supabase-admin'
+import { getEmailConfig, sendEmailSafe } from '@/lib/email/resend'
+import { adminRegistrationNotificationEmail, registrationReceivedEmail } from '@/lib/email/templates'
 import type { Database, DiplomeType, GenreType, NationaliteType, PlanRetourType, BourseType } from '@/types/database.types'
 import { parsePhoneNumberFromString } from 'libphonenumber-js'
 
@@ -355,7 +357,32 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    return NextResponse.json({ success: true })
+    const { adminTo } = getEmailConfig()
+    const userEmail = registrationReceivedEmail({ prenom, nom, email })
+    const adminEmail = adminRegistrationNotificationEmail({ prenom, nom, email })
+
+    const [userEmailResult, adminEmailResult] = await Promise.all([
+      sendEmailSafe('inscription:user', {
+        to: email,
+        subject: userEmail.subject,
+        html: userEmail.html,
+        text: userEmail.text,
+      }),
+      sendEmailSafe('inscription:admin', {
+        to: adminTo,
+        subject: adminEmail.subject,
+        html: adminEmail.html,
+        text: adminEmail.text,
+      }),
+    ])
+
+    return NextResponse.json({
+      success: true,
+      email: {
+        user: userEmailResult.ok,
+        admin: adminEmailResult.ok,
+      },
+    })
   } catch (err) {
     console.error('Erreur inscription:', err)
     return NextResponse.json(

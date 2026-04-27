@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { createSupabaseAdmin } from '@/lib/supabase-admin'
+import { sendEmailSafe } from '@/lib/email/resend'
+import { adminUserCreatedEmail } from '@/lib/email/templates'
 import type { UserRole } from '@/types/database.types'
 
 const ALLOWED_ROLES: UserRole[] = ['admin', 'moderateur']
@@ -142,6 +144,14 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       )
     }
+
+    const userCreatedEmail = adminUserCreatedEmail({ email, nom, prenom, role })
+    await sendEmailSafe('admin:create-user', {
+      to: email,
+      subject: userCreatedEmail.subject,
+      html: userCreatedEmail.html,
+      text: userCreatedEmail.text,
+    })
 
     return NextResponse.json({ success: true })
   } catch (err) {
