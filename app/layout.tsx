@@ -9,7 +9,12 @@ import { Toaster } from "@/components/ui/sonner"
 export const metadata: Metadata = {
   title: "France Alumni Connect - Réseau des Alumni Guinée",
   description: "Le réseau des anciens étudiants guinéens diplômés de France",
-    generator: 'v0.app'
+  icons: {
+    icon: "/logo/logo.png",
+    shortcut: "/logo/logo.png",
+    apple: "/logo/logo.png",
+  },
+  generator: 'v0.app'
 }
 
 export default function RootLayout({

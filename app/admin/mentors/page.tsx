@@ -6,22 +6,31 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
 import { Badge } from "@/components/ui/badge"
+import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select"
+import {
   Eye, Check, X, Trash2, Loader2, Users, Mail, Phone,
-  GraduationCap, Building, MapPin, AlertCircle, CheckCircle2,
+  GraduationCap, Building, MapPin, AlertCircle, CheckCircle2, Search, Filter,
 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { MentorDemande, MentorStatut } from "@/types/database.types"
 
 const AIDES_LABELS: Record<string, string> = {
-  stage: 'Recherche de stage',
+  stage: 'Former à la recherche de stage',
   etudes: 'Parler de mes études',
   metier: 'Parler de mon métier',
-  cv: 'Rédaction CV / Lettre de motivation',
+  cv: 'Former à la rédaction CV',
+  lettre_motivation: 'Former à la rédaction lettre de motivation',
+  orienter: 'Orienter',
+  benevolat: 'Former au bénévolat',
 }
+
+const AIDES_FILTER_OPTIONS = Object.entries(AIDES_LABELS).map(([value, label]) => ({ value, label }))
 
 const CANAUX_LABELS: Record<string, string> = {
   whatsapp: 'WhatsApp',
@@ -69,6 +78,9 @@ export default function MentorsAdminPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [searchTerm, setSearchTerm] = useState('')
+  const [filterAide, setFilterAide] = useState('all')
+  const [filterCanal, setFilterCanal] = useState<'all' | 'whatsapp' | 'mail'>('all')
 
   // Dialog vue détail
   const [viewDemande, setViewDemande] = useState<MentorDemandeWithAlumni | null>(null)
@@ -160,12 +172,26 @@ export default function MentorsAdminPage() {
   }
 
   const enAttente = demandes.filter(d => d.statut === 'en_attente').length
+  const approuvees = demandes.filter(d => d.statut === 'approuve').length
+  const refusees = demandes.filter(d => d.statut === 'refuse').length
+
+  const filteredDemandes = demandes.filter((demande) => {
+    const search = searchTerm.trim().toLowerCase()
+    const fullName = displayName(demande.alumni).toLowerCase()
+    const email = demande.alumni?.email?.toLowerCase() || ''
+    const ville = demande.alumni?.ville?.toLowerCase() || ''
+    const entreprise = demande.alumni?.entreprise?.toLowerCase() || ''
+    const matchesSearch = !search || [fullName, email, ville, entreprise].some((value) => value.includes(search))
+    const matchesAide = filterAide === 'all' || demande.aides_proposees.includes(filterAide)
+    const matchesCanal = filterCanal === 'all' || demande.canaux_echange.includes(filterCanal)
+    return matchesSearch && matchesAide && matchesCanal
+  })
 
   return (
     <AdminWrapper>
-      <div className="space-y-6">
+      <div className="space-y-6 p-6">
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <h1 className="text-2xl font-bold flex items-center gap-2">
               <Users className="h-6 w-6 text-[#3558A2]" />
@@ -178,6 +204,31 @@ export default function MentorsAdminPage() {
               )}
             </p>
           </div>
+          <div className="inline-flex items-center gap-2 self-start rounded-full bg-[#3558A2]/10 px-3 py-1 text-xs font-medium text-[#3558A2]">
+            <Filter className="h-3.5 w-3.5" />
+            Gestion admin mentor
+          </div>
+        </div>
+
+        <div className="grid gap-4 md:grid-cols-3">
+          <Card className="border-l-4 border-l-amber-400 shadow-sm">
+            <CardContent className="flex items-center justify-between px-4 py-3">
+              <p className="text-sm font-medium text-muted-foreground">En attente</p>
+              <p className="text-xl font-bold text-slate-900">{enAttente}</p>
+            </CardContent>
+          </Card>
+          <Card className="border-l-4 border-l-green-500 shadow-sm">
+            <CardContent className="flex items-center justify-between px-4 py-3">
+              <p className="text-sm font-medium text-muted-foreground">Approuvées</p>
+              <p className="text-xl font-bold text-slate-900">{approuvees}</p>
+            </CardContent>
+          </Card>
+          <Card className="border-l-4 border-l-red-400 shadow-sm">
+            <CardContent className="flex items-center justify-between px-4 py-3">
+              <p className="text-sm font-medium text-muted-foreground">Refusées</p>
+              <p className="text-xl font-bold text-slate-900">{refusees}</p>
+            </CardContent>
+          </Card>
         </div>
 
         {feedback && (
@@ -192,22 +243,63 @@ export default function MentorsAdminPage() {
           </Alert>
         )}
 
+        <Card className="shadow-sm">
+          <CardContent>
+            <div className="flex flex-col gap-3 lg:flex-row">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Rechercher par nom, email, ville ou entreprise..."
+                  className="pl-10"
+                />
+              </div>
+              <Select value={filterAide} onValueChange={setFilterAide}>
+                <SelectTrigger className="w-full lg:w-[280px]">
+                  <SelectValue placeholder="Tous domaines d'aide" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous domaines d'aide</SelectItem>
+                  {AIDES_FILTER_OPTIONS.map((aide) => (
+                    <SelectItem key={aide.value} value={aide.value}>
+                      {aide.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <Select value={filterCanal} onValueChange={(value) => setFilterCanal(value as 'all' | 'whatsapp' | 'mail')}>
+                <SelectTrigger className="w-full lg:w-[180px]">
+                  <SelectValue placeholder="Tous canaux" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Tous canaux</SelectItem>
+                  <SelectItem value="whatsapp">WhatsApp</SelectItem>
+                  <SelectItem value="mail">Mail</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </CardContent>
+        </Card>
+
         {isLoading ? (
           <div className="flex justify-center py-16">
             <Loader2 className="h-8 w-8 animate-spin text-[#3558A2]" />
           </div>
-        ) : demandes.length === 0 ? (
+        ) : filteredDemandes.length === 0 ? (
           <Card>
             <CardContent className="py-16 text-center text-muted-foreground">
-              Aucune candidature mentor pour le moment.
+              {demandes.length === 0
+                ? 'Aucune candidature mentor pour le moment.'
+                : 'Aucune candidature ne correspond à vos filtres.'}
             </CardContent>
           </Card>
         ) : (
-          <div className="space-y-3">
-            {demandes.map((demande) => (
-              <Card key={demande.id} className="overflow-hidden">
-                <CardContent className="p-4">
-                  <div className="flex items-center gap-4">
+          <div className="space-y-4">
+            {filteredDemandes.map((demande) => (
+              <Card key={demande.id} className="overflow-hidden shadow-sm">
+                <CardContent className="p-5">
+                  <div className="flex flex-col gap-4 xl:flex-row xl:items-center">
                     {/* Avatar */}
                     <Avatar className="h-12 w-12 shrink-0">
                       <AvatarImage src={demande.alumni?.photo_url || undefined} />
@@ -240,17 +332,24 @@ export default function MentorsAdminPage() {
                         </span>
                       </div>
                       {/* Aperçu rapide aides */}
-                      <div className="flex gap-1 mt-2 flex-wrap">
+                      <div className="mt-3 flex gap-1.5 flex-wrap">
                         {demande.aides_proposees.map(a => (
                           <span key={a} className="text-xs bg-[#3558A2]/10 text-[#3558A2] px-2 py-0.5 rounded-full">
                             {AIDES_LABELS[a] || a}
                           </span>
                         ))}
                       </div>
+                      <div className="mt-3 flex flex-wrap gap-2 text-xs text-muted-foreground">
+                        {demande.canaux_echange.map((canal) => (
+                          <span key={canal} className="rounded-full border px-2.5 py-1">
+                            {CANAUX_LABELS[canal] || canal}
+                          </span>
+                        ))}
+                      </div>
                     </div>
 
                     {/* Actions */}
-                    <div className="flex items-center gap-2 shrink-0">
+                    <div className="flex items-center gap-2 shrink-0 xl:self-start">
                       <Button
                         variant="outline"
                         size="sm"

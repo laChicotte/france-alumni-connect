@@ -16,10 +16,13 @@ import { MentorDemande } from "@/types/database.types"
 import { cn } from "@/lib/utils"
 
 const AIDES = [
-  { id: 'stage', label: 'Recherche de stage' },
+  { id: 'stage', label: 'Former à la recherche de stage' },
   { id: 'etudes', label: 'Parler de mes études' },
   { id: 'metier', label: 'Parler de mon métier' },
-  { id: 'cv', label: 'Rédaction CV / Lettre de motivation' },
+  { id: 'cv', label: 'Former à la rédaction CV' },
+  { id: 'lettre_motivation', label: 'Former à la rédaction lettre de motivation' },
+  { id: 'orienter', label: 'Orienter' },
+  { id: 'benevolat', label: 'Former au bénévolat' },
 ]
 
 const CANAUX = [
@@ -70,7 +73,6 @@ export default function DevenirMentorPage() {
 
       setUser(parsedUser)
 
-      // Vérifier si une demande existe déjà
       const { data } = await (supabase
         .from('mentor_demandes')
         .select('*')
@@ -79,7 +81,6 @@ export default function DevenirMentorPage() {
 
       if (data) {
         setExistingDemande(data as MentorDemande)
-        // Pré-remplir le formulaire avec les données existantes
         setAides(data.aides_proposees || [])
         setMaxPersonnes(String(data.max_personnes || ''))
         setCanaux(data.canaux_echange || [])
@@ -186,7 +187,6 @@ export default function DevenirMentorPage() {
     )
   }
 
-  // ── Soumission réussie (première fois) ──
   if (submitted) {
     return (
       <div className="min-h-screen bg-muted py-8 flex items-center justify-center">
@@ -206,7 +206,6 @@ export default function DevenirMentorPage() {
     )
   }
 
-  // ── Candidature en attente : lecture seule ──
   if (existingDemande && existingDemande.statut === 'en_attente') {
     return (
       <div className="min-h-screen bg-muted py-8 flex items-center justify-center">
@@ -229,7 +228,6 @@ export default function DevenirMentorPage() {
     )
   }
 
-  // ── Candidature refusée ──
   if (existingDemande && existingDemande.statut === 'refuse') {
     return (
       <div className="min-h-screen bg-muted py-8 flex items-center justify-center">
@@ -258,7 +256,6 @@ export default function DevenirMentorPage() {
     )
   }
 
-  // ── Formulaire : nouvelle demande ou mise à jour si approuvé ──
   const isApproved = existingDemande?.statut === 'approuve'
 
   return (
@@ -281,7 +278,7 @@ export default function DevenirMentorPage() {
           {isApproved ? (
             <div className="flex items-center gap-2">
               <CheckCircle className="h-4 w-4 text-green-600" />
-              <p className="text-green-700 font-medium text-sm">Candidature approuvée — vous pouvez modifier vos informations.</p>
+              <p className="text-green-700 font-medium text-sm">Candidature approuvée - vous pouvez modifier vos informations.</p>
             </div>
           ) : (
             <p className="text-muted-foreground">
@@ -297,7 +294,6 @@ export default function DevenirMentorPage() {
         )}
 
         <form onSubmit={isApproved ? handleUpdate : handleSubmit} className="space-y-6">
-          {/* Question 1 */}
           <Card>
             <CardHeader>
               <CardTitle className="text-base font-semibold">
@@ -328,7 +324,6 @@ export default function DevenirMentorPage() {
             </CardContent>
           </Card>
 
-          {/* Question 2 */}
           <Card>
             <CardHeader>
               <CardTitle className="text-base font-semibold">
@@ -351,7 +346,6 @@ export default function DevenirMentorPage() {
             </CardContent>
           </Card>
 
-          {/* Question 3 */}
           <Card>
             <CardHeader>
               <CardTitle className="text-base font-semibold">
@@ -382,7 +376,6 @@ export default function DevenirMentorPage() {
             </CardContent>
           </Card>
 
-          {/* Question 4 - Grille disponibilités */}
           <Card>
             <CardHeader>
               <CardTitle className="text-base font-semibold">
