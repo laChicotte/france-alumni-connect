@@ -26,7 +26,6 @@ const AIDES_LABELS: Record<string, string> = {
   metier: 'Parler de mon métier',
   cv: 'Former à la rédaction CV',
   lettre_motivation: 'Former à la rédaction lettre de motivation',
-  orienter: 'Orienter',
   benevolat: 'Former au bénévolat',
 }
 
@@ -135,18 +134,31 @@ export default function MentorsAdminPage() {
     setIsSubmitting(true)
     setFeedback(null)
 
-    const { error } = await (supabase
-      .from('mentor_demandes') as any)
-      .update({
-        statut: actionType,
-        note_admin: noteAdmin.trim() || null,
-        updated_at: new Date().toISOString(),
-      })
-      .eq('id', actionDemande.id)
+    try {
+      const { data, error } = await (supabase
+        .from('mentor_demandes') as any)
+        .update({
+          statut: actionType,
+          note_admin: noteAdmin.trim() || null,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', actionDemande.id)
+        .select('id')
+        .maybeSingle()
 
-    if (error) {
-      setFeedback({ type: 'error', message: 'Erreur lors de la mise à jour.' })
-    } else {
+      if (error) {
+        setFeedback({ type: 'error', message: `Erreur lors de la mise à jour : ${error.message}` })
+        return
+      }
+
+      if (!data) {
+        setFeedback({
+          type: 'error',
+          message: "Aucune candidature n'a été mise à jour. Vérifiez que votre compte admin est bien connecté côté Supabase.",
+        })
+        return
+      }
+
       setFeedback({
         type: 'success',
         message: actionType === 'approuve' ? 'Candidature approuvée.' : 'Candidature refusée.',
@@ -154,9 +166,13 @@ export default function MentorsAdminPage() {
       setActionDemande(null)
       setActionType(null)
       setNoteAdmin('')
-      fetchDemandes()
+      await fetchDemandes()
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Erreur inconnue'
+      setFeedback({ type: 'error', message: `Erreur lors de la mise à jour : ${message}` })
+    } finally {
+      setIsSubmitting(false)
     }
-    setIsSubmitting(false)
   }
 
   const handleDelete = async (demande: MentorDemandeWithAlumni) => {

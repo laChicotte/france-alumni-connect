@@ -21,7 +21,6 @@ const AIDES = [
   { id: 'metier', label: 'Parler de mon métier' },
   { id: 'cv', label: 'Former à la rédaction CV' },
   { id: 'lettre_motivation', label: 'Former à la rédaction lettre de motivation' },
-  { id: 'orienter', label: 'Orienter' },
   { id: 'benevolat', label: 'Former au bénévolat' },
 ]
 
@@ -281,8 +280,19 @@ export default function DevenirMentorPage() {
               <p className="text-green-700 font-medium text-sm">Candidature approuvée - vous pouvez modifier vos informations.</p>
             </div>
           ) : (
-            <p className="text-muted-foreground">
-              En devenant mentor, vous accompagnez les prochaines générations d'alumni. Quelques questions pour mieux vous connaître.
+            <p className="text-muted-foreground text-justify">
+              <p className="mt-2">Devenez mentor. Transmettez. Inspirez. Impactez.</p>
+              <p className="mt-2">
+                Vous souhaitez partager votre expérience et accompagner la nouvelle génération ? France Alumni 
+                Guinée vous invite à devenir mentor d&apos;un jeune étudiant ou jeune diplômé.
+              </p>
+              <p className="mt-2">
+                En consacrant environ 2 heures par mois, vous pourrez l&apos;aider à s&apos;orienter, préparer sa 
+                recherche de stage ou d&apos;emploi, gagner en confiance et bénéficier de vos conseils.
+              </p>
+              <p className="mt-2">
+                Être mentor, c&apos;est avant tout écouter, encourager et transmettre ce que votre parcours vous a appris.
+              </p>
             </p>
           )}
         </div>
@@ -297,7 +307,7 @@ export default function DevenirMentorPage() {
           <Card>
             <CardHeader>
               <CardTitle className="text-base font-semibold">
-                Je souhaite apporter mon aide concernant :
+                Je souhaite apporter mon aide pour :
               </CardTitle>
             </CardHeader>
             <CardContent>

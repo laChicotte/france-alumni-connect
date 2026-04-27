@@ -132,11 +132,11 @@ export default function HomePage() {
         <div className="hero-affiliate-badge absolute bottom-3 right-3 z-20 sm:bottom-6 sm:right-8">
           <div className="flex items-start gap-1.5 sm:gap-2.5">
             
-            <span className="inline-flex rounded-sm px-2 py-1 text-[10px] font-bold lowercase tracking-wide text-white sm:px-4 sm:py-2.5 sm:text-sm">
+            {/* <span className="inline-flex rounded-sm px-2 py-1 text-[10px] font-bold lowercase tracking-wide text-white sm:px-4 sm:py-2.5 sm:text-sm">
               en lien avec
             </span>
 
-            <div className="h-10 w-[2px] bg-white/90 sm:h-22" aria-hidden="true" />
+            <div className="h-10 w-[2px] bg-white/90 sm:h-22" aria-hidden="true" /> */}
 
             <img
               src="/accueil/ambassade.png"

@@ -7,12 +7,12 @@ import { CookieBanner } from "@/components/cookie-banner"
 import { Toaster } from "@/components/ui/sonner"
 
 export const metadata: Metadata = {
-  title: "France Alumni Connect - Réseau des Alumni Guinée",
+  title: "France Alumni Connect",
   description: "Le réseau des anciens étudiants guinéens diplômés de France",
   icons: {
-    icon: "/logo/logo.png",
-    shortcut: "/logo/logo.png",
-    apple: "/logo/logo.png",
+    icon: "/logo/iconweb.png",
+    shortcut: "/logo/iconweb.png",
+    apple: "/logo/iconweb.png",
   },
   generator: 'v0.app'
 }
