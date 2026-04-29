@@ -312,117 +312,130 @@ export default function AdminEntreprisesPage() {
         )}
       </div>
 
-      {/* Dialog: Détail */}
+      {/* Modal custom: Détail */}
       {selectedEntreprise && (
-        <Dialog open onOpenChange={() => setSelectedEntreprise(null)}>
-          <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
-            <DialogHeader>
-              <DialogTitle className="flex items-center gap-3">
+        <div className="fixed inset-0 z-[110] flex items-start justify-center pt-[88px] px-4 pb-4" onClick={() => setSelectedEntreprise(null)}>
+          <div className="absolute inset-0 bg-black/50" />
+          <div
+            className="relative bg-white rounded-xl shadow-2xl w-full max-w-4xl max-h-[calc(100vh-104px)] flex flex-col"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Header fixe */}
+            <div className="flex items-center justify-between px-6 py-4 border-b shrink-0">
+              <div className="flex items-center gap-3">
                 {selectedEntreprise.logo_url && (
                   <img src={selectedEntreprise.logo_url} alt="" className="w-10 h-10 object-contain rounded" />
                 )}
-                {selectedEntreprise.denomination_sociale}
+                <h2 className="text-lg font-bold text-gray-900">{selectedEntreprise.denomination_sociale}</h2>
                 <StatutBadge statut={selectedEntreprise.statut} />
-              </DialogTitle>
-            </DialogHeader>
-            <div className="space-y-5 pt-2 text-sm">
-              <section>
-                <h4 className="font-semibold text-[#3558A2] mb-2 text-base">Identification de l'alumni</h4>
-                <div className="grid grid-cols-2 gap-y-1 gap-x-4">
-                  <div><span className="font-medium">Nom :</span> {selectedEntreprise.users ? `${selectedEntreprise.users.prenom} ${selectedEntreprise.users.nom}` : '—'}</div>
-                  <div><span className="font-medium">Email compte :</span> {selectedEntreprise.users?.email || '—'}</div>
-                  <div><span className="font-medium">Fonction :</span> {selectedEntreprise.fonction}</div>
-                  <div><span className="font-medium">Email pro :</span> {selectedEntreprise.email_pro}</div>
-                  <div><span className="font-medium">Téléphone pro :</span> {selectedEntreprise.telephone_pro}</div>
-                </div>
-              </section>
+              </div>
+              <button onClick={() => setSelectedEntreprise(null)} className="text-gray-400 hover:text-gray-600 transition-colors">
+                <X className="h-5 w-5" />
+              </button>
+            </div>
 
-              <section>
-                <h4 className="font-semibold text-[#3558A2] mb-2 text-base">Informations juridiques</h4>
-                <div className="grid grid-cols-2 gap-y-1 gap-x-4">
-                  <div><span className="font-medium">Dénomination :</span> {selectedEntreprise.denomination_sociale}</div>
-                  {selectedEntreprise.nom_commercial && <div><span className="font-medium">Nom commercial :</span> {selectedEntreprise.nom_commercial}</div>}
-                  <div><span className="font-medium">Forme juridique :</span> {selectedEntreprise.forme_juridique}</div>
-                  <div><span className="font-medium">Date de création :</span> {selectedEntreprise.date_creation}</div>
-                  <div><span className="font-medium">RCCM / NIF :</span> {selectedEntreprise.numero_rccm_nif}</div>
-                  <div><span className="font-medium">Siège social :</span> {selectedEntreprise.localisation_siege}</div>
-                </div>
-                {selectedEntreprise.document_justificatif_url && (
-                  <Button variant="outline" size="sm" className="mt-3" onClick={() => handleViewDocument(selectedEntreprise.document_justificatif_url!)} disabled={isLoadingDoc}>
-                    {isLoadingDoc ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <FileText className="h-4 w-4 mr-2" />}
-                    Voir le document justificatif <ExternalLink className="h-3 w-3 ml-2" />
-                  </Button>
-                )}
-              </section>
-
-              <section>
-                <h4 className="font-semibold text-[#3558A2] mb-2 text-base">Profil de l'entreprise</h4>
-                <div className="grid grid-cols-2 gap-y-1 gap-x-4 [&>div]:min-w-0 [&>div]:break-words">
-                  <div><span className="font-medium">Secteur :</span> {selectedEntreprise.secteur_activite}</div>
-                  <div><span className="font-medium">Stade :</span> {STADE_LABELS[selectedEntreprise.stade_developpement] || selectedEntreprise.stade_developpement}</div>
-                  <div><span className="font-medium">Effectif :</span> {selectedEntreprise.effectif}</div>
-                  {selectedEntreprise.chiffre_affaires && <div><span className="font-medium">CA approx. :</span> {selectedEntreprise.chiffre_affaires}</div>}
-                  {selectedEntreprise.site_web && <div className="col-span-2"><span className="font-medium">Site web :</span> <a href={selectedEntreprise.site_web} target="_blank" rel="noreferrer" className="text-[#3558A2] hover:underline">{selectedEntreprise.site_web}</a></div>}
-                </div>
-                {selectedEntreprise.types_clients.length > 0 && <p className="mt-1"><span className="font-medium">Clients :</span> {selectedEntreprise.types_clients.join(', ')}</p>}
-                <p className="mt-2 text-gray-700">{selectedEntreprise.description_produits}</p>
-              </section>
-
-              {selectedEntreprise.besoins.length > 0 && (
+            {/* Contenu scrollable */}
+            <div className="overflow-y-auto flex-1 px-6 py-4">
+              <div className="space-y-5 text-sm">
                 <section>
-                  <h4 className="font-semibold text-[#3558A2] mb-2 text-base">Besoins</h4>
-                  <div className="flex flex-wrap gap-1">
-                    {selectedEntreprise.besoins.map(b => <Badge key={b} variant="outline" className="text-xs">{b}</Badge>)}
+                  <h4 className="font-semibold text-[#3558A2] mb-2 text-base">Identification de l'alumni</h4>
+                  <div className="grid grid-cols-2 gap-y-1 gap-x-6">
+                    <div><span className="font-medium">Nom :</span> {selectedEntreprise.users ? `${selectedEntreprise.users.prenom} ${selectedEntreprise.users.nom}` : '—'}</div>
+                    <div><span className="font-medium">Email compte :</span> {selectedEntreprise.users?.email || '—'}</div>
+                    <div><span className="font-medium">Fonction :</span> {selectedEntreprise.fonction}</div>
+                    <div><span className="font-medium">Email pro :</span> {selectedEntreprise.email_pro}</div>
+                    <div><span className="font-medium">Téléphone pro :</span> {selectedEntreprise.telephone_pro}</div>
                   </div>
-                  {selectedEntreprise.besoins_autre && <p className="mt-1 text-gray-600">Autre : {selectedEntreprise.besoins_autre}</p>}
                 </section>
-              )}
 
-              <section>
-                <h4 className="font-semibold text-[#3558A2] mb-2 text-base">Collaboration</h4>
-                <div className="grid grid-cols-2 gap-y-1 gap-x-4">
-                  <div>Recherche associé : <span className={selectedEntreprise.recherche_associe ? 'text-green-600 font-medium' : 'text-gray-400'}>{selectedEntreprise.recherche_associe ? `Oui${selectedEntreprise.domaine_associe ? ` (${selectedEntreprise.domaine_associe})` : ''}` : 'Non'}</span></div>
-                  <div>Propose emploi/stage : <span className={selectedEntreprise.propose_emploi ? 'text-green-600 font-medium' : 'text-gray-400'}>{selectedEntreprise.propose_emploi ? 'Oui' : 'Non'}</span></div>
-                  <div>Disponible événement : <span className={selectedEntreprise.disponible_evenement ? 'text-green-600 font-medium' : 'text-gray-400'}>{selectedEntreprise.disponible_evenement ? 'Oui' : 'Non'}</span></div>
-                  <div>Souhaite devenir mentor : <span className={selectedEntreprise.souhaite_mentor ? 'text-green-600 font-medium' : 'text-gray-400'}>{selectedEntreprise.souhaite_mentor ? 'Oui' : 'Non'}</span></div>
-                </div>
-              </section>
+                <section>
+                  <h4 className="font-semibold text-[#3558A2] mb-2 text-base">Informations juridiques</h4>
+                  <div className="grid grid-cols-2 gap-y-1 gap-x-6">
+                    <div><span className="font-medium">Dénomination :</span> {selectedEntreprise.denomination_sociale}</div>
+                    {selectedEntreprise.nom_commercial && <div><span className="font-medium">Nom commercial :</span> {selectedEntreprise.nom_commercial}</div>}
+                    <div><span className="font-medium">Forme juridique :</span> {selectedEntreprise.forme_juridique}</div>
+                    <div><span className="font-medium">Date de création :</span> {selectedEntreprise.date_creation}</div>
+                    <div><span className="font-medium">RCCM / NIF :</span> {selectedEntreprise.numero_rccm_nif}</div>
+                    <div><span className="font-medium">Siège social :</span> {selectedEntreprise.localisation_siege}</div>
+                  </div>
+                  {selectedEntreprise.document_justificatif_url && (
+                    <Button variant="outline" size="sm" className="mt-3" onClick={() => handleViewDocument(selectedEntreprise.document_justificatif_url!)} disabled={isLoadingDoc}>
+                      {isLoadingDoc ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <FileText className="h-4 w-4 mr-2" />}
+                      Voir le document justificatif <ExternalLink className="h-3 w-3 ml-2" />
+                    </Button>
+                  )}
+                </section>
 
-              <section>
-                <h4 className="font-semibold text-[#3558A2] mb-2 text-base">Impact & Valorisation</h4>
-                {selectedEntreprise.impact_principal.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mb-2">
-                    {selectedEntreprise.impact_principal.map(i => <Badge key={i} variant="secondary" className="text-xs">{i}</Badge>)}
+                <section>
+                  <h4 className="font-semibold text-[#3558A2] mb-2 text-base">Profil de l'entreprise</h4>
+                  <div className="grid grid-cols-2 gap-y-1 gap-x-6">
+                    <div><span className="font-medium">Secteur :</span> {selectedEntreprise.secteur_activite}</div>
+                    <div><span className="font-medium">Stade :</span> {STADE_LABELS[selectedEntreprise.stade_developpement] || selectedEntreprise.stade_developpement}</div>
+                    <div><span className="font-medium">Effectif :</span> {selectedEntreprise.effectif}</div>
+                    {selectedEntreprise.chiffre_affaires && <div><span className="font-medium">CA approx. :</span> {selectedEntreprise.chiffre_affaires}</div>}
+                    {selectedEntreprise.site_web && <div className="col-span-2"><span className="font-medium">Site web :</span> <a href={selectedEntreprise.site_web} target="_blank" rel="noreferrer" className="text-[#3558A2] hover:underline">{selectedEntreprise.site_web}</a></div>}
+                  </div>
+                  {selectedEntreprise.types_clients.length > 0 && <p className="mt-1"><span className="font-medium">Clients :</span> {selectedEntreprise.types_clients.join(', ')}</p>}
+                  <p className="mt-2 text-gray-700">{selectedEntreprise.description_produits}</p>
+                </section>
+
+                {selectedEntreprise.besoins.length > 0 && (
+                  <section>
+                    <h4 className="font-semibold text-[#3558A2] mb-2 text-base">Besoins</h4>
+                    <div className="flex flex-wrap gap-1">
+                      {selectedEntreprise.besoins.map(b => <Badge key={b} variant="outline" className="text-xs">{b}</Badge>)}
+                    </div>
+                    {selectedEntreprise.besoins_autre && <p className="mt-1 text-gray-600">Autre : {selectedEntreprise.besoins_autre}</p>}
+                  </section>
+                )}
+
+                <section>
+                  <h4 className="font-semibold text-[#3558A2] mb-2 text-base">Collaboration</h4>
+                  <div className="grid grid-cols-2 gap-y-1 gap-x-6">
+                    <div>Recherche associé : <span className={selectedEntreprise.recherche_associe ? 'text-green-600 font-medium' : 'text-gray-400'}>{selectedEntreprise.recherche_associe ? `Oui${selectedEntreprise.domaine_associe ? ` (${selectedEntreprise.domaine_associe})` : ''}` : 'Non'}</span></div>
+                    <div>Propose emploi/stage : <span className={selectedEntreprise.propose_emploi ? 'text-green-600 font-medium' : 'text-gray-400'}>{selectedEntreprise.propose_emploi ? 'Oui' : 'Non'}</span></div>
+                    <div>Disponible événement : <span className={selectedEntreprise.disponible_evenement ? 'text-green-600 font-medium' : 'text-gray-400'}>{selectedEntreprise.disponible_evenement ? 'Oui' : 'Non'}</span></div>
+                    <div>Souhaite devenir mentor : <span className={selectedEntreprise.souhaite_mentor ? 'text-green-600 font-medium' : 'text-gray-400'}>{selectedEntreprise.souhaite_mentor ? 'Oui' : 'Non'}</span></div>
+                  </div>
+                </section>
+
+                <section>
+                  <h4 className="font-semibold text-[#3558A2] mb-2 text-base">Impact & Valorisation</h4>
+                  {selectedEntreprise.impact_principal.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mb-2">
+                      {selectedEntreprise.impact_principal.map(i => <Badge key={i} variant="secondary" className="text-xs">{i}</Badge>)}
+                    </div>
+                  )}
+                  {selectedEntreprise.description_impact && <p className="text-gray-700 mb-1">{selectedEntreprise.description_impact}</p>}
+                  <p>Mise en avant sur le site : <span className={selectedEntreprise.mise_en_avant ? 'text-green-600 font-medium' : 'text-gray-400'}>{selectedEntreprise.mise_en_avant ? 'Oui' : 'Non'}</span></p>
+                  {selectedEntreprise.presentation_publication && <p className="mt-1 italic text-gray-600">"{selectedEntreprise.presentation_publication}"</p>}
+                </section>
+
+                {selectedEntreprise.notes_admin && (
+                  <div className="bg-amber-50 border border-amber-200 rounded p-3">
+                    <p className="font-semibold text-amber-700 mb-1">Note admin</p>
+                    <p className="text-amber-800">{selectedEntreprise.notes_admin}</p>
                   </div>
                 )}
-                {selectedEntreprise.description_impact && <p className="text-gray-700 mb-1">{selectedEntreprise.description_impact}</p>}
-                <p>Mise en avant sur le site : <span className={selectedEntreprise.mise_en_avant ? 'text-green-600 font-medium' : 'text-gray-400'}>{selectedEntreprise.mise_en_avant ? 'Oui' : 'Non'}</span></p>
-                {selectedEntreprise.presentation_publication && <p className="mt-1 italic text-gray-600">"{selectedEntreprise.presentation_publication}"</p>}
-              </section>
-
-              {selectedEntreprise.notes_admin && (
-                <div className="bg-amber-50 border border-amber-200 rounded p-3">
-                  <p className="font-semibold text-amber-700 mb-1">Note admin</p>
-                  <p className="text-amber-800">{selectedEntreprise.notes_admin}</p>
-                </div>
-              )}
-
-              <div className="flex gap-2 pt-2 border-t">
-                {selectedEntreprise.statut !== 'valide' && (
-                  <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={() => openAction(selectedEntreprise, 'valide')}>
-                    <Check className="h-4 w-4 mr-2" /> Valider
-                  </Button>
-                )}
-                {selectedEntreprise.statut !== 'rejete' && (
-                  <Button variant="outline" className="border-red-500 text-red-600 hover:bg-red-50" onClick={() => openAction(selectedEntreprise, 'rejete')}>
-                    <X className="h-4 w-4 mr-2" /> Rejeter
-                  </Button>
-                )}
-                <Button variant="outline" onClick={() => setSelectedEntreprise(null)} className="ml-auto">Fermer</Button>
               </div>
             </div>
-          </DialogContent>
-        </Dialog>
+
+            {/* Footer fixe */}
+            <div className="flex gap-2 px-6 py-4 border-t shrink-0">
+              {selectedEntreprise.statut !== 'valide' && (
+                <Button className="bg-green-600 hover:bg-green-700 text-white" onClick={() => openAction(selectedEntreprise, 'valide')}>
+                  <Check className="h-4 w-4 mr-2" /> Valider
+                </Button>
+              )}
+              {selectedEntreprise.statut !== 'rejete' && (
+                <Button variant="outline" className="border-red-500 text-red-600 hover:bg-red-50" onClick={() => openAction(selectedEntreprise, 'rejete')}>
+                  <X className="h-4 w-4 mr-2" /> Rejeter
+                </Button>
+              )}
+              <Button variant="outline" onClick={() => setSelectedEntreprise(null)} className="ml-auto">Fermer</Button>
+            </div>
+          </div>
+        </div>
       )}
 
       {/* Dialog: Confirmer action */}
