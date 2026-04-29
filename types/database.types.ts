@@ -16,7 +16,7 @@ export type DiplomeType =
   | 'doctorat'
   | 'post_doctorat'
   | 'autre'
-export type GenreType = 'Homme' | 'Femme' | 'Autre'
+export type GenreType = 'Homme' | 'Femme'
 export type BourseType = 'Non boursier' | 'Boursier Etat français' | 'Boursier Etat guinéen' | 'Boursier Etats français et guinéen'
 export type NationaliteType = 'Guinéenne' | 'Franco-Guinéenne' | 'Guinéenne-Autre'
 export type PlanRetourType = 'Dans 2 ans' | 'Dans 5 ans' | 'Déjà en Guinée' | 'Autre'

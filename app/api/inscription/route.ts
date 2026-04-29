@@ -26,7 +26,7 @@ const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 const ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png']
 const MAX_PHOTO_SIZE = 3 * 1024 * 1024 // 3MB
 const ALLOWED_PHOTO_TYPES = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
-const ALLOWED_GENRES: GenreType[] = ['Homme', 'Femme', 'Autre']
+const ALLOWED_GENRES: GenreType[] = ['Homme', 'Femme']
 const ALLOWED_NATIONALITES: NationaliteType[] = ['Guinéenne', 'Franco-Guinéenne', 'Guinéenne-Autre']
 const ALLOWED_PLAN_RETOUR: PlanRetourType[] = ['Dans 2 ans', 'Dans 5 ans', 'Déjà en Guinée', 'Autre']
 const ALLOWED_BOURSES: BourseType[] = ['Non boursier', 'Boursier Etat français', 'Boursier Etat guinéen', 'Boursier Etats français et guinéen']
@@ -115,7 +115,7 @@ export async function POST(request: NextRequest) {
 
     if (!ALLOWED_GENRES.includes(genre as GenreType)) {
       return NextResponse.json(
-        { error: 'Genre invalide. Valeurs autorisées: Homme, Femme, Autre.' },
+        { error: 'Genre invalide. Valeurs autorisées: Homme, Femme.' },
         { status: 400 }
       )
     }

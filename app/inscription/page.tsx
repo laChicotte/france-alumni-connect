@@ -117,7 +117,7 @@ export default function InscriptionPage() {
   })
   const [diplomeFile, setDiplomeFile] = useState<File | null>(null)
   const [photoFile, setPhotoFile] = useState<File | null>(null)
-  const genreOptions: GenreType[] = ["Homme", "Femme", "Autre"]
+  const genreOptions: GenreType[] = ["Homme", "Femme"]
   const nationaliteOptions: NationaliteType[] = ["Guinéenne", "Franco-Guinéenne", "Guinéenne-Autre"]
   const planRetourOptions: PlanRetourType[] = ["Dans 2 ans", "Dans 5 ans", "Déjà en Guinée", "Autre"]
   const bourseOptions: BourseType[] = ["Non boursier", "Boursier Etat français", "Boursier Etat guinéen", "Boursier Etats français et guinéen"]
