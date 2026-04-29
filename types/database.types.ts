@@ -26,6 +26,10 @@ export type JobType = 'cdi' | 'cdd' | 'stage' | 'freelance' | 'alternance'
 export type FormationStatut = 'en_attente' | 'publiee' | 'archivee'
 export type FormationNiveau = 'Débutant' | 'Intermédiaire' | 'Avancé' | 'Tous niveaux'
 export type MentorStatut = 'en_attente' | 'approuve' | 'refuse'
+export type EntrepriseStatut = 'en_attente' | 'valide' | 'rejete'
+export type EntrepriseFonction = 'fondateur' | 'cofondateur' | 'gerant' | 'directeur' | 'associe' | 'autre'
+export type EntrepriseFormeJuridique = 'SARL' | 'SA' | 'entreprise_individuelle' | 'cooperative' | 'autre'
+export type EntrepriseStade = 'lancement' | 'activite_reguliere' | 'croissance' | 'expansion'
 
 export interface MentorDemande {
   id: string
@@ -584,6 +588,126 @@ export interface Database {
           updated_at?: string
         }
       }
+      entreprises_alumni: {
+        Row: {
+          id: string
+          user_id: string
+          statut: EntrepriseStatut
+          // Étape 1
+          fonction: string
+          email_pro: string
+          telephone_pro: string
+          // Étape 2
+          denomination_sociale: string
+          nom_commercial: string | null
+          forme_juridique: string
+          date_creation: string
+          numero_rccm_nif: string
+          localisation_siege: string
+          document_justificatif_url: string | null
+          // Étape 3
+          secteur_activite: string
+          description_produits: string
+          stade_developpement: EntrepriseStade
+          effectif: string
+          chiffre_affaires: string | null
+          types_clients: string[]
+          site_web: string | null
+          // Étape 4
+          besoins: string[]
+          besoins_autre: string | null
+          // Étape 5
+          recherche_associe: boolean
+          domaine_associe: string | null
+          propose_emploi: boolean
+          disponible_evenement: boolean
+          souhaite_mentor: boolean
+          // Étape 6
+          impact_principal: string[]
+          description_impact: string | null
+          mise_en_avant: boolean
+          presentation_publication: string | null
+          logo_url: string | null
+          photos_urls: string[]
+          // Admin
+          notes_admin: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          statut?: EntrepriseStatut
+          fonction: string
+          email_pro: string
+          telephone_pro: string
+          denomination_sociale: string
+          nom_commercial?: string | null
+          forme_juridique: string
+          date_creation: string
+          numero_rccm_nif: string
+          localisation_siege: string
+          document_justificatif_url?: string | null
+          secteur_activite: string
+          description_produits: string
+          stade_developpement: EntrepriseStade
+          effectif: string
+          chiffre_affaires?: string | null
+          types_clients?: string[]
+          site_web?: string | null
+          besoins?: string[]
+          besoins_autre?: string | null
+          recherche_associe?: boolean
+          domaine_associe?: string | null
+          propose_emploi?: boolean
+          disponible_evenement?: boolean
+          souhaite_mentor?: boolean
+          impact_principal?: string[]
+          description_impact?: string | null
+          mise_en_avant?: boolean
+          presentation_publication?: string | null
+          logo_url?: string | null
+          photos_urls?: string[]
+          notes_admin?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          statut?: EntrepriseStatut
+          fonction?: string
+          email_pro?: string
+          telephone_pro?: string
+          denomination_sociale?: string
+          nom_commercial?: string | null
+          forme_juridique?: string
+          date_creation?: string
+          numero_rccm_nif?: string
+          localisation_siege?: string
+          document_justificatif_url?: string | null
+          secteur_activite?: string
+          description_produits?: string
+          stade_developpement?: EntrepriseStade
+          effectif?: string
+          chiffre_affaires?: string | null
+          types_clients?: string[]
+          site_web?: string | null
+          besoins?: string[]
+          besoins_autre?: string | null
+          recherche_associe?: boolean
+          domaine_associe?: string | null
+          propose_emploi?: boolean
+          disponible_evenement?: boolean
+          souhaite_mentor?: boolean
+          impact_principal?: string[]
+          description_impact?: string | null
+          mise_en_avant?: boolean
+          presentation_publication?: string | null
+          logo_url?: string | null
+          photos_urls?: string[]
+          notes_admin?: string | null
+          updated_at?: string
+        }
+      }
       inscriptions_formations: {
         Row: {
           id: string
@@ -637,3 +761,4 @@ export type TypeEvenement = Database['public']['Tables']['types_evenements']['Ro
 export type TypeFormation = Database['public']['Tables']['types_formations']['Row']
 export type Formation = Database['public']['Tables']['formations']['Row']
 export type InscriptionFormation = Database['public']['Tables']['inscriptions_formations']['Row']
+export type EntrepriseAlumni = Database['public']['Tables']['entreprises_alumni']['Row']

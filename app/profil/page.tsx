@@ -13,7 +13,7 @@ import { Switch } from "@/components/ui/switch"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { User, Users, Mail, Phone, MapPin, Building, GraduationCap, Edit2, Save, X, Loader2, Linkedin, CheckCircle, AlertCircle, FileText, Eye, EyeOff, Lock, ChevronDown, Check } from "lucide-react"
+import { User, Users, Mail, Phone, MapPin, Building, Building2, GraduationCap, Edit2, Save, X, Loader2, Linkedin, CheckCircle, AlertCircle, FileText, Eye, EyeOff, Lock, ChevronDown, Check } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { AlumniProfile, Secteur, StatutProfessionnel, DiplomeType, GenreType, NationaliteType, PlanRetourType, BourseType } from "@/types/database.types"
 import { cn } from "@/lib/utils"
@@ -502,6 +502,13 @@ export default function ProfilPage() {
                     >
                       <Users className="h-4 w-4" />
                       {mentorStatut === 'approuve' ? 'Infos mentor' : 'Devenir mentor'}
+                    </a>
+                    <a
+                      href="/entrepreneur/mon-profil"
+                      className="w-full flex items-center justify-center gap-2 border border-[#3558A2] text-[#3558A2] hover:bg-[#3558A2]/5 font-medium py-2.5 px-4 rounded-lg transition-colors"
+                    >
+                      <Building2 className="h-4 w-4" />
+                      Mon entreprise
                     </a>
                     {formData.document_diplome_url && (
                       <a

@@ -17,6 +17,7 @@ import {
   Menu,
   X,
   Building,
+  Building2,
   Tags,
   FolderCog,
   CalendarCog,
@@ -45,6 +46,7 @@ const navItems: NavItem[] = [
   { href: "/admin/evenements", label: "Événements", icon: Calendar },
   { href: "/admin/formations", label: "Formations", icon: BookOpen },
   { href: "/admin/mentors", label: "Mentors", icon: Award },
+  { href: "/admin/entrepreneurs", label: "Entrepreneurs", icon: Building2 },
   { href: "/admin/partenaires", label: "Partenaires", icon: Handshake },
   {
     href: "/admin/config",
