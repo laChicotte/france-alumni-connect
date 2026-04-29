@@ -89,6 +89,13 @@ CREATE TRIGGER update_mentor_demandes_updated_at
   FOR EACH ROW
   EXECUTE FUNCTION update_updated_at();
 
+-- Table: entreprises_alumni
+DROP TRIGGER IF EXISTS update_entreprises_alumni_updated_at ON entreprises_alumni;
+CREATE TRIGGER update_entreprises_alumni_updated_at
+  BEFORE UPDATE ON entreprises_alumni
+  FOR EACH ROW
+  EXECUTE FUNCTION update_updated_at();
+
 -- ================================================
 -- NOTE IMPORTANTE:
 -- Il n'y a PAS de trigger sur auth.users

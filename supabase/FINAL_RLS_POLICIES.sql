@@ -905,6 +905,87 @@ USING (
 );
 
 -- ================================================
+-- TABLE: entreprises_alumni
+-- ================================================
+
+-- SELECT: alumni voit sa propre entreprise (quel que soit le statut)
+DROP POLICY IF EXISTS "Alumni can view own entreprise" ON entreprises_alumni;
+CREATE POLICY "Alumni can view own entreprise"
+ON entreprises_alumni FOR SELECT
+TO authenticated
+USING (user_id = auth.uid());
+
+-- SELECT: lecture des entreprises validées
+DROP POLICY IF EXISTS "Anyone can view validated entreprises" ON entreprises_alumni;
+CREATE POLICY "Anyone can view validated entreprises"
+ON entreprises_alumni FOR SELECT
+TO authenticated
+USING (statut = 'valide');
+
+-- SELECT: admin et modérateur voient tout
+DROP POLICY IF EXISTS "Admins and moderators can view all entreprises" ON entreprises_alumni;
+CREATE POLICY "Admins and moderators can view all entreprises"
+ON entreprises_alumni FOR SELECT
+TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM public.users u
+    WHERE u.id = auth.uid()
+    AND u.role IN ('admin', 'moderateur')
+  )
+);
+
+-- INSERT: alumni actif, statut forcé à en_attente (un seul dépôt via UNIQUE)
+DROP POLICY IF EXISTS "Alumni can submit own entreprise" ON entreprises_alumni;
+CREATE POLICY "Alumni can submit own entreprise"
+ON entreprises_alumni FOR INSERT
+TO authenticated
+WITH CHECK (
+  user_id = auth.uid()
+  AND statut = 'en_attente'
+  AND EXISTS (
+    SELECT 1 FROM public.users u
+    WHERE u.id = auth.uid()
+    AND u.role = 'alumni'
+    AND u.status = 'actif'
+  )
+);
+
+-- UPDATE: alumni modifie sa propre entreprise
+DROP POLICY IF EXISTS "Alumni can update own entreprise" ON entreprises_alumni;
+CREATE POLICY "Alumni can update own entreprise"
+ON entreprises_alumni FOR UPDATE
+TO authenticated
+USING (user_id = auth.uid())
+WITH CHECK (user_id = auth.uid());
+
+-- UPDATE: admin traite les demandes
+DROP POLICY IF EXISTS "Admins can update all entreprises" ON entreprises_alumni;
+CREATE POLICY "Admins can update all entreprises"
+ON entreprises_alumni FOR UPDATE
+TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM public.users u
+    WHERE u.id = auth.uid()
+    AND u.role = 'admin'
+  )
+);
+
+-- DELETE: admin uniquement
+DROP POLICY IF EXISTS "Admins can delete entreprises" ON entreprises_alumni;
+CREATE POLICY "Admins can delete entreprises"
+ON entreprises_alumni FOR DELETE
+TO authenticated
+USING (
+  EXISTS (
+    SELECT 1 FROM public.users u
+    WHERE u.id = auth.uid()
+    AND u.role = 'admin'
+  )
+);
+
+-- ================================================
 -- VÉRIFICATION
 -- ================================================
 SELECT

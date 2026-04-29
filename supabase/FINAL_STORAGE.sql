@@ -392,6 +392,144 @@ USING (
 );
 
 -- ================================================
+-- 13. CRÉER LE BUCKET "entreprises-logos" (public)
+-- ================================================
+
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'entreprises-logos',
+  'entreprises-logos',
+  true,
+  3145728,
+  ARRAY['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/svg+xml']
+)
+ON CONFLICT (id) DO NOTHING;
+
+DROP POLICY IF EXISTS "Anyone can view entreprises logos" ON storage.objects;
+CREATE POLICY "Anyone can view entreprises logos"
+ON storage.objects FOR SELECT
+TO public
+USING (bucket_id = 'entreprises-logos');
+
+DROP POLICY IF EXISTS "Users can upload own entreprise logo" ON storage.objects;
+CREATE POLICY "Users can upload own entreprise logo"
+ON storage.objects FOR INSERT
+TO authenticated
+WITH CHECK (
+  bucket_id = 'entreprises-logos'
+  AND (storage.foldername(name))[1] = auth.uid()::text
+);
+
+DROP POLICY IF EXISTS "Users can update own entreprise logo" ON storage.objects;
+CREATE POLICY "Users can update own entreprise logo"
+ON storage.objects FOR UPDATE
+TO authenticated
+USING (
+  bucket_id = 'entreprises-logos'
+  AND (storage.foldername(name))[1] = auth.uid()::text
+);
+
+DROP POLICY IF EXISTS "Users can delete own entreprise logo or admin" ON storage.objects;
+CREATE POLICY "Users can delete own entreprise logo or admin"
+ON storage.objects FOR DELETE
+TO authenticated
+USING (
+  bucket_id = 'entreprises-logos'
+  AND (
+    (storage.foldername(name))[1] = auth.uid()::text
+    OR EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin')
+  )
+);
+
+-- ================================================
+-- 14. CRÉER LE BUCKET "entreprises-docs" (privé)
+-- ================================================
+
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'entreprises-docs',
+  'entreprises-docs',
+  false,
+  5242880,
+  ARRAY['application/pdf', 'image/jpeg', 'image/jpg', 'image/png']
+)
+ON CONFLICT (id) DO NOTHING;
+
+DROP POLICY IF EXISTS "Owner or admin can view entreprise docs" ON storage.objects;
+CREATE POLICY "Owner or admin can view entreprise docs"
+ON storage.objects FOR SELECT
+TO authenticated
+USING (
+  bucket_id = 'entreprises-docs'
+  AND (
+    (storage.foldername(name))[1] = auth.uid()::text
+    OR EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin')
+  )
+);
+
+DROP POLICY IF EXISTS "Users can upload own entreprise docs" ON storage.objects;
+CREATE POLICY "Users can upload own entreprise docs"
+ON storage.objects FOR INSERT
+TO authenticated
+WITH CHECK (
+  bucket_id = 'entreprises-docs'
+  AND (storage.foldername(name))[1] = auth.uid()::text
+);
+
+DROP POLICY IF EXISTS "Users can delete own entreprise docs or admin" ON storage.objects;
+CREATE POLICY "Users can delete own entreprise docs or admin"
+ON storage.objects FOR DELETE
+TO authenticated
+USING (
+  bucket_id = 'entreprises-docs'
+  AND (
+    (storage.foldername(name))[1] = auth.uid()::text
+    OR EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin')
+  )
+);
+
+-- ================================================
+-- 15. CRÉER LE BUCKET "entreprises-media" (public)
+-- ================================================
+
+INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+VALUES (
+  'entreprises-media',
+  'entreprises-media',
+  true,
+  10485760,
+  ARRAY['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+)
+ON CONFLICT (id) DO NOTHING;
+
+DROP POLICY IF EXISTS "Anyone can view entreprises media" ON storage.objects;
+CREATE POLICY "Anyone can view entreprises media"
+ON storage.objects FOR SELECT
+TO public
+USING (bucket_id = 'entreprises-media');
+
+DROP POLICY IF EXISTS "Users can upload own entreprises media" ON storage.objects;
+CREATE POLICY "Users can upload own entreprises media"
+ON storage.objects FOR INSERT
+TO authenticated
+WITH CHECK (
+  bucket_id = 'entreprises-media'
+  AND (storage.foldername(name))[1] = auth.uid()::text
+);
+
+DROP POLICY IF EXISTS "Users can delete own entreprises media or admin" ON storage.objects;
+CREATE POLICY "Users can delete own entreprises media or admin"
+ON storage.objects FOR DELETE
+TO authenticated
+USING (
+  bucket_id = 'entreprises-media'
+  AND (
+    (storage.foldername(name))[1] = auth.uid()::text
+    OR EXISTS (SELECT 1 FROM public.users u WHERE u.id = auth.uid() AND u.role = 'admin')
+  )
+);
+
+-- ================================================
 -- VÉRIFICATION
 -- ================================================
 SELECT
@@ -399,5 +537,5 @@ SELECT
   name as policy_name,
   definition
 FROM storage.policies
-WHERE bucket_id IN ('diplomes', 'alumni-photos', 'articles-media', 'evenements-media', 'logo-partenaire', 'formations-media')
+WHERE bucket_id IN ('diplomes', 'alumni-photos', 'articles-media', 'evenements-media', 'logo-partenaire', 'formations-media', 'entreprises-logos', 'entreprises-docs', 'entreprises-media')
 ORDER BY name;

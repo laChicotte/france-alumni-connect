@@ -363,6 +363,73 @@ CREATE TABLE IF NOT EXISTS public.mentor_demandes (
 ALTER TABLE public.mentor_demandes ENABLE ROW LEVEL SECURITY;
 
 -- ================================================
+-- TABLE: entreprises_alumni
+-- ================================================
+
+CREATE TABLE IF NOT EXISTS public.entreprises_alumni (
+  id            UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id       UUID        NOT NULL UNIQUE REFERENCES public.users(id) ON DELETE CASCADE,
+  statut        TEXT        NOT NULL DEFAULT 'en_attente'
+                            CHECK (statut IN ('en_attente', 'valide', 'rejete')),
+
+  -- Étape 1: Identification
+  fonction                  TEXT        NOT NULL,
+  email_pro                 TEXT        NOT NULL,
+  telephone_pro             TEXT        NOT NULL,
+
+  -- Étape 2: Juridique (confidentiel → filtré côté API)
+  denomination_sociale      TEXT        NOT NULL,
+  nom_commercial            TEXT,
+  forme_juridique           TEXT        NOT NULL,
+  date_creation             DATE        NOT NULL,
+  numero_rccm_nif           TEXT        NOT NULL,
+  localisation_siege        TEXT        NOT NULL,
+  document_justificatif_url TEXT,
+
+  -- Étape 3: Profil entreprise
+  secteur_activite          TEXT        NOT NULL,
+  description_produits      TEXT        NOT NULL,
+  stade_developpement       TEXT        NOT NULL
+                            CHECK (stade_developpement IN ('lancement', 'activite_reguliere', 'croissance', 'expansion')),
+  effectif                  TEXT        NOT NULL,
+  chiffre_affaires          TEXT,
+  types_clients             TEXT[]      NOT NULL DEFAULT '{}',
+  site_web                  TEXT,
+
+  -- Étape 4: Besoins (confidentiel → filtré côté API)
+  besoins                   TEXT[]      NOT NULL DEFAULT '{}',
+  besoins_autre             TEXT,
+
+  -- Étape 5: Collaboration (confidentiel → filtré côté API)
+  recherche_associe         BOOLEAN     NOT NULL DEFAULT false,
+  domaine_associe           TEXT,
+  propose_emploi            BOOLEAN     NOT NULL DEFAULT false,
+  disponible_evenement      BOOLEAN     NOT NULL DEFAULT false,
+  souhaite_mentor           BOOLEAN     NOT NULL DEFAULT false,
+
+  -- Étape 6: Impact & Valorisation
+  impact_principal          TEXT[]      NOT NULL DEFAULT '{}',
+  description_impact        TEXT,
+  mise_en_avant             BOOLEAN     NOT NULL DEFAULT false,
+  presentation_publication  TEXT,
+  logo_url                  TEXT,
+  photos_urls               TEXT[]      NOT NULL DEFAULT '{}',
+
+  -- Admin
+  notes_admin               TEXT,
+
+  created_at                TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at                TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+ALTER TABLE public.entreprises_alumni ENABLE ROW LEVEL SECURITY;
+
+CREATE INDEX IF NOT EXISTS idx_entreprises_alumni_user_id
+  ON public.entreprises_alumni (user_id);
+
+CREATE INDEX IF NOT EXISTS idx_entreprises_alumni_statut
+  ON public.entreprises_alumni (statut);
+
+-- ================================================
 -- VÉRIFICATION
 -- ================================================
 SELECT table_name

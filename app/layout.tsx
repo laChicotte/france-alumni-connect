@@ -30,6 +30,7 @@ export default function RootLayout({
         <Footer />
         <CookieBanner />
         <Toaster richColors position="top-right" />
+        <script defer src="https://analytics.francealumniconnect.fr/script.js" data-website-id="10e9381c-4875-4779-9e1b-af68f27a6da8"></script>
       </body>
     </html>
   )
