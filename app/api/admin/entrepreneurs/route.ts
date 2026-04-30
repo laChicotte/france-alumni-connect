@@ -32,11 +32,11 @@ export async function GET(request: NextRequest) {
     }
 
     const supabaseAdmin = createSupabaseAdmin()
-    const { data: callerProfile } = await supabaseAdmin
+    const { data: callerProfile } = await (supabaseAdmin
       .from('users')
       .select('role')
       .eq('id', callerAuth.user.id)
-      .single()
+      .single() as any) as { data: { role: string } | null }
 
     if (!callerProfile || !['admin', 'moderateur'].includes(callerProfile.role)) {
       return NextResponse.json({ error: 'Accès refusé' }, { status: 403 })

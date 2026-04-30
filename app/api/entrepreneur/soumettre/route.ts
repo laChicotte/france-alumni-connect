@@ -73,11 +73,11 @@ export async function POST(request: NextRequest) {
     const userId = callerAuth.user.id
     const supabaseAdmin = createSupabaseAdmin()
 
-    const { data: userProfile } = await supabaseAdmin
+    const { data: userProfile } = await (supabaseAdmin
       .from('users')
       .select('role, status')
       .eq('id', userId)
-      .single()
+      .single() as any) as { data: { role: string; status: string } | null }
 
     if (!userProfile || userProfile.role !== 'alumni' || userProfile.status !== 'actif') {
       return NextResponse.json({ error: 'Accès réservé aux alumni actifs' }, { status: 403 })
@@ -134,11 +134,18 @@ export async function POST(request: NextRequest) {
     const souhaite_mentor = parseBool('souhaite_mentor')
     const mise_en_avant = parseBool('mise_en_avant')
 
-    const { data: existing } = await supabaseAdmin
+    const { data: existing } = await (supabaseAdmin
       .from('entreprises_alumni')
       .select('id, logo_url, document_justificatif_url, photos_urls')
       .eq('user_id', userId)
-      .maybeSingle()
+      .maybeSingle() as any) as {
+        data: {
+          id: string
+          logo_url: string | null
+          document_justificatif_url: string | null
+          photos_urls: string[] | null
+        } | null
+      }
 
     // Logo
     let logo_url: string | null = existing?.logo_url ?? null
@@ -192,14 +199,14 @@ export async function POST(request: NextRequest) {
     }
 
     if (existing) {
-      const { error } = await supabaseAdmin
-        .from('entreprises_alumni')
+      const { error } = await (supabaseAdmin
+        .from('entreprises_alumni') as any)
         .update(payload)
         .eq('user_id', userId)
       if (error) return NextResponse.json({ error: error.message }, { status: 500 })
     } else {
-      const { error } = await supabaseAdmin
-        .from('entreprises_alumni')
+      const { error } = await (supabaseAdmin
+        .from('entreprises_alumni') as any)
         .insert(payload)
       if (error) return NextResponse.json({ error: error.message }, { status: 500 })
     }

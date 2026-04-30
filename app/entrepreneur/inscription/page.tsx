@@ -204,11 +204,11 @@ export default function EntrepreneurInscriptionPage() {
       const { data: { session } } = await supabase.auth.getSession()
       if (!session) { router.push('/connexion'); return }
 
-      const { data: profile } = await supabase
+      const { data: profile } = await (supabase
         .from('users')
         .select('role')
         .eq('id', session.user.id)
-        .single()
+        .single() as any) as { data: { role: string } | null }
 
       if (!profile || profile.role !== 'alumni') { router.push('/'); return }
       setUserId(session.user.id)

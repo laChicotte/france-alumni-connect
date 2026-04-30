@@ -13,9 +13,10 @@ type EntrepriseStatutAction = typeof ALLOWED_STATUTS[number]
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id: entrepriseId } = await params
     const token = getBearerToken(request)
     if (!token) {
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
@@ -38,11 +39,11 @@ export async function PATCH(
     }
 
     const supabaseAdmin = createSupabaseAdmin()
-    const { data: callerProfile } = await supabaseAdmin
+    const { data: callerProfile } = await (supabaseAdmin
       .from('users')
       .select('role')
       .eq('id', callerAuth.user.id)
-      .single()
+      .single() as any) as { data: { role: string } | null }
 
     if (!callerProfile || callerProfile.role !== 'admin') {
       return NextResponse.json(
@@ -61,7 +62,6 @@ export async function PATCH(
       return NextResponse.json({ error: 'Statut invalide' }, { status: 400 })
     }
 
-    const entrepriseId = params.id
     if (!entrepriseId) {
       return NextResponse.json({ error: 'ID manquant' }, { status: 400 })
     }
@@ -69,8 +69,8 @@ export async function PATCH(
     const updatePayload: Record<string, unknown> = { statut }
     if (notes_admin !== undefined) updatePayload.notes_admin = notes_admin
 
-    const { error: updateError } = await supabaseAdmin
-      .from('entreprises_alumni')
+    const { error: updateError } = await (supabaseAdmin
+      .from('entreprises_alumni') as any)
       .update(updatePayload)
       .eq('id', entrepriseId)
 
