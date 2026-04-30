@@ -27,8 +27,8 @@ export type FormationStatut = 'en_attente' | 'publiee' | 'archivee'
 export type FormationNiveau = 'Débutant' | 'Intermédiaire' | 'Avancé' | 'Tous niveaux'
 export type MentorStatut = 'en_attente' | 'approuve' | 'refuse'
 export type EntrepriseStatut = 'en_attente' | 'valide' | 'rejete'
-export type EntrepriseFonction = 'fondateur' | 'cofondateur' | 'gerant' | 'directeur' | 'associe' | 'autre'
-export type EntrepriseFormeJuridique = 'SARL' | 'SA' | 'entreprise_individuelle' | 'cooperative' | 'autre'
+export type EntrepriseFonction = 'fondateur' | 'cofondateur' | 'gerant' | 'directeur' | 'associe'
+export type EntrepriseFormeJuridique = 'SARL' | 'SA' | 'entreprise_individuelle' | 'cooperative' | 'SNC' | 'SAS' | 'GIE'
 export type EntrepriseStade = 'lancement' | 'activite_reguliere' | 'croissance' | 'expansion'
 
 export interface MentorDemande {

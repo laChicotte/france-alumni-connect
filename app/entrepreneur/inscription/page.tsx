@@ -16,8 +16,6 @@ import { CheckCircle2, AlertCircle, ChevronLeft, ChevronRight, Loader2, Upload, 
 type FormData = {
   // Étape 1
   fonction: string
-  email_pro: string
-  telephone_pro: string
   // Étape 2
   denomination_sociale: string
   nom_commercial: string
@@ -51,8 +49,8 @@ type FormData = {
 
 // ─── Constantes ──────────────────────────────────────────────────────────────
 
-const FONCTIONS = ['Fondateur', 'Cofondateur', 'Gérant', 'Directeur', 'Associé', 'Autre']
-const FORMES_JURIDIQUES = ['SARL', 'SA', 'Entreprise individuelle', 'Coopérative', 'Autre']
+const FONCTIONS = ['Fondateur', 'Cofondateur', 'Gérant', 'Directeur', 'Associé']
+const FORMES_JURIDIQUES = ['SARL', 'SA', 'Entreprise individuelle', 'Coopérative', 'SNC', 'SAS', 'GIE']
 const STADES = [
   { value: 'lancement', label: 'Lancement' },
   { value: 'activite_reguliere', label: 'Activité régulière' },
@@ -85,7 +83,6 @@ const IMPACT_OPTIONS = [
 
 const STEPS = [
   'Identification',
-  'Juridique',
   'Profil',
   'Besoins',
   'Collaboration',
@@ -94,7 +91,7 @@ const STEPS = [
 ]
 
 const EMPTY_FORM: FormData = {
-  fonction: '', email_pro: '', telephone_pro: '',
+  fonction: '',
   denomination_sociale: '', nom_commercial: '', forme_juridique: '',
   date_creation: '', numero_rccm_nif: '', localisation_siege: '',
   secteur_activite: '', description_produits: '', stade_developpement: '',
@@ -228,8 +225,6 @@ export default function EntrepreneurInscriptionPage() {
       if (data) {
         setForm({
           fonction: data.fonction || '',
-          email_pro: data.email_pro || '',
-          telephone_pro: data.telephone_pro || '',
           denomination_sociale: data.denomination_sociale || '',
           nom_commercial: data.nom_commercial || '',
           forme_juridique: data.forme_juridique || '',
@@ -271,23 +266,19 @@ export default function EntrepreneurInscriptionPage() {
   const validateStep = (): string | null => {
     if (step === 1) {
       if (!form.fonction) return 'Veuillez indiquer votre fonction dans l\'entreprise.'
-      if (!form.email_pro) return 'L\'email professionnel est requis.'
-      if (!form.telephone_pro) return 'Le téléphone professionnel est requis.'
-    }
-    if (step === 2) {
       if (!form.denomination_sociale) return 'La dénomination sociale est requise.'
       if (!form.forme_juridique) return 'La forme juridique est requise.'
       if (!form.date_creation) return 'La date de création est requise.'
       if (!form.numero_rccm_nif) return 'Le numéro RCCM / NIF est requis.'
       if (!form.localisation_siege) return 'La localisation du siège est requise.'
     }
-    if (step === 3) {
+    if (step === 2) {
       if (!form.secteur_activite) return 'Le secteur d\'activité est requis.'
       if (!form.description_produits) return 'La description est requise.'
       if (!form.stade_developpement) return 'Le stade de développement est requis.'
       if (!form.effectif) return 'L\'effectif est requis.'
     }
-    if (step === 7) {
+    if (step === 6) {
       if (!declarations.every(Boolean)) return 'Veuillez cocher les 3 déclarations pour soumettre.'
     }
     return null
@@ -383,7 +374,7 @@ export default function EntrepreneurInscriptionPage() {
         {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-2xl font-bold text-[#3558A2] font-serif">Référencer mon entreprise</h1>
-          <p className="text-sm text-gray-500 mt-1">Complétez les 7 étapes pour soumettre votre dossier</p>
+          <p className="text-sm text-gray-500 mt-1">Complétez les 6 étapes pour soumettre votre dossier</p>
         </div>
 
         {/* Stepper */}
@@ -433,37 +424,26 @@ export default function EntrepreneurInscriptionPage() {
             {step === 1 && (
               <div className="space-y-4">
                 <div>
-                  <Label>Fonction dans l'entreprise *</Label>
+                  <Label className="mb-2 block">Fonction dans l'entreprise *</Label>
                   <RadioGroup
                     options={FONCTIONS.map(f => ({ value: f, label: f }))}
                     value={form.fonction}
                     onChange={v => set('fonction', v)}
                   />
                 </div>
-                <div>
-                  <Label htmlFor="email_pro">Email professionnel *</Label>
-                  <Input id="email_pro" type="email" value={form.email_pro} onChange={e => set('email_pro', e.target.value)} placeholder="contact@monentreprise.com" />
+                <div className="border-t pt-4">
+                  <p className="text-sm font-semibold text-gray-700">Informations juridiques</p>
                 </div>
                 <div>
-                  <Label htmlFor="telephone_pro">Téléphone professionnel *</Label>
-                  <Input id="telephone_pro" value={form.telephone_pro} onChange={e => set('telephone_pro', e.target.value)} placeholder="+224 6XX XX XX XX" />
-                </div>
-              </div>
-            )}
-
-            {/* ── Étape 2: Juridique ── */}
-            {step === 2 && (
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="denomination_sociale">Dénomination sociale *</Label>
+                  <Label htmlFor="denomination_sociale" className="mb-2 block">Dénomination sociale *</Label>
                   <Input id="denomination_sociale" value={form.denomination_sociale} onChange={e => set('denomination_sociale', e.target.value)} placeholder="Nom officiel de l'entreprise" />
                 </div>
                 <div>
-                  <Label htmlFor="nom_commercial">Nom commercial <span className="text-gray-400 font-normal">(si différent)</span></Label>
+                  <Label htmlFor="nom_commercial" className="mb-2 block">Nom commercial <span className="text-gray-400 font-normal">(si différent)</span></Label>
                   <Input id="nom_commercial" value={form.nom_commercial} onChange={e => set('nom_commercial', e.target.value)} />
                 </div>
                 <div>
-                  <Label>Forme juridique *</Label>
+                  <Label className="mb-2 block">Forme juridique *</Label>
                   <RadioGroup
                     options={FORMES_JURIDIQUES.map(f => ({ value: f, label: f }))}
                     value={form.forme_juridique}
@@ -472,20 +452,20 @@ export default function EntrepreneurInscriptionPage() {
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="date_creation">Date de création *</Label>
+                    <Label htmlFor="date_creation" className="mb-2 block">Date de création *</Label>
                     <Input id="date_creation" type="date" value={form.date_creation} onChange={e => set('date_creation', e.target.value)} />
                   </div>
                   <div>
-                    <Label htmlFor="numero_rccm_nif">RCCM / NIF *</Label>
-                    <Input id="numero_rccm_nif" value={form.numero_rccm_nif} onChange={e => set('numero_rccm_nif', e.target.value)} placeholder="Numéro officiel" />
+                    <Label htmlFor="numero_rccm_nif" className="mb-2 block">RCCM / NIF *</Label>
+                    <Input id="numero_rccm_nif" value={form.numero_rccm_nif} onChange={e => set('numero_rccm_nif', e.target.value)} placeholder="Ex : RCCM GN.TCC.2025.14390" />
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="localisation_siege">Localisation du siège social *</Label>
+                  <Label htmlFor="localisation_siege" className="mb-2 block">Localisation du siège social *</Label>
                   <Input id="localisation_siege" value={form.localisation_siege} onChange={e => set('localisation_siege', e.target.value)} placeholder="Ville, adresse" />
                 </div>
                 <div>
-                  <Label>Document justificatif <span className="text-gray-400 font-normal">(RCCM, NIF ou acte officiel — PDF/image, max 5MB)</span></Label>
+                  <Label className="mb-2 block">Document justificatif <span className="text-gray-400 font-normal">(RCCM, NIF ou acte officiel — PDF/image, max 5MB)</span></Label>
                   <input type="file" ref={docInputRef} accept=".pdf,image/*" className="hidden" onChange={handleDocChange} />
                   <Button type="button" variant="outline" onClick={() => docInputRef.current?.click()} className="mt-1 w-full">
                     <Upload className="h-4 w-4 mr-2" />
@@ -495,59 +475,59 @@ export default function EntrepreneurInscriptionPage() {
               </div>
             )}
 
-            {/* ── Étape 3: Profil ── */}
-            {step === 3 && (
+            {/* ── Étape 2: Profil ── */}
+            {step === 2 && (
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="secteur_activite">Secteur d'activité *</Label>
+                  <Label htmlFor="secteur_activite" className="mb-2 block">Secteur d'activité *</Label>
                   <Input id="secteur_activite" value={form.secteur_activite} onChange={e => set('secteur_activite', e.target.value)} placeholder="Ex: Technologie, Agriculture, Santé..." />
                 </div>
                 <div>
-                  <Label htmlFor="description_produits">Description des produits / services *</Label>
+                  <Label htmlFor="description_produits" className="mb-2 block">Description des produits / services *</Label>
                   <Textarea id="description_produits" rows={3} value={form.description_produits} onChange={e => set('description_produits', e.target.value)} placeholder="Décrivez ce que propose votre entreprise..." />
                 </div>
                 <div>
-                  <Label>Stade de développement *</Label>
+                  <Label className="mb-2 block">Stade de développement *</Label>
                   <RadioGroup options={STADES} value={form.stade_developpement} onChange={v => set('stade_developpement', v)} />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="effectif">Effectif actuel *</Label>
+                    <Label htmlFor="effectif" className="mb-2 block">Effectif actuel *</Label>
                     <Input id="effectif" value={form.effectif} onChange={e => set('effectif', e.target.value)} placeholder="Ex: 5, 10-20..." />
                   </div>
                   <div>
-                    <Label htmlFor="chiffre_affaires">CA annuel approx. <span className="text-gray-400 font-normal">(optionnel)</span></Label>
+                    <Label htmlFor="chiffre_affaires" className="mb-2 block">CA annuel approx. <span className="text-gray-400 font-normal">(optionnel)</span></Label>
                     <Input id="chiffre_affaires" value={form.chiffre_affaires} onChange={e => set('chiffre_affaires', e.target.value)} placeholder="Ex: 50 millions GNF" />
                   </div>
                 </div>
                 <div>
-                  <Label>Principaux clients / bénéficiaires</Label>
+                  <Label className="mb-2 block">Principaux clients / bénéficiaires</Label>
                   <CheckboxGroup options={TYPES_CLIENTS} selected={form.types_clients} onChange={v => set('types_clients', v)} />
                 </div>
                 <div>
-                  <Label htmlFor="site_web">Site web / réseaux sociaux <span className="text-gray-400 font-normal">(optionnel)</span></Label>
+                  <Label htmlFor="site_web" className="mb-2 block">Site web / réseaux sociaux <span className="text-gray-400 font-normal">(optionnel)</span></Label>
                   <Input id="site_web" type="url" value={form.site_web} onChange={e => set('site_web', e.target.value)} placeholder="https://..." />
                 </div>
               </div>
             )}
 
-            {/* ── Étape 4: Besoins ── */}
-            {step === 4 && (
+            {/* ── Étape 3: Besoins ── */}
+            {step === 3 && (
               <div className="space-y-4">
                 <div>
-                  <Label className="text-base">Quels sont vos besoins prioritaires ?</Label>
+                  <Label className="mb-2 block text-base">Quels sont vos besoins prioritaires ?</Label>
                   <p className="text-sm text-gray-500 mb-3">Sélectionnez tout ce qui s'applique</p>
                   <CheckboxGroup options={BESOINS_OPTIONS} selected={form.besoins} onChange={v => set('besoins', v)} />
                 </div>
                 <div>
-                  <Label htmlFor="besoins_autre">Autre besoin <span className="text-gray-400 font-normal">(préciser)</span></Label>
+                  <Label htmlFor="besoins_autre" className="mb-2 block">Autre besoin <span className="text-gray-400 font-normal">(préciser)</span></Label>
                   <Input id="besoins_autre" value={form.besoins_autre} onChange={e => set('besoins_autre', e.target.value)} placeholder="Précisez si besoin spécifique..." />
                 </div>
               </div>
             )}
 
-            {/* ── Étape 5: Collaboration ── */}
-            {step === 5 && (
+            {/* ── Étape 4: Collaboration ── */}
+            {step === 4 && (
               <div className="space-y-3">
                 <BooleanField
                   label="Recherchez-vous un associé, partenaire technique ou commercial au sein du réseau ?"
@@ -556,7 +536,7 @@ export default function EntrepreneurInscriptionPage() {
                 />
                 {form.recherche_associe && (
                   <div className="ml-4">
-                    <Label htmlFor="domaine_associe">Dans quel domaine ?</Label>
+                    <Label htmlFor="domaine_associe" className="mb-2 block">Dans quel domaine ?</Label>
                     <Input id="domaine_associe" value={form.domaine_associe} onChange={e => set('domaine_associe', e.target.value)} placeholder="Ex: Développement commercial, Finance..." />
                   </div>
                 )}
@@ -578,16 +558,16 @@ export default function EntrepreneurInscriptionPage() {
               </div>
             )}
 
-            {/* ── Étape 6: Impact & Valorisation ── */}
-            {step === 6 && (
+            {/* ── Étape 5: Impact & Valorisation ── */}
+            {step === 5 && (
               <div className="space-y-4">
                 <div>
-                  <Label className="text-base">Impact principal de votre entreprise</Label>
+                  <Label className="mb-2 block text-base">Impact principal de votre entreprise</Label>
                   <p className="text-sm text-gray-500 mb-3">Sélectionnez tout ce qui correspond</p>
                   <CheckboxGroup options={IMPACT_OPTIONS} selected={form.impact_principal} onChange={v => set('impact_principal', v)} />
                 </div>
                 <div>
-                  <Label htmlFor="description_impact">Décrivez brièvement l'impact <span className="text-gray-400 font-normal">(optionnel)</span></Label>
+                  <Label htmlFor="description_impact" className="mb-2 block">Décrivez brièvement l'impact <span className="text-gray-400 font-normal">(optionnel)</span></Label>
                   <Textarea id="description_impact" rows={2} value={form.description_impact} onChange={e => set('description_impact', e.target.value)} placeholder="En quelques phrases..." />
                 </div>
                 <BooleanField
@@ -597,12 +577,12 @@ export default function EntrepreneurInscriptionPage() {
                 />
                 {form.mise_en_avant && (
                   <div>
-                    <Label htmlFor="presentation_publication">Présentation courte pour publication</Label>
+                    <Label htmlFor="presentation_publication" className="mb-2 block">Présentation courte pour publication</Label>
                     <Textarea id="presentation_publication" rows={2} value={form.presentation_publication} onChange={e => set('presentation_publication', e.target.value)} placeholder="Accroche de présentation publique..." />
                   </div>
                 )}
                 <div>
-                  <Label>Logo de l'entreprise <span className="text-gray-400 font-normal">(JPG/PNG/SVG, max 3MB)</span></Label>
+                  <Label className="mb-2 block">Logo de l'entreprise <span className="text-gray-400 font-normal">(JPG/PNG/SVG, max 3MB)</span></Label>
                   <input type="file" ref={logoInputRef} accept="image/*" className="hidden" onChange={handleLogoChange} />
                   <div className="flex items-center gap-3 mt-1">
                     {logoPreview && (
@@ -615,7 +595,7 @@ export default function EntrepreneurInscriptionPage() {
                   </div>
                 </div>
                 <div>
-                  <Label>Photos / supports <span className="text-gray-400 font-normal">(optionnel, max 5 photos)</span></Label>
+                  <Label className="mb-2 block">Photos / supports <span className="text-gray-400 font-normal">(optionnel, max 5 photos)</span></Label>
                   <input type="file" ref={photosInputRef} accept="image/*" multiple className="hidden" onChange={handlePhotosChange} />
                   {photoPreviews.length > 0 && (
                     <div className="flex gap-2 flex-wrap mt-1 mb-2">
@@ -638,8 +618,8 @@ export default function EntrepreneurInscriptionPage() {
               </div>
             )}
 
-            {/* ── Étape 7: Déclaration ── */}
-            {step === 7 && (
+            {/* ── Étape 6: Déclaration ── */}
+            {step === 6 && (
               <div className="space-y-4">
                 <p className="text-sm text-gray-600">En soumettant ce formulaire, vous confirmez :</p>
                 {[
@@ -673,7 +653,7 @@ export default function EntrepreneurInscriptionPage() {
             <ChevronLeft className="h-4 w-4 mr-1" />
             {step === 1 ? 'Annuler' : 'Précédent'}
           </Button>
-          {step < 7 ? (
+          {step < 6 ? (
             <Button onClick={handleNext} className="bg-[#3558A2] hover:bg-[#2a4580]">
               Suivant <ChevronRight className="h-4 w-4 ml-1" />
             </Button>

@@ -266,6 +266,79 @@ export function formationProposalRejectedEmail(input: ProposalEmailInput) {
   }
 }
 
+type EntrepriseEmailInput = PersonName & {
+  email: string
+  denomination: string
+}
+
+export function entrepriseReferencementStaffNotificationEmail(input: {
+  auteurPrenom: string | null
+  auteurNom: string | null
+  auteurEmail: string
+  denomination: string
+}) {
+  const auteur = escapeHtml(`${input.auteurPrenom || ''} ${input.auteurNom || ''}`.trim() || 'Un alumni')
+  const email = escapeHtml(input.auteurEmail)
+  const denomination = escapeHtml(input.denomination)
+
+  return {
+    subject: `Nouveau référencement d'entreprise à valider — ${appName}`,
+    html: layout(
+      "Nouveau référencement d'entreprise",
+      `
+        <p style="margin:0 0 12px;">Un alumni vient de soumettre une demande de référencement d'entreprise. Ce dossier est en attente de validation.</p>
+        <p style="margin:0 0 6px;"><strong>Demandeur :</strong> ${auteur}</p>
+        <p style="margin:0 0 6px;"><strong>Email :</strong> ${email}</p>
+        <p style="margin:0 0 16px;"><strong>Entreprise :</strong> ${denomination}</p>
+        <p style="margin:0 0 12px;">Connectez-vous à l'espace d'administration pour examiner ce dossier et décider de le valider ou de le rejeter.</p>
+        <a href="/admin/entrepreneurs" style="display:inline-block;padding:10px 20px;background:${primaryColor};color:#ffffff;text-decoration:none;border-radius:6px;font-size:14px;">
+          Accéder à l'administration
+        </a>
+      `
+    ),
+    text: `Nouveau référencement d'entreprise à valider sur ${appName}. Demandeur : ${input.auteurPrenom || ''} ${input.auteurNom || ''} (${input.auteurEmail}). Entreprise : ${input.denomination}.`,
+  }
+}
+
+export function entrepriseReferencementApprovedEmail(input: EntrepriseEmailInput) {
+  const name = escapeHtml(displayName(input))
+  const denomination = escapeHtml(input.denomination)
+
+  return {
+    subject: 'Votre entreprise a été référencée sur France Alumni Guinée',
+    html: layout(
+      'Votre entreprise a été référencée !',
+      `
+        <p style="margin:0 0 12px;">Bonjour ${name},</p>
+        <p style="margin:0 0 12px;">Excellente nouvelle ! Votre demande de référencement pour l'entreprise <strong>« ${denomination} »</strong> a été examinée et validée par notre équipe. Votre entreprise est désormais référencée sur la plateforme ${escapeHtml(appName)}.</p>
+        <p style="margin:0 0 12px;">Vous pouvez dès à présent consulter et mettre à jour votre profil d'entreprise depuis votre espace personnel. Votre présence enrichit notre annuaire entrepreneurial et renforce les opportunités de mise en réseau au sein de notre communauté.</p>
+        <p style="margin:0;">Nous vous souhaitons beaucoup de succès dans le développement de votre activité !</p>
+      `
+    ),
+    text: `Bonjour ${displayName(input)}, votre entreprise « ${input.denomination} » a été validée et référencée sur ${appName}. Consultez votre espace personnel pour mettre à jour votre profil.`,
+  }
+}
+
+export function entrepriseReferencementRejectedEmail(input: EntrepriseEmailInput) {
+  const name = escapeHtml(displayName(input))
+  const denomination = escapeHtml(input.denomination)
+
+  return {
+    subject: "Votre demande de référencement d'entreprise — France Alumni Guinée",
+    html: layout(
+      'Votre demande de référencement',
+      `
+        <p style="margin:0 0 12px;">Bonjour ${name},</p>
+        <p style="margin:0 0 12px;">Nous vous remercions d'avoir soumis votre demande de référencement pour l'entreprise <strong>« ${denomination} »</strong> sur la plateforme ${escapeHtml(appName)}.</p>
+        <p style="margin:0 0 12px;">Après examen attentif de votre dossier, notre équipe n'est malheureusement pas en mesure de valider ce référencement en l'état. Cela peut être lié à des informations manquantes, à des documents justificatifs incomplets ou à d'autres critères de validation.</p>
+        <p style="margin:0 0 12px;">Nous vous invitons à compléter ou corriger votre dossier et à le soumettre à nouveau. Notre équipe reste disponible pour vous accompagner dans cette démarche.</p>
+        <p style="margin:0;">Pour toute question, contactez-nous à <a href="mailto:france.alumni@institutfrancais-guinee.fr" style="color:${primaryColor};">france.alumni@institutfrancais-guinee.fr</a>.</p>
+      `
+    ),
+    text: `Bonjour ${displayName(input)}, votre demande de référencement pour « ${input.denomination} » n'a pas été validée sur ${appName}. Vous pouvez corriger votre dossier et le soumettre à nouveau. Contact : france.alumni@institutfrancais-guinee.fr`,
+  }
+}
+
 export function accountStatusChangedEmail(input: StatusEmailInput) {
   const name = escapeHtml(displayName(input))
   const isActive = input.status === 'actif'

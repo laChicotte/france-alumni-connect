@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { createSupabaseAdmin } from '@/lib/supabase-admin'
+import { sendEmailSafe } from '@/lib/email/resend'
+import { entrepriseReferencementApprovedEmail, entrepriseReferencementRejectedEmail } from '@/lib/email/templates'
 
 function getBearerToken(request: NextRequest) {
   const auth = request.headers.get('authorization') || ''
@@ -66,6 +68,16 @@ export async function PATCH(
       return NextResponse.json({ error: 'ID manquant' }, { status: 400 })
     }
 
+    const { data: entreprise } = await (supabaseAdmin
+      .from('entreprises_alumni')
+      .select('user_id, denomination_sociale, statut')
+      .eq('id', entrepriseId)
+      .single() as any) as { data: { user_id: string; denomination_sociale: string; statut: string } | null }
+
+    if (!entreprise) return NextResponse.json({ error: 'Entreprise introuvable' }, { status: 404 })
+
+    const wasEnAttente = entreprise.statut === 'en_attente'
+
     const updatePayload: Record<string, unknown> = { statut }
     if (notes_admin !== undefined) updatePayload.notes_admin = notes_admin
 
@@ -76,6 +88,21 @@ export async function PATCH(
 
     if (updateError) {
       return NextResponse.json({ error: updateError.message }, { status: 500 })
+    }
+
+    if (wasEnAttente && (statut === 'valide' || statut === 'rejete')) {
+      const { data: alumni } = await (supabaseAdmin
+        .from('users')
+        .select('email, nom, prenom')
+        .eq('id', entreprise.user_id)
+        .single() as any) as { data: { email: string; nom: string | null; prenom: string | null } | null }
+
+      if (alumni) {
+        const tpl = statut === 'valide'
+          ? entrepriseReferencementApprovedEmail({ email: alumni.email, nom: alumni.nom, prenom: alumni.prenom, denomination: entreprise.denomination_sociale })
+          : entrepriseReferencementRejectedEmail({ email: alumni.email, nom: alumni.nom, prenom: alumni.prenom, denomination: entreprise.denomination_sociale })
+        await sendEmailSafe(`entreprise-referencement-${statut}`, { to: alumni.email, ...tpl })
+      }
     }
 
     return NextResponse.json({ success: true })

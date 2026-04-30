@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { createSupabaseAdmin } from '@/lib/supabase-admin'
+import { sendEmailSafe } from '@/lib/email/resend'
+import { entrepriseReferencementStaffNotificationEmail } from '@/lib/email/templates'
 
 function getBearerToken(request: NextRequest) {
   const auth = request.headers.get('authorization') || ''
@@ -75,21 +77,27 @@ export async function POST(request: NextRequest) {
 
     const { data: userProfile } = await (supabaseAdmin
       .from('users')
-      .select('role, status')
+      .select('role, status, email, nom, prenom')
       .eq('id', userId)
-      .single() as any) as { data: { role: string; status: string } | null }
+      .single() as any) as { data: { role: string; status: string; email: string; nom: string | null; prenom: string | null } | null }
 
     if (!userProfile || userProfile.role !== 'alumni' || userProfile.status !== 'actif') {
       return NextResponse.json({ error: 'Accès réservé aux alumni actifs' }, { status: 403 })
     }
+
+    const { data: alumniProfile } = await (supabaseAdmin
+      .from('alumni_profiles')
+      .select('telephone')
+      .eq('user_id', userId)
+      .single() as any) as { data: { telephone: string | null } | null }
 
     const formData = await request.formData()
 
     const get = (key: string) => String(formData.get(key) || '').trim()
 
     const fonction = get('fonction')
-    const email_pro = get('email_pro')
-    const telephone_pro = get('telephone_pro')
+    const email_pro = userProfile.email
+    const telephone_pro = alumniProfile?.telephone || ''
     const denomination_sociale = get('denomination_sociale')
     const forme_juridique = get('forme_juridique')
     const date_creation = get('date_creation')
@@ -209,6 +217,22 @@ export async function POST(request: NextRequest) {
         .from('entreprises_alumni') as any)
         .insert(payload)
       if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    }
+
+    const { data: staff } = await (supabaseAdmin
+      .from('users')
+      .select('email')
+      .in('role', ['admin', 'moderateur'])
+      .eq('status', 'actif') as any) as { data: { email: string }[] | null }
+
+    if (staff && staff.length > 0) {
+      const tpl = entrepriseReferencementStaffNotificationEmail({
+        auteurPrenom: userProfile.prenom,
+        auteurNom: userProfile.nom,
+        auteurEmail: userProfile.email,
+        denomination: denomination_sociale,
+      })
+      await sendEmailSafe('entreprise-referencement-staff', { to: staff.map(s => s.email), ...tpl })
     }
 
     return NextResponse.json({ success: true })
