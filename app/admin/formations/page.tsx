@@ -195,26 +195,36 @@ export default function FormationsAdminPage() {
     setIsSubmitting(false)
   }
 
+  const callFormationStatut = async (f: FormationWithType, action: 'publiee' | 'archivee') => {
+    const { data: { session } } = await supabase.auth.getSession()
+    const token = session?.access_token
+    if (!token) { setFeedback({ type: "error", message: "Session expirée, veuillez vous reconnecter." }); return false }
+    const res = await fetch(`/api/admin/formations/${f.id}/statut`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ action }),
+    })
+    const json = await res.json()
+    if (!res.ok) { setFeedback({ type: "error", message: json.error || "Erreur serveur" }); return false }
+    return true
+  }
+
   const handlePublier = async (f: FormationWithType) => {
     setFeedback(null)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase.from("formations") as any).update({ statut: "publiee" }).eq("id", f.id)
-    if (error) {
-      setFeedback({ type: "error", message: `Publication échouée: ${error.message}` })
-    } else {
-      setFeedback({ type: "success", message: `Formation "${f.titre}" publiée.` })
+    const ok = await callFormationStatut(f, 'publiee')
+    if (ok) {
+      const wasEnAttente = f.statut === 'en_attente'
+      setFeedback({ type: "success", message: `Formation "${f.titre}" publiée.${wasEnAttente ? ' Le proposant a été notifié par email.' : ''}` })
       fetchFormations()
     }
   }
 
   const handleArchiver = async (f: FormationWithType) => {
     setFeedback(null)
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase.from("formations") as any).update({ statut: "archivee", actif: false }).eq("id", f.id)
-    if (error) {
-      setFeedback({ type: "error", message: `Archivage échoué: ${error.message}` })
-    } else {
-      setFeedback({ type: "success", message: `Formation "${f.titre}" archivée.` })
+    const ok = await callFormationStatut(f, 'archivee')
+    if (ok) {
+      const wasEnAttente = f.statut === 'en_attente'
+      setFeedback({ type: "success", message: `Formation "${f.titre}" archivée.${wasEnAttente ? ' Le proposant a été notifié par email.' : ''}` })
       fetchFormations()
     }
   }

@@ -67,18 +67,20 @@ export default function ProposerArticlePage() {
         }
       }
 
-      const { error } = await (supabase.from('articles') as any).insert({
-        titre: formData.titre.trim(),
-        slug: generateSlug(formData.titre),
-        extrait: formData.extrait.trim() || null,
-        contenu: formData.contenu.trim(),
-        image_couverture_url: imageUrl,
-        categorie_id: formData.categorie_id || null,
-        auteur_id: userId,
-        status: 'en_attente',
+      const { data: { session } } = await supabase.auth.getSession()
+      const res = await fetch('/api/alumni/articles/proposer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
+        body: JSON.stringify({
+          titre: formData.titre.trim(),
+          extrait: formData.extrait.trim() || null,
+          contenu: formData.contenu.trim(),
+          image_couverture_url: imageUrl,
+          categorie_id: formData.categorie_id || null,
+        }),
       })
-
-      if (error) { alert(`Erreur : ${error.message}`); return }
+      const json = await res.json()
+      if (!res.ok) { alert(`Erreur : ${json.error || 'Erreur serveur'}`); return }
       setSubmitted(true)
     } catch (err) {
       console.error(err)

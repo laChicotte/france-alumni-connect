@@ -140,9 +140,9 @@ export function articleProposalRejectedEmail(input: ProposalEmailInput) {
   const titre = escapeHtml(input.titre)
 
   return {
-    subject: 'Votre proposition d\'article — France Alumni Guinée',
+    subject: 'Votre proposition d\'article n\'a pas été approuvée sur France Alumni Guinée',
     html: layout(
-      'Votre proposition d\'article',
+      'Votre article n\'a pas été approuvé',
       `
         <p style="margin:0 0 12px;">Bonjour ${name},</p>
         <p style="margin:0 0 12px;">Nous vous remercions sincèrement d'avoir pris le temps de rédiger et de soumettre votre article <strong>« ${titre} »</strong> à la plateforme France Alumni Guinée.</p>
@@ -179,9 +179,9 @@ export function evenementProposalRejectedEmail(input: ProposalEmailInput) {
   const titre = escapeHtml(input.titre)
 
   return {
-    subject: 'Votre proposition d\'événement — France Alumni Guinée',
+    subject: 'Votre proposition d\'événement n\'a pas été approuvée sur France Alumni Guinée',
     html: layout(
-      'Votre proposition d\'événement',
+      'Votre proposition d\'événement n\'a pas été approuvée',
       `
         <p style="margin:0 0 12px;">Bonjour ${name},</p>
         <p style="margin:0 0 12px;">Nous vous remercions d'avoir soumis votre proposition d'événement <strong>« ${titre} »</strong> sur la plateforme France Alumni Guinée. Nous apprécions votre implication et votre souhait de contribuer à la vie de notre communauté.</p>
@@ -190,6 +190,79 @@ export function evenementProposalRejectedEmail(input: ProposalEmailInput) {
       `
     ),
     text: `Bonjour ${displayName(input)}, votre proposition d'événement « ${input.titre} » n'a pas été retenue sur ${appName}. N'hésitez pas à soumettre de nouvelles initiatives.`,
+  }
+}
+
+type ProposalStaffNotificationInput = {
+  auteurPrenom: string | null
+  auteurNom: string | null
+  auteurEmail: string
+  titre: string
+  type: 'article' | 'evenement' | 'formation'
+}
+
+export function proposalStaffNotificationEmail(input: ProposalStaffNotificationInput) {
+  const auteur = escapeHtml(`${input.auteurPrenom || ''} ${input.auteurNom || ''}`.trim() || 'Un alumni')
+  const email = escapeHtml(input.auteurEmail)
+  const titre = escapeHtml(input.titre)
+  const typeLabel = input.type === 'article' ? 'article' : input.type === 'evenement' ? 'événement' : 'formation'
+  const adminUrl = input.type === 'article' ? '/admin/articles' : input.type === 'evenement' ? '/admin/evenements' : '/admin/formations'
+
+  return {
+    subject: `Nouvelle proposition d'${typeLabel} à modérer — ${appName}`,
+    html: layout(
+      `Nouvelle proposition d'${typeLabel}`,
+      `
+        <p style="margin:0 0 12px;">Une nouvelle proposition d'${typeLabel} vient d'être soumise par un alumni et est en attente de modération.</p>
+        <p style="margin:0 0 6px;"><strong>Auteur :</strong> ${auteur}</p>
+        <p style="margin:0 0 6px;"><strong>Email :</strong> ${email}</p>
+        <p style="margin:0 0 16px;"><strong>Titre :</strong> ${titre}</p>
+        <p style="margin:0 0 12px;">Connectez-vous à l'espace d'administration pour examiner cette proposition et décider de la valider ou de la refuser.</p>
+        <a href="${escapeHtml(adminUrl)}" style="display:inline-block;padding:10px 20px;background:${primaryColor};color:#ffffff;text-decoration:none;border-radius:6px;font-size:14px;">
+          Accéder à la modération
+        </a>
+      `
+    ),
+    text: `Nouvelle proposition d'${typeLabel} à modérer sur ${appName}. Auteur : ${input.auteurPrenom || ''} ${input.auteurNom || ''} (${input.auteurEmail}). Titre : ${input.titre}. Connectez-vous à l'administration pour modérer.`,
+  }
+}
+
+export function formationProposalApprovedEmail(input: ProposalEmailInput) {
+  const name = escapeHtml(displayName(input))
+  const titre = escapeHtml(input.titre)
+
+  return {
+    subject: 'Votre formation a été publiée sur France Alumni Guinée',
+    html: layout(
+      'Votre formation a été publiée !',
+      `
+        <p style="margin:0 0 12px;">Bonjour ${name},</p>
+        <p style="margin:0 0 12px;">Excellente nouvelle ! Votre proposition de formation <strong>« ${titre} »</strong> a été examinée et validée par notre équipe. Elle est désormais publiée sur la plateforme ${escapeHtml(appName)} et accessible à l'ensemble de la communauté.</p>
+        <p style="margin:0 0 12px;">Les membres peuvent dès à présent consulter votre formation et s'y inscrire. Nous vous remercions chaleureusement pour cette initiative qui contribue au développement des compétences au sein de notre réseau.</p>
+        <p style="margin:0;">Nous vous souhaitons une formation enrichissante et un bel échange avec les participants !</p>
+      `
+    ),
+    text: `Bonjour ${displayName(input)}, votre formation « ${input.titre} » a été validée et publiée sur ${appName}. Les membres peuvent désormais s'y inscrire !`,
+  }
+}
+
+export function formationProposalRejectedEmail(input: ProposalEmailInput) {
+  const name = escapeHtml(displayName(input))
+  const titre = escapeHtml(input.titre)
+
+  return {
+    subject: 'Votre proposition de formation — France Alumni Guinée',
+    html: layout(
+      'Votre proposition de formation',
+      `
+        <p style="margin:0 0 12px;">Bonjour ${name},</p>
+        <p style="margin:0 0 12px;">Nous vous remercions d'avoir soumis votre proposition de formation <strong>« ${titre} »</strong> sur la plateforme ${escapeHtml(appName)}. Votre engagement en faveur du développement des compétences de notre communauté est vraiment précieux.</p>
+        <p style="margin:0 0 12px;">Après examen attentif de votre dossier, notre équipe n'est malheureusement pas en mesure de retenir cette proposition pour publication à ce stade. Cela peut être lié au calendrier des formations, à la thématique ou à d'autres contraintes organisationnelles.</p>
+        <p style="margin:0 0 12px;">Nous vous encourageons vivement à retravailler votre proposition ou à en soumettre de nouvelles. Votre contribution au réseau est importante et nous espérons pouvoir collaborer avec vous prochainement.</p>
+        <p style="margin:0;">Pour toute question ou pour obtenir des précisions, n'hésitez pas à nous écrire à <a href="mailto:france.alumni@institutfrancais-guinee.fr" style="color:${primaryColor};">france.alumni@institutfrancais-guinee.fr</a>.</p>
+      `
+    ),
+    text: `Bonjour ${displayName(input)}, votre proposition de formation « ${input.titre} » n'a pas été retenue sur ${appName}. Nous vous encourageons à soumettre de nouvelles propositions. Contact : france.alumni@institutfrancais-guinee.fr`,
   }
 }
 

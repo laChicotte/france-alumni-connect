@@ -69,24 +69,24 @@ export default function ProposerEvenementPage() {
         }
       }
 
-      const { error } = await (supabase.from('evenements') as any).insert({
-        titre: formData.titre.trim(),
-        slug: generateSlug(formData.titre),
-        date: formData.date,
-        heure: formData.heure,
-        lieu: formData.lieu.trim(),
-        type_evenement_id: formData.type_evenement_id || null,
-        description: formData.description.trim(),
-        image_url: imageUrl,
-        places_max: formData.places_max ? parseInt(formData.places_max) : null,
-        lien_visio: formData.lien_visio.trim() || null,
-        organisateur_id: userId,
-        statut: 'en_attente',
-        actif: false,
-        archive: false,
+      const { data: { session } } = await supabase.auth.getSession()
+      const res = await fetch('/api/alumni/evenements/proposer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
+        body: JSON.stringify({
+          titre: formData.titre.trim(),
+          date: formData.date,
+          heure: formData.heure,
+          lieu: formData.lieu.trim(),
+          type_evenement_id: formData.type_evenement_id || null,
+          description: formData.description.trim(),
+          image_url: imageUrl,
+          places_max: formData.places_max || null,
+          lien_visio: formData.lien_visio.trim() || null,
+        }),
       })
-
-      if (error) { alert(`Erreur : ${error.message}`); return }
+      const json = await res.json()
+      if (!res.ok) { alert(`Erreur : ${json.error || 'Erreur serveur'}`); return }
       setSubmitted(true)
     } catch (err) {
       console.error(err)

@@ -14,9 +14,6 @@ import { Loader2, ArrowLeft, CheckCircle2 } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import type { TypeFormation } from "@/types/database.types"
 
-function generateSlug(titre: string) {
-  return titre.toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)/g, "") + "-" + Date.now()
-}
 
 export default function ProposerFormationPage() {
   const router = useRouter()
@@ -86,31 +83,30 @@ export default function ProposerFormationPage() {
         }
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const { error } = await (supabase.from("formations") as any).insert({
-        titre: formData.titre.trim(),
-        slug: generateSlug(formData.titre),
-        date_debut: formData.date_debut,
-        date_fin: formData.date_fin || null,
-        heure_debut: formData.heure_debut,
-        heure_fin: formData.heure_fin || null,
-        lieu: formData.lieu.trim(),
-        lien_visio: formData.lien_visio.trim() || null,
-        type_formation_id: formData.type_formation_id || null,
-        description: formData.description.trim(),
-        programme: formData.programme.trim() || null,
-        image_url: imageUrl,
-        places_max: formData.places_max ? parseInt(formData.places_max) : null,
-        niveau: formData.niveau || null,
-        gratuit: formData.gratuit,
-        prix: !formData.gratuit && formData.prix ? parseFloat(formData.prix) : null,
-        proposee_par: currentUser.id,
-        statut: "en_attente",
-        actif: true,
+      const res = await fetch('/api/alumni/formations/proposer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          titre: formData.titre.trim(),
+          date_debut: formData.date_debut,
+          date_fin: formData.date_fin || null,
+          heure_debut: formData.heure_debut,
+          heure_fin: formData.heure_fin || null,
+          lieu: formData.lieu.trim(),
+          lien_visio: formData.lien_visio.trim() || null,
+          type_formation_id: formData.type_formation_id || null,
+          description: formData.description.trim(),
+          programme: formData.programme.trim() || null,
+          image_url: imageUrl,
+          places_max: formData.places_max || null,
+          niveau: formData.niveau || null,
+          gratuit: formData.gratuit,
+          prix: !formData.gratuit && formData.prix ? formData.prix : null,
+        }),
       })
-
-      if (error) {
-        alert(`Erreur : ${error.message}`)
+      const json = await res.json()
+      if (!res.ok) {
+        alert(`Erreur : ${json.error || 'Erreur serveur'}`)
         return
       }
 
