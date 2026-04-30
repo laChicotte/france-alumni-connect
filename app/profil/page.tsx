@@ -13,9 +13,9 @@ import { Switch } from "@/components/ui/switch"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { User, Users, Mail, Phone, MapPin, Building, Building2, GraduationCap, Edit2, Save, X, Loader2, Linkedin, CheckCircle, AlertCircle, FileText, Eye, EyeOff, Lock, ChevronDown, Check } from "lucide-react"
+import { User, Users, Mail, Phone, MapPin, Building, Building2, GraduationCap, Edit2, Save, X, Loader2, Linkedin, CheckCircle, AlertCircle, FileText, Eye, EyeOff, ChevronDown, Check } from "lucide-react"
 import { supabase } from "@/lib/supabase"
-import { AlumniProfile, Secteur, StatutProfessionnel, DiplomeType, GenreType, NationaliteType, PlanRetourType, BourseType } from "@/types/database.types"
+import { AlumniProfile, Secteur, StatutProfessionnel, DiplomeType, NationaliteType, PlanRetourType, BourseType } from "@/types/database.types"
 import { cn } from "@/lib/utils"
 
 
@@ -568,33 +568,7 @@ export default function ProfilPage() {
                 ) : (
                   // Affichage pour alumni
                   <>
-                    {/* 1. Informations vérifiées */}
-                    <div className="p-4 bg-muted/50 rounded-lg border">
-                      <div className="flex items-center gap-2 mb-3 text-muted-foreground">
-                        <Lock className="h-4 w-4" />
-                        <span className="text-sm font-medium">Informations vérifiées (non modifiables)</span>
-                      </div>
-                      <div className="grid md:grid-cols-2 gap-4">
-                        <div>
-                          <Label className="mb-0.5 block text-muted-foreground text-xs">Prénom</Label>
-                          <p className="font-medium">{formData.prenom || '-'}</p>
-                        </div>
-                        <div>
-                          <Label className="mb-0.5 block text-muted-foreground text-xs">Nom</Label>
-                          <p className="font-medium">{formData.nom || '-'}</p>
-                        </div>
-                        <div>
-                          <Label className="mb-0.5 block text-muted-foreground text-xs">Genre</Label>
-                          <p className="font-medium">{(formData.genre as GenreType) || '-'}</p>
-                        </div>
-                      </div>
-                      <div className="mt-4">
-                        <Label className="mb-0.5 block text-muted-foreground text-xs">Email</Label>
-                        <p className="font-medium">{user.email}</p>
-                      </div>
-                    </div>
-
-                    {/* 2. Profil personnel */}
+                    {/* 1. Profil personnel */}
                     <div>
                       <h3 className="text-sm font-semibold text-[#3558A2] uppercase tracking-wide mb-3 border-b border-[#3558A2]/20 pb-1">Profil personnel</h3>
                       <div className="space-y-4">
