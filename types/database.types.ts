@@ -20,7 +20,7 @@ export type GenreType = 'Homme' | 'Femme'
 export type BourseType = 'Non boursier' | 'Boursier Etat français' | 'Boursier Etat guinéen' | 'Boursier Etats français et guinéen'
 export type NationaliteType = 'Guinéenne' | 'Franco-Guinéenne' | 'Guinéenne-Autre'
 export type PlanRetourType = 'Dans 2 ans' | 'Dans 5 ans' | 'Déjà en Guinée' | 'Autre'
-export type ArticleStatus = 'brouillon' | 'publie'
+export type ArticleStatus = 'brouillon' | 'publie' | 'en_attente'
 export type ArticleMediaType = 'image' | 'video'
 export type JobType = 'cdi' | 'cdd' | 'stage' | 'freelance' | 'alternance'
 export type FormationStatut = 'en_attente' | 'publiee' | 'archivee'
@@ -307,6 +307,7 @@ export interface Database {
           organisateur_id: string | null
           archive: boolean
           actif: boolean
+          statut: string
           created_at: string
           updated_at: string
         }
@@ -325,6 +326,7 @@ export interface Database {
           organisateur_id?: string | null
           archive?: boolean
           actif?: boolean
+          statut?: string
           created_at?: string
           updated_at?: string
         }
@@ -342,6 +344,7 @@ export interface Database {
           organisateur_id?: string | null
           archive?: boolean
           actif?: boolean
+          statut?: string
           updated_at?: string
         }
       }

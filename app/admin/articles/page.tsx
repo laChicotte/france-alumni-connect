@@ -11,13 +11,18 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Search, Plus, Pencil, Trash2, Eye, EyeOff, Loader2, Download, Pin, PinOff, MoreVertical, CalendarClock, AlertCircle, CheckCircle2 } from "lucide-react"
+import { Search, Plus, Pencil, Trash2, Eye, EyeOff, Loader2, Download, Pin, PinOff, MoreVertical, CalendarClock, AlertCircle, CheckCircle2, Check, Clock } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import type { Article } from "@/types/database.types"
+
+type PendingArticle = Article & {
+  users: { nom: string | null; prenom: string | null } | null
+}
 import { downloadCsv } from "@/lib/export/csv"
 
 export default function ArticlesPage() {
   const [articles, setArticles] = useState<Article[]>([])
+  const [pendingArticles, setPendingArticles] = useState<PendingArticle[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [startDate, setStartDate] = useState("")
@@ -33,13 +38,54 @@ export default function ArticlesPage() {
 
   const fetchArticles = async () => {
     setIsLoading(true)
-    const { data, error } = await supabase
-      .from("articles")
-      .select("*")
-      .order("epingle", { ascending: false })
-      .order("created_at", { ascending: false })
-    if (!error) setArticles(data || [])
+    const [mainRes, pendingRes] = await Promise.all([
+      supabase
+        .from("articles")
+        .select("*")
+        .neq("status", "en_attente")
+        .order("epingle", { ascending: false })
+        .order("created_at", { ascending: false }),
+      (supabase.from("articles") as any)
+        .select("*, users:auteur_id(nom, prenom)")
+        .eq("status", "en_attente")
+        .order("created_at", { ascending: false }),
+    ])
+    if (!mainRes.error) setArticles(mainRes.data || [])
+    setPendingArticles(pendingRes.data || [])
     setIsLoading(false)
+  }
+
+  const callProposalAction = async (id: string, action: 'publie' | 'rejete') => {
+    const { data: { session } } = await supabase.auth.getSession()
+    const token = session?.access_token
+    if (!token) { setFeedback({ type: "error", message: "Session expirée, veuillez vous reconnecter." }); return false }
+    const res = await fetch(`/api/admin/articles/${id}/statut`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ action }),
+    })
+    const json = await res.json()
+    if (!res.ok) { setFeedback({ type: "error", message: json.error || "Erreur serveur" }); return false }
+    return true
+  }
+
+  const handlePublishProposal = async (id: string) => {
+    setFeedback(null)
+    const ok = await callProposalAction(id, 'publie')
+    if (ok) {
+      setFeedback({ type: "success", message: "Article publié avec succès. L'auteur a été notifié par email." })
+      fetchArticles()
+    }
+  }
+
+  const handleDeleteProposal = async (id: string) => {
+    if (!confirm("Rejeter et supprimer cette proposition d'article ?")) return
+    setFeedback(null)
+    const ok = await callProposalAction(id, 'rejete')
+    if (ok) {
+      setFeedback({ type: "success", message: "Proposition rejetée. L'auteur a été notifié par email." })
+      fetchArticles()
+    }
   }
 
   const handleDelete = async (id: string) => {
@@ -159,6 +205,56 @@ export default function ArticlesPage() {
             {feedback.type === "error" ? <AlertCircle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4 text-green-600" />}
             <AlertDescription>{feedback.message}</AlertDescription>
           </Alert>
+        )}
+
+        {pendingArticles.length > 0 && (
+          <Card className="border-amber-200 bg-amber-50">
+            <CardHeader className="pb-3">
+              <CardTitle className="text-amber-800 flex items-center gap-2 text-base">
+                <Clock className="h-5 w-5" />
+                Propositions en attente ({pendingArticles.length})
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <div className="space-y-2">
+                {pendingArticles.map(article => (
+                  <div key={article.id} className="flex items-center justify-between gap-4 bg-white rounded-lg p-3 border border-amber-100">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium truncate text-sm">{article.titre}</p>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        par {article.users ? `${article.users.prenom} ${article.users.nom}` : 'Alumni'}
+                        {' · '}{new Date(article.created_at).toLocaleDateString('fr-FR')}
+                      </p>
+                    </div>
+                    <div className="flex gap-2 shrink-0">
+                      <Link href={`/admin/articles/${article.id}/modifier`}>
+                        <Button size="sm" variant="outline" title="Lire l'article">
+                          <Eye className="h-4 w-4 mr-1" /> Lire
+                        </Button>
+                      </Link>
+                      <Button
+                        size="sm"
+                        className="bg-green-600 hover:bg-green-700 text-white"
+                        onClick={() => handlePublishProposal(article.id)}
+                        disabled={isSubmitting}
+                      >
+                        <Check className="h-4 w-4 mr-1" /> Publier
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleDeleteProposal(article.id)}
+                        disabled={isSubmitting}
+                        title="Supprimer la proposition"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         )}
 
         <Card>

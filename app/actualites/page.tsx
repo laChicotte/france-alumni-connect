@@ -447,11 +447,19 @@ export default function ActualitesPage() {
       {/* Contribuez CTA */}
       <section className="py-16">
         <div className="max-w-2xl mx-auto px-4 text-center">
-          <a href="mailto:france.alumni@institutfrancais-guinee.fr">
-            <Button className="mb-6 h-14 rounded-full bg-[#ea292c] px-10 text-lg font-semibold hover:bg-[#f48988]/90">
-              contribuez
-            </Button>
-          </a>
+          {isAuthenticated ? (
+            <Link href="/actualites/proposer">
+              <Button className="mb-6 h-14 rounded-full bg-[#ea292c] px-10 text-lg font-semibold hover:bg-[#f48988]/90">
+                contribuez
+              </Button>
+            </Link>
+          ) : (
+            <a href="mailto:france.alumni@institutfrancais-guinee.fr">
+              <Button className="mb-6 h-14 rounded-full bg-[#ea292c] px-10 text-lg font-semibold hover:bg-[#f48988]/90">
+                contribuez
+              </Button>
+            </a>
+          )}
           <p className="text-base text-muted-foreground">
             Vous êtes alumni ? Partagez vos idées et vos travaux avec la communauté. Proposez vos contenus (portraits, recherches, études…) pour publication ici !
           </p>

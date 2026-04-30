@@ -38,7 +38,7 @@ DO $$ BEGIN
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
-  CREATE TYPE article_status AS ENUM ('brouillon', 'publie');
+  CREATE TYPE article_status AS ENUM ('brouillon', 'publie', 'en_attente');
 EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 DO $$ BEGIN
@@ -237,6 +237,8 @@ CREATE TABLE IF NOT EXISTS public.evenements (
   organisateur_id    UUID        REFERENCES public.users(id),
   archive            BOOLEAN     NOT NULL DEFAULT false,
   actif              BOOLEAN     NOT NULL DEFAULT true,
+  statut             TEXT        NOT NULL DEFAULT 'publie'
+                     CHECK (statut IN ('en_attente', 'publie', 'rejete')),
   created_at         TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at         TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

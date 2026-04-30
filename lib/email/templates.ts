@@ -105,6 +105,88 @@ export function adminUserCreatedEmail(input: AdminUserEmailInput) {
   }
 }
 
+type ProposalEmailInput = PersonName & {
+  email: string
+  titre: string
+}
+
+export function articleProposalApprovedEmail(input: ProposalEmailInput) {
+  const name = escapeHtml(displayName(input))
+  const titre = escapeHtml(input.titre)
+
+  return {
+    subject: 'Votre article a été publié sur France Alumni Guinée',
+    html: layout(
+      'Votre article a été publié !',
+      `
+        <p style="margin:0 0 12px;">Bonjour ${name},</p>
+        <p style="margin:0 0 12px;">Nous avons le plaisir de vous informer que votre article <strong>« ${titre} »</strong> a été examiné et validé par notre équipe éditoriale.</p>
+        <p style="margin:0 0 12px;">Il est désormais publié et visible par l'ensemble de la communauté France Alumni Guinée. Nous vous remercions chaleureusement pour cette contribution qui enrichit notre réseau et témoigne de votre engagement.</p>
+        <p style="margin:0;">N'hésitez pas à continuer à partager vos idées, expériences et réflexions avec la communauté. Votre voix compte !</p>
+      `
+    ),
+    text: `Bonjour ${displayName(input)}, votre article « ${input.titre} » a été validé et publié sur ${appName}. Merci pour votre contribution !`,
+  }
+}
+
+export function articleProposalRejectedEmail(input: ProposalEmailInput) {
+  const name = escapeHtml(displayName(input))
+  const titre = escapeHtml(input.titre)
+
+  return {
+    subject: 'Votre proposition d\'article — France Alumni Guinée',
+    html: layout(
+      'Votre proposition d\'article',
+      `
+        <p style="margin:0 0 12px;">Bonjour ${name},</p>
+        <p style="margin:0 0 12px;">Nous vous remercions sincèrement d'avoir pris le temps de rédiger et de soumettre votre article <strong>« ${titre} »</strong> à la plateforme France Alumni Guinée.</p>
+        <p style="margin:0 0 12px;">Après examen par notre équipe éditoriale, nous ne sommes malheureusement pas en mesure de le publier en l'état. Cela peut être dû à des critères éditoriaux, à la ligne éditoriale du moment, ou à d'autres considérations internes.</p>
+        <p style="margin:0 0 12px;">Nous vous encourageons vivement à retravailler votre proposition ou à en soumettre de nouvelles. Votre engagement pour la communauté est précieux et nous espérons pouvoir collaborer avec vous prochainement.</p>
+        <p style="margin:0;">Pour toute question, n'hésitez pas à nous contacter à l'adresse <a href="mailto:france.alumni@institutfrancais-guinee.fr" style="color:${primaryColor};">france.alumni@institutfrancais-guinee.fr</a>.</p>
+      `
+    ),
+    text: `Bonjour ${displayName(input)}, votre proposition d'article « ${input.titre} » n'a pas été retenue pour publication sur ${appName}. Nous vous encourageons à soumettre de nouvelles propositions.`,
+  }
+}
+
+export function evenementProposalApprovedEmail(input: ProposalEmailInput) {
+  const name = escapeHtml(displayName(input))
+  const titre = escapeHtml(input.titre)
+
+  return {
+    subject: 'Votre événement a été publié sur France Alumni Guinée',
+    html: layout(
+      'Votre événement a été publié !',
+      `
+        <p style="margin:0 0 12px;">Bonjour ${name},</p>
+        <p style="margin:0 0 12px;">Excellente nouvelle ! Votre proposition d'événement <strong>« ${titre} »</strong> a été validée par notre équipe et est désormais publiée sur la plateforme France Alumni Guinée.</p>
+        <p style="margin:0 0 12px;">Les membres de la communauté peuvent dès à présent le consulter et s'y inscrire. Nous sommes ravis de soutenir vos initiatives et vous remercions pour l'énergie que vous mettez au service du réseau.</p>
+        <p style="margin:0;">Nous vous souhaitons un événement riche et fructueux !</p>
+      `
+    ),
+    text: `Bonjour ${displayName(input)}, votre événement « ${input.titre} » a été validé et publié sur ${appName}. Les membres peuvent désormais s'y inscrire !`,
+  }
+}
+
+export function evenementProposalRejectedEmail(input: ProposalEmailInput) {
+  const name = escapeHtml(displayName(input))
+  const titre = escapeHtml(input.titre)
+
+  return {
+    subject: 'Votre proposition d\'événement — France Alumni Guinée',
+    html: layout(
+      'Votre proposition d\'événement',
+      `
+        <p style="margin:0 0 12px;">Bonjour ${name},</p>
+        <p style="margin:0 0 12px;">Nous vous remercions d'avoir soumis votre proposition d'événement <strong>« ${titre} »</strong> sur la plateforme France Alumni Guinée. Nous apprécions votre implication et votre souhait de contribuer à la vie de notre communauté.</p>
+        <p style="margin:0 0 12px;">Après étude de votre proposition, notre équipe n'est pas en mesure de la retenir pour publication à ce stade. Nous espérons cependant que cela ne vous découragera pas et vous invitons à soumettre de nouvelles initiatives à l'avenir.</p>
+        <p style="margin:0;">Pour échanger davantage sur votre projet ou obtenir des précisions, vous pouvez nous écrire à <a href="mailto:france.alumni@institutfrancais-guinee.fr" style="color:${primaryColor};">france.alumni@institutfrancais-guinee.fr</a>.</p>
+      `
+    ),
+    text: `Bonjour ${displayName(input)}, votre proposition d'événement « ${input.titre} » n'a pas été retenue sur ${appName}. N'hésitez pas à soumettre de nouvelles initiatives.`,
+  }
+}
+
 export function accountStatusChangedEmail(input: StatusEmailInput) {
   const name = escapeHtml(displayName(input))
   const isActive = input.status === 'actif'

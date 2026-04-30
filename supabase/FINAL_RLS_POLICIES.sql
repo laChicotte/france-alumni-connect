@@ -192,6 +192,16 @@ WITH CHECK (
   )
 );
 
+-- INSERT: alumni peut proposer un article (status en_attente, auteur_id = soi-même)
+DROP POLICY IF EXISTS "alumni_propose_article" ON articles;
+CREATE POLICY "alumni_propose_article"
+ON articles FOR INSERT
+TO authenticated
+WITH CHECK (
+  status = 'en_attente'
+  AND auteur_id = auth.uid()
+);
+
 -- DELETE: admin tout, moderateur ses articles
 DROP POLICY IF EXISTS "Admins can delete articles" ON articles;
 DROP POLICY IF EXISTS "Admins and moderators can delete manageable articles" ON articles;
@@ -356,6 +366,17 @@ WITH CHECK (
       OR (u.role = 'moderateur' AND evenements.organisateur_id = auth.uid())
     )
   )
+);
+
+-- INSERT: alumni peut proposer un événement (statut en_attente, actif false, organisateur_id = soi-même)
+DROP POLICY IF EXISTS "alumni_propose_evenement" ON evenements;
+CREATE POLICY "alumni_propose_evenement"
+ON evenements FOR INSERT
+TO authenticated
+WITH CHECK (
+  statut = 'en_attente'
+  AND organisateur_id = auth.uid()
+  AND actif = false
 );
 
 -- UPDATE

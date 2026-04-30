@@ -403,13 +403,21 @@ export default function EvenementsPublicPage() {
 
       <section className="py-16">
         <div className="max-w-2xl mx-auto px-4 text-center">
-          <a href="mailto:france.alumni@institutfrancais-guinee.fr">
-            <Button className="mb-6 h-14 rounded-full bg-[#ea292c] px-10 text-lg font-semibold hover:bg-[#f48988]/90">
-              proposez votre événement
-            </Button>
-          </a>
+          {isAuthenticated ? (
+            <Link href="/evenements/proposer">
+              <Button className="mb-6 h-14 rounded-full bg-[#ea292c] px-10 text-lg font-semibold hover:bg-[#f48988]/90">
+                proposez votre événement
+              </Button>
+            </Link>
+          ) : (
+            <a href="mailto:france.alumni@institutfrancais-guinee.fr">
+              <Button className="mb-6 h-14 rounded-full bg-[#ea292c] px-10 text-lg font-semibold hover:bg-[#f48988]/90">
+                proposez votre événement
+              </Button>
+            </a>
+          )}
           <p className="text-base text-muted-foreground">
-          Vous êtes alumni ? Partagez vos idées d'événements utiles à la communauté qui pourraient être organisés par France Alumni Guinée
+            Vous êtes alumni ? Partagez vos idées d&apos;événements utiles à la communauté qui pourraient être organisés par France Alumni Guinée
           </p>
         </div>
       </section>

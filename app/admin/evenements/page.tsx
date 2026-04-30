@@ -16,7 +16,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { Search, Plus, Pencil, Trash2, Archive, Loader2, CalendarDays, MapPin, Clock3, Eye, Download, AlertCircle, CheckCircle2 } from "lucide-react"
+import { Search, Plus, Pencil, Trash2, Archive, Loader2, CalendarDays, MapPin, Clock3, Eye, Download, AlertCircle, CheckCircle2, Check, X, Clock } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import type { Evenement, TypeEvenement } from "@/types/database.types"
 import { downloadCsv } from "@/lib/export/csv"
@@ -24,11 +24,13 @@ import { downloadCsv } from "@/lib/export/csv"
 interface EvenementWithType extends Evenement {
   types_evenements?: { libelle: string } | null
   inscriptions_count?: number
+  statut?: string
 }
 
 export default function EvenementsPage() {
   const PAGE_SIZE = 4
   const [evenements, setEvenements] = useState<EvenementWithType[]>([])
+  const [pendingEvents, setPendingEvents] = useState<EvenementWithType[]>([])
   const [types, setTypes] = useState<TypeEvenement[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
@@ -59,16 +61,19 @@ export default function EvenementsPage() {
 
   const fetchEvenements = async () => {
     setIsLoading(true)
-    const { data, error } = await (supabase
-      .from('evenements')
-      .select('*, types_evenements(libelle)') as any)
-      .order('date', { ascending: true })
-    if (!error) {
-      const events = (data || []) as EvenementWithType[]
+    const [mainRes, pendingRes] = await Promise.all([
+      (supabase.from('evenements').select('*, types_evenements(libelle)') as any)
+        .neq('statut', 'en_attente')
+        .order('date', { ascending: true }),
+      (supabase.from('evenements').select('*, types_evenements(libelle)') as any)
+        .eq('statut', 'en_attente')
+        .order('created_at', { ascending: false }),
+    ])
+    if (!mainRes.error) {
+      const events = (mainRes.data || []) as EvenementWithType[]
       const withCounts = await Promise.all(
         events.map(async (event) => {
-          const { count } = await (supabase
-            .from("inscriptions_evenements") as any)
+          const { count } = await (supabase.from("inscriptions_evenements") as any)
             .select("*", { count: "exact", head: true })
             .eq("evenement_id", event.id)
           return { ...event, inscriptions_count: count || 0 }
@@ -76,7 +81,41 @@ export default function EvenementsPage() {
       )
       setEvenements(withCounts)
     }
+    setPendingEvents(pendingRes.data || [])
     setIsLoading(false)
+  }
+
+  const callEventAction = async (id: string, action: 'publie' | 'rejete') => {
+    const { data: { session } } = await supabase.auth.getSession()
+    const token = session?.access_token
+    if (!token) { setFeedback({ type: "error", message: "Session expirée, veuillez vous reconnecter." }); return false }
+    const res = await fetch(`/api/admin/evenements/${id}/statut`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ action }),
+    })
+    const json = await res.json()
+    if (!res.ok) { setFeedback({ type: "error", message: json.error || "Erreur serveur" }); return false }
+    return true
+  }
+
+  const handleApproveEvent = async (id: string) => {
+    setFeedback(null)
+    const ok = await callEventAction(id, 'publie')
+    if (ok) {
+      setFeedback({ type: "success", message: "Événement approuvé et publié. L'organisateur a été notifié par email." })
+      fetchEvenements()
+    }
+  }
+
+  const handleRejectEvent = async (id: string) => {
+    if (!confirm("Rejeter cette proposition d'événement ?")) return
+    setFeedback(null)
+    const ok = await callEventAction(id, 'rejete')
+    if (ok) {
+      setFeedback({ type: "success", message: "Proposition rejetée. L'organisateur a été notifié par email." })
+      fetchEvenements()
+    }
   }
 
   const fetchTypes = async () => {
@@ -367,6 +406,47 @@ export default function EvenementsPage() {
           {feedback.type === "error" ? <AlertCircle className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4 text-green-600" />}
           <AlertDescription>{feedback.message}</AlertDescription>
         </Alert>
+      )}
+
+      {pendingEvents.length > 0 && (
+        <Card className="border-amber-200 bg-amber-50 mb-6">
+          <CardHeader className="pb-3">
+            <CardTitle className="text-amber-800 flex items-center gap-2 text-base">
+              <Clock className="h-5 w-5" />
+              Propositions en attente ({pendingEvents.length})
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <div className="space-y-2">
+              {pendingEvents.map(event => (
+                <div key={event.id} className="flex items-center justify-between gap-4 bg-white rounded-lg p-3 border border-amber-100">
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium truncate text-sm">{event.titre}</p>
+                    <p className="text-xs text-gray-500 mt-0.5">
+                      {new Date(event.date).toLocaleDateString('fr-FR')} · {event.heure} · {event.lieu}
+                    </p>
+                  </div>
+                  <div className="flex gap-2 shrink-0">
+                    <Button
+                      size="sm"
+                      className="bg-green-600 hover:bg-green-700 text-white"
+                      onClick={() => handleApproveEvent(event.id)}
+                    >
+                      <Check className="h-4 w-4 mr-1" /> Approuver
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => handleRejectEvent(event.id)}
+                    >
+                      <X className="h-4 w-4 mr-1" /> Rejeter
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       <Card className="mb-6">
