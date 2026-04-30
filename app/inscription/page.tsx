@@ -117,6 +117,8 @@ export default function InscriptionPage() {
   })
   const [diplomeFile, setDiplomeFile] = useState<File | null>(null)
   const [photoFile, setPhotoFile] = useState<File | null>(null)
+  const [formationDomaineCustom, setFormationDomaineCustom] = useState('')
+  const [secteurCustom, setSecteurCustom] = useState('')
   const genreOptions: GenreType[] = ["Homme", "Femme"]
   const nationaliteOptions: NationaliteType[] = ["Guinéenne", "Franco-Guinéenne", "Guinéenne-Autre"]
   const planRetourOptions: PlanRetourType[] = ["Dans 2 ans", "Dans 5 ans", "Déjà en Guinée", "Autre"]
@@ -126,7 +128,10 @@ export default function InscriptionPage() {
   const diplomeSelectOptions: UiOption[] = DIPLOME_OPTIONS.map((item) => ({ value: item.value, label: item.label }))
   const formationDomaineSelectOptions: UiOption[] = FORMATION_DOMAINE_OPTIONS.map((item) => ({ value: item, label: item }))
   const statutSelectOptions: UiOption[] = statuts.map((item) => ({ value: item.id, label: item.libelle }))
-  const secteurSelectOptions: UiOption[] = secteurs.map((item) => ({ value: item.id, label: item.libelle }))
+  const secteurSelectOptions: UiOption[] = [
+    ...secteurs.map((item) => ({ value: item.id, label: item.libelle })),
+    { value: '__autre__', label: 'Autre' },
+  ]
   const planRetourSelectOptions: UiOption[] = planRetourOptions.map((item) => ({ value: item, label: item }))
   const bourseSelectOptions: UiOption[] = bourseOptions.map((item) => ({ value: item, label: item }))
   const telephoneCountrySelectOptions: UiOption[] = useMemo(() => {
@@ -306,6 +311,18 @@ export default function InscriptionPage() {
       return
     }
 
+    if (formData.formation_domaine === 'Autre' && !formationDomaineCustom.trim()) {
+      setError('Veuillez préciser votre discipline.')
+      setIsLoading(false)
+      return
+    }
+
+    if (formData.secteur_id === '__autre__' && !secteurCustom.trim()) {
+      setError("Veuillez préciser votre secteur d'activité.")
+      setIsLoading(false)
+      return
+    }
+
     if (!diplomeFile) {
       setError("Veuillez joindre votre diplôme.")
       setIsLoading(false)
@@ -347,9 +364,10 @@ export default function InscriptionPage() {
       body.append('universite', formData.universite)
       body.append('annee_promotion', formData.annee_promotion)
       body.append('diplome', formData.diplome)
-      body.append('formation_domaine', formData.formation_domaine)
+      body.append('formation_domaine', formData.formation_domaine === 'Autre' ? formationDomaineCustom.trim() : formData.formation_domaine)
       body.append('statut_professionnel_id', formData.statut_professionnel_id)
-      body.append('secteur_id', formData.secteur_id)
+      body.append('secteur_id', formData.secteur_id === '__autre__' ? '__autre__' : formData.secteur_id)
+      if (formData.secteur_id === '__autre__') body.append('secteur_libre', secteurCustom.trim())
       body.append('entreprise', formData.entreprise)
       body.append('poste_actuel', formData.poste_actuel)
       body.append('bio', formData.bio)
@@ -531,11 +549,25 @@ export default function InscriptionPage() {
                     id: "formation_domaine",
                     value: formData.formation_domaine,
                     options: formationDomaineSelectOptions,
-                    onSelect: (newValue) => setFormData((prev) => ({ ...prev, formation_domaine: newValue })),
+                    onSelect: (newValue) => {
+                      setFormData((prev) => ({ ...prev, formation_domaine: newValue }))
+                      if (newValue !== 'Autre') setFormationDomaineCustom('')
+                    },
                     placeholder: "Sélectionner",
                     searchPlaceholder: "Rechercher un domaine...",
                     emptyLabel: "Aucun domaine trouvé.",
                   })}
+                  {formData.formation_domaine === 'Autre' && (
+                    <div className="space-y-1">
+                      <Input
+                        placeholder="Précisez votre discipline"
+                        value={formationDomaineCustom}
+                        onChange={e => setFormationDomaineCustom(e.target.value)}
+                        maxLength={20}
+                      />
+                      <p className="text-xs text-muted-foreground">{formationDomaineCustom.length}/20 caractères</p>
+                    </div>
+                  )}
                 </div>
                 <div className="space-y-2 md:col-span-2">
                   <Label htmlFor="bourse">Bourse <span className="text-red-500">*</span></Label>
@@ -576,12 +608,26 @@ export default function InscriptionPage() {
                     id: "secteur_id",
                     value: formData.secteur_id,
                     options: secteurSelectOptions,
-                    onSelect: (newValue) => setFormData((prev) => ({ ...prev, secteur_id: newValue })),
+                    onSelect: (newValue) => {
+                      setFormData((prev) => ({ ...prev, secteur_id: newValue }))
+                      if (newValue !== '__autre__') setSecteurCustom('')
+                    },
                     placeholder: isLoadingOptions ? "Chargement..." : "Sélectionner",
                     searchPlaceholder: "Rechercher un secteur...",
                     emptyLabel: "Aucun secteur trouvé.",
                     disabled: isLoadingOptions,
                   })}
+                  {formData.secteur_id === '__autre__' && (
+                    <div className="space-y-1">
+                      <Input
+                        placeholder="Précisez votre secteur d'activité"
+                        value={secteurCustom}
+                        onChange={e => setSecteurCustom(e.target.value)}
+                        maxLength={20}
+                      />
+                      <p className="text-xs text-muted-foreground">{secteurCustom.length}/20 caractères</p>
+                    </div>
+                  )}
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="entreprise">Entreprise / organisation <span className="text-red-500">*</span></Label>

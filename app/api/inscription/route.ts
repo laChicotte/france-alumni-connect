@@ -74,6 +74,7 @@ export async function POST(request: NextRequest) {
     const formationDomaine = formData.get('formation_domaine') as string
     const statutProfessionnelId = formData.get('statut_professionnel_id') as string
     const secteurId = formData.get('secteur_id') as string
+    const secteurLibre = formData.get('secteur_libre') as string | null
     const entreprise = formData.get('entreprise') as string
     const posteActuel = formData.get('poste_actuel') as string
     const bio = formData.get('bio') as string | null
@@ -330,7 +331,8 @@ export async function POST(request: NextRequest) {
       diplome: diplome as DiplomeType,
       formation_domaine: formationDomaine,
       statut_professionnel_id: statutProfessionnelId,
-      secteur_id: secteurId,
+      secteur_id: secteurId === '__autre__' ? null : secteurId,
+      secteur_libre: secteurId === '__autre__' ? (secteurLibre?.trim().slice(0, 20) || null) : null,
       entreprise,
       poste_actuel: posteActuel,
       bio: bio?.trim() || null,

@@ -98,6 +98,7 @@ export interface Database {
           formation_domaine: string
           statut_professionnel_id: string | null
           secteur_id: string | null
+          secteur_libre: string | null
           entreprise: string | null
           poste_actuel: string | null
           bio: string | null
@@ -125,6 +126,7 @@ export interface Database {
           formation_domaine: string
           statut_professionnel_id?: string | null
           secteur_id?: string | null
+          secteur_libre?: string | null
           entreprise?: string | null
           poste_actuel?: string | null
           bio?: string | null
@@ -151,6 +153,7 @@ export interface Database {
           formation_domaine?: string
           statut_professionnel_id?: string | null
           secteur_id?: string | null
+          secteur_libre?: string | null
           entreprise?: string | null
           poste_actuel?: string | null
           bio?: string | null

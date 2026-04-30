@@ -139,6 +139,7 @@ CREATE TABLE IF NOT EXISTS public.alumni_profiles (
   formation_domaine        TEXT             NOT NULL,
   statut_professionnel_id  UUID             REFERENCES public.statuts_professionnels(id),
   secteur_id               UUID             REFERENCES public.secteurs(id),
+  secteur_libre            TEXT,
   entreprise               TEXT,
   poste_actuel             TEXT,
   bio                      TEXT,

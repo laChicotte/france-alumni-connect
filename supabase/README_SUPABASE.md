@@ -79,6 +79,18 @@ Ces scripts ne modifient rien, ils permettent de lister ce qui existe :
 - Valeurs: `Non boursier`, `Boursier Etat français`, `Boursier Etat guinéen`, `Boursier Etats français et guinéen`
 - Optionnel (nullable)
 
+### Champ secteur_libre (alumni_profiles) — migration appliquée
+- Colonne: `alumni_profiles.secteur_libre`
+- Type: TEXT nullable
+- Rôle: stocke le texte libre saisi par l'alumni quand il choisit "Autre" dans la liste déroulante secteur d'activité
+- Limité à 20 caractères côté formulaire et API
+- Quand renseigné, `secteur_id` est `NULL`
+- **SQL exécuté** :
+  ```sql
+  ALTER TABLE public.alumni_profiles
+    ADD COLUMN IF NOT EXISTS secteur_libre TEXT;
+  ```
+
 ### Champ genre (alumni_profiles)
 - Colonne: `alumni_profiles.genre`
 - Valeurs autorisées: `Homme`, `Femme`, `Autre`

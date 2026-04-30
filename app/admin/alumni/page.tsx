@@ -47,6 +47,13 @@ interface AlumniWithSecteur extends AlumniProfile {
   secteurs?: { libelle: string } | null
   users?: { email: string } | null
   statuts_professionnels?: { libelle: string } | null
+  secteur_libre?: string | null
+}
+
+function afficherSecteur(profile: AlumniWithSecteur): string {
+  if (profile.secteurs?.libelle) return profile.secteurs.libelle
+  if (profile.secteur_libre) return profile.secteur_libre
+  return '-'
 }
 
 const DIPLOME_LABELS: Record<string, string> = {
@@ -149,7 +156,7 @@ export default function AlumniPage() {
       annee_promotion: profile.annee_promotion,
       diplome: profile.diplome,
       formation_domaine: profile.formation_domaine,
-      secteur: profile.secteurs?.libelle || "",
+      secteur: afficherSecteur(profile),
       entreprise: profile.entreprise || "",
       poste_actuel: profile.poste_actuel || "",
       visible_annuaire: profile.visible_annuaire ? "oui" : "non",
@@ -273,7 +280,7 @@ export default function AlumniPage() {
                       <TableCell>{profile.universite}</TableCell>
                       <TableCell>{profile.annee_promotion}</TableCell>
                       <TableCell>
-                        {profile.secteurs?.libelle || '-'}
+                        {afficherSecteur(profile)}
                       </TableCell>
                       <TableCell>{profile.ville}</TableCell>
                       <TableCell>
@@ -433,7 +440,10 @@ export default function AlumniPage() {
                   </div>
                   <div className="flex items-start gap-2">
                     <Briefcase className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />
-                    <div><p className="text-xs text-gray-400">Secteur</p><p>{selectedAlumni.secteurs?.libelle || '-'}</p></div>
+                    <div>
+                      <p className="text-xs text-gray-400">Secteur</p>
+                      <p>{afficherSecteur(selectedAlumni)}</p>
+                    </div>
                   </div>
                   <div className="flex items-start gap-2">
                     <Briefcase className="h-4 w-4 text-gray-400 mt-0.5 shrink-0" />
