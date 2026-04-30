@@ -395,7 +395,7 @@ export default function AnnuairePage() {
 
                 <Link
                   href="/entrepreneurs"
-                  className="inline-flex h-10 items-center gap-2 rounded-full bg-red px-5 text-sm font-semibold text-white hover:bg-[#2a4580] transition-colors shrink-0"
+                  className="inline-flex h-10 items-center gap-2 rounded-full bg-[#FF0000] px-5 text-sm font-semibold text-white hover:bg-[#2a4580] transition-colors shrink-0"
                 >
                   <Building2 className="h-4 w-4" />
                   Entreprises fondées par les Alumni
