@@ -56,16 +56,22 @@ export function registrationReceivedEmail(input: RegistrationEmailInput) {
   const name = escapeHtml(displayName(input))
 
   return {
-    subject: 'Votre inscription a bien été reçue',
+    subject: 'Votre demande d\'inscription a bien été reçue — France Alumni Guinée',
     html: layout(
-      'Inscription reçue',
+      'Demande d\'inscription reçue',
       `
         <p style="margin:0 0 12px;">Bonjour ${name},</p>
-        <p style="margin:0 0 12px;">Votre demande d'inscription sur la plateforme ${escapeHtml(appName)} a bien été reçue.</p>
-        <p style="margin:0;">Votre compte est actuellement en attente de validation par l'équipe d'administration. Vous recevrez un email lorsque votre compte sera activé.</p>
+        <p style="margin:0 0 12px;">Nous avons bien reçu votre demande d'inscription sur la plateforme <strong>${escapeHtml(appName)}</strong>. Nous vous remercions de l'intérêt que vous portez à notre réseau.</p>
+        <p style="margin:0 0 12px;">Votre dossier va être examiné par notre équipe d'administration dans les meilleurs délais. Cette vérification nous permet de garantir la qualité et la fiabilité de notre communauté d'alumni.</p>
+        <p style="margin:0 0 12px;">Vous recevrez prochainement un email vous informant de la décision prise concernant votre compte :</p>
+        <ul style="margin:0 0 12px;padding-left:20px;">
+          <li style="margin-bottom:6px;">En cas de <strong>validation</strong>, vous pourrez immédiatement vous connecter et accéder à l'ensemble des services de la plateforme.</li>
+          <li style="margin-bottom:6px;">En cas de <strong>refus</strong>, vous en serez informé avec les raisons si nécessaire, et vous aurez la possibilité de nous contacter pour tout éclaircissement.</li>
+        </ul>
+        <p style="margin:0;">Pour toute question, n'hésitez pas à nous écrire à <a href="mailto:france.alumni@institutfrancais-guinee.fr" style="color:${primaryColor};">france.alumni@institutfrancais-guinee.fr</a>.</p>
       `
     ),
-    text: `Bonjour ${displayName(input)}, votre demande d'inscription sur ${appName} a bien été reçue. Votre compte est en attente de validation.`,
+    text: `Bonjour ${displayName(input)}, nous avons bien reçu votre demande d'inscription sur ${appName}. Votre dossier va être examiné par notre équipe d'administration. Vous recevrez un email lors de la validation ou du refus de votre compte. Pour toute question : france.alumni@institutfrancais-guinee.fr`,
   }
 }
 
