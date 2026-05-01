@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { createSupabaseAdmin } from '@/lib/supabase-admin'
 import { sendEmailSafe } from '@/lib/email/resend'
 import { entrepriseReferencementStaffNotificationEmail } from '@/lib/email/templates'
+import { sanitizeUrl } from '@/lib/utils'
 
 function getBearerToken(request: NextRequest) {
   const auth = request.headers.get('authorization') || ''
@@ -122,7 +123,7 @@ export async function POST(request: NextRequest) {
 
     const nom_commercial = get('nom_commercial') || null
     const chiffre_affaires = get('chiffre_affaires') || null
-    const site_web = get('site_web') || null
+    const site_web = sanitizeUrl(get('site_web'))
     const besoins_autre = get('besoins_autre') || null
     const domaine_associe = get('domaine_associe') || null
     const description_impact = get('description_impact') || null

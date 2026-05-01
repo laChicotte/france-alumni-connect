@@ -16,7 +16,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { User, Users, Mail, Phone, MapPin, Building, Building2, GraduationCap, Edit2, Save, X, Loader2, Linkedin, CheckCircle, AlertCircle, FileText, Eye, EyeOff, ChevronDown, Check } from "lucide-react"
 import { supabase } from "@/lib/supabase"
 import { AlumniProfile, Secteur, StatutProfessionnel, DiplomeType, NationaliteType, PlanRetourType, BourseType } from "@/types/database.types"
-import { cn } from "@/lib/utils"
+import { cn, sanitizeLinkedinUrl } from "@/lib/utils"
 
 
 
@@ -108,6 +108,27 @@ export default function ProfilPage() {
   const [isBourseOpen, setIsBourseOpen] = useState(false)
 
   const [mentorStatut, setMentorStatut] = useState<string | null>(null)
+  const [isDiplomeLoading, setIsDiplomeLoading] = useState(false)
+
+  const handleViewDiplome = async () => {
+    if (!formData.document_diplome_url) return
+    setIsDiplomeLoading(true)
+    try {
+      const session = await supabase.auth.getSession()
+      const token = session.data.session?.access_token
+      if (!token) { setError('Session expirée, veuillez vous reconnecter'); return }
+      const res = await fetch('/api/alumni/diplome/signed-url', {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const json = await res.json()
+      if (!res.ok || !json.signedUrl) { setError('Impossible d\'ouvrir le diplôme'); return }
+      window.open(json.signedUrl, '_blank', 'noopener,noreferrer')
+    } catch {
+      setError('Erreur lors de l\'ouverture du diplôme')
+    } finally {
+      setIsDiplomeLoading(false)
+    }
+  }
 
   // Options pour les selects
   const [secteurs, setSecteurs] = useState<Secteur[]>([])
@@ -275,7 +296,7 @@ export default function ProfilPage() {
           poste_actuel: formData.poste_actuel || null,
           photo_url: nextPhotoUrl,
           bio: formData.bio || null,
-          linkedin_url: formData.linkedin_url || null,
+          linkedin_url: sanitizeLinkedinUrl(formData.linkedin_url),
           nationalite: formData.nationalite || 'Guinéenne',
           plan_retour: (formData.plan_retour as string) || null,
           bourse: (formData.bourse as BourseType) || null,
@@ -511,15 +532,15 @@ export default function ProfilPage() {
                       Mon entreprise
                     </a>
                     {formData.document_diplome_url && (
-                      <a
-                        href={formData.document_diplome_url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="w-full flex items-center justify-center gap-2 border border-[#3558A2] text-[#3558A2] hover:bg-[#3558A2]/5 font-medium py-2.5 px-4 rounded-lg transition-colors"
+                      <button
+                        type="button"
+                        onClick={handleViewDiplome}
+                        disabled={isDiplomeLoading}
+                        className="w-full flex items-center justify-center gap-2 border border-[#3558A2] text-[#3558A2] hover:bg-[#3558A2]/5 font-medium py-2.5 px-4 rounded-lg transition-colors disabled:opacity-50"
                       >
-                        <FileText className="h-4 w-4" />
+                        {isDiplomeLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <FileText className="h-4 w-4" />}
                         Voir mon diplôme
-                      </a>
+                      </button>
                     )}
                   </div>
                 )}

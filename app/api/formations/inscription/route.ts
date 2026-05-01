@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createClient } from "@supabase/supabase-js"
 import type { Database } from "@/types/database.types"
+import { checkRateLimit } from "@/lib/rate-limit"
 
 function getBearerToken(request: NextRequest) {
   const auth = request.headers.get("authorization") || ""
@@ -9,6 +10,9 @@ function getBearerToken(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const rateLimitResponse = await checkRateLimit(request, 'alumni')
+  if (rateLimitResponse) return rateLimitResponse
+
   try {
     const token = getBearerToken(request)
     const body = await request.json()

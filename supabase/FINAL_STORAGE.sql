@@ -22,7 +22,10 @@ ON CONFLICT (id) DO NOTHING;
 -- 2. POLICIES POUR LE BUCKET "diplomes"
 -- ================================================
 
--- SELECT: Seuls les admins et le propriétaire peuvent voir les diplômes
+-- Supprimer toute ancienne policy trop permissive
+DROP POLICY IF EXISTS "Authenticated users can upload diplomes" ON storage.objects;
+
+-- SELECT: propriétaire ou admin/modérateur uniquement
 DROP POLICY IF EXISTS "Users can view own diploma" ON storage.objects;
 CREATE POLICY "Users can view own diploma"
 ON storage.objects FOR SELECT
@@ -30,19 +33,16 @@ TO authenticated
 USING (
   bucket_id = 'diplomes'
   AND (
-    -- L'utilisateur peut voir son propre diplôme
     (storage.foldername(name))[1] = auth.uid()::text
-    OR
-    -- Les admins peuvent voir tous les diplômes
-    EXISTS (
+    OR EXISTS (
       SELECT 1 FROM public.users u
       WHERE u.id = auth.uid()
-      AND u.role = 'admin'
+      AND u.role IN ('admin', 'moderateur')
     )
   )
 );
 
--- INSERT: Les utilisateurs peuvent uploader leur diplôme
+-- INSERT: alumni upload dans son propre dossier uniquement
 DROP POLICY IF EXISTS "Users can upload own diploma" ON storage.objects;
 CREATE POLICY "Users can upload own diploma"
 ON storage.objects FOR INSERT
@@ -52,7 +52,7 @@ WITH CHECK (
   AND (storage.foldername(name))[1] = auth.uid()::text
 );
 
--- UPDATE: Les utilisateurs peuvent mettre à jour leur diplôme
+-- UPDATE: alumni met à jour son propre diplôme uniquement
 DROP POLICY IF EXISTS "Users can update own diploma" ON storage.objects;
 CREATE POLICY "Users can update own diploma"
 ON storage.objects FOR UPDATE
@@ -62,7 +62,7 @@ USING (
   AND (storage.foldername(name))[1] = auth.uid()::text
 );
 
--- DELETE: Seuls les admins peuvent supprimer des diplômes
+-- DELETE: admin uniquement
 DROP POLICY IF EXISTS "Admins can delete diplomas" ON storage.objects;
 CREATE POLICY "Admins can delete diplomas"
 ON storage.objects FOR DELETE

@@ -4,23 +4,8 @@ import { getEmailConfig, sendEmailSafe } from '@/lib/email/resend'
 import { adminRegistrationNotificationEmail, registrationReceivedEmail } from '@/lib/email/templates'
 import type { Database, DiplomeType, GenreType, NationaliteType, PlanRetourType, BourseType } from '@/types/database.types'
 import { parsePhoneNumberFromString } from 'libphonenumber-js'
-
-// Rate limiting : max 5 tentatives par IP par fenêtre de 60s
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
-const RATE_LIMIT_MAX = 5
-const RATE_LIMIT_WINDOW_MS = 60_000
-
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now()
-  const entry = rateLimitMap.get(ip)
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS })
-    return true
-  }
-  if (entry.count >= RATE_LIMIT_MAX) return false
-  entry.count++
-  return true
-}
+import { checkRateLimit } from '@/lib/rate-limit'
+import { sanitizeLinkedinUrl } from '@/lib/utils'
 
 const MAX_FILE_SIZE = 5 * 1024 * 1024 // 5MB
 const ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png']
@@ -49,13 +34,8 @@ const ALLOWED_DIPLOMES: DiplomeType[] = [
 ]
 
 export async function POST(request: NextRequest) {
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
-  if (!checkRateLimit(ip)) {
-    return NextResponse.json(
-      { error: 'Trop de tentatives. Veuillez réessayer dans une minute.' },
-      { status: 429 }
-    )
-  }
+  const rateLimitResponse = await checkRateLimit(request, 'inscription')
+  if (rateLimitResponse) return rateLimitResponse
 
   try {
     const formData = await request.formData()
@@ -79,7 +59,7 @@ export async function POST(request: NextRequest) {
     const posteActuel = formData.get('poste_actuel') as string
     const bio = formData.get('bio') as string | null
     const linkedinUrlRaw = formData.get('linkedin_url') as string | null
-    const linkedinUrl = linkedinUrlRaw?.trim() || null
+    const linkedinUrl = sanitizeLinkedinUrl(linkedinUrlRaw)
     const planRetour = formData.get('plan_retour') as string
     const bourse = formData.get('bourse') as string
     const visibleAnnuaireRaw = formData.get('visible_annuaire') as string
@@ -287,8 +267,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    const { data: urlData } = supabase.storage.from('diplomes').getPublicUrl(fileName)
-    const diplomeUrl = urlData.publicUrl
+    // Stocker le chemin (path) et non l'URL publique — le bucket est privé
+    const diplomeUrl = fileName
 
     // 4. Upload photo de profil (obligatoire)
     const photoExt = photoFile.name.split('.').pop()?.toLowerCase() || 'jpg'

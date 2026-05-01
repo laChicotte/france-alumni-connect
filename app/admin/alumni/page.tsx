@@ -77,6 +77,28 @@ export default function AlumniPage() {
   const [dialogAction, setDialogAction] = useState<string | null>(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null)
+  const [isDiplomeLoading, setIsDiplomeLoading] = useState(false)
+
+  const handleViewDiplome = async (profile: AlumniWithSecteur) => {
+    if (!profile.document_diplome_url || !profile.user_id) return
+    setIsDiplomeLoading(true)
+    try {
+      const { data: sessionData } = await supabase.auth.getSession()
+      const token = sessionData.session?.access_token
+      if (!token) return
+      const res = await fetch(`/api/admin/alumni/diplome/signed-url?userId=${encodeURIComponent(profile.user_id)}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      const json = await res.json()
+      if (res.ok && json.signedUrl) {
+        window.open(json.signedUrl, '_blank', 'noopener,noreferrer')
+      }
+    } catch {
+      // non bloquant
+    } finally {
+      setIsDiplomeLoading(false)
+    }
+  }
 
   useEffect(() => {
     fetchAlumni()
@@ -481,14 +503,14 @@ export default function AlumniPage() {
                   </a>
                 )}
                 {selectedAlumni.document_diplome_url && (
-                  <a
-                    href={selectedAlumni.document_diplome_url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1.5 text-sm text-[#3558A2] hover:underline"
+                  <button
+                    type="button"
+                    onClick={() => handleViewDiplome(selectedAlumni)}
+                    disabled={isDiplomeLoading}
+                    className="flex items-center gap-1.5 text-sm text-[#3558A2] hover:underline disabled:opacity-50"
                   >
-                    <FileText className="h-4 w-4" /> Voir le diplôme
-                  </a>
+                    <FileText className="h-4 w-4" /> {isDiplomeLoading ? 'Chargement...' : 'Voir le diplôme'}
+                  </button>
                 )}
               </div>
 

@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { createSupabaseAdmin } from '@/lib/supabase-admin'
 import { sendEmailSafe } from '@/lib/email/resend'
 import { proposalStaffNotificationEmail } from '@/lib/email/templates'
+import { sanitizeUrl } from '@/lib/utils'
 
 function getBearerToken(request: NextRequest) {
   const auth = request.headers.get('authorization') || ''
@@ -61,7 +62,7 @@ export async function POST(request: NextRequest) {
         description: description.trim(),
         image_url,
         places_max: places_max ? parseInt(places_max) : null,
-        lien_visio: lien_visio?.trim() || null,
+        lien_visio: sanitizeUrl(lien_visio),
         organisateur_id: callerAuth.user.id,
         statut: 'en_attente',
         actif: false,

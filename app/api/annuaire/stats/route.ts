@@ -36,7 +36,7 @@ export async function GET() {
   try {
     const supabase = createSupabaseAdmin()
 
-    // Stats globales basées sur alumni_profiles (tous les profils enregistrés)
+    // Stats publiques : uniquement les profils visibles dans l'annuaire
     const { data: profilesData, error: profilesError } = await supabase
       .from("alumni_profiles")
       .select(`
@@ -48,6 +48,7 @@ export async function GET() {
         secteurs(libelle),
         statuts_professionnels(libelle)
       `)
+      .eq("visible_annuaire", true)
 
     if (profilesError) {
       return NextResponse.json({ error: profilesError.message }, { status: 500 })

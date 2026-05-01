@@ -4,25 +4,9 @@ import { createSupabaseAdmin } from '@/lib/supabase-admin'
 import { sendEmailSafe } from '@/lib/email/resend'
 import { adminUserCreatedEmail } from '@/lib/email/templates'
 import type { UserRole } from '@/types/database.types'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 const ALLOWED_ROLES: UserRole[] = ['admin', 'moderateur']
-
-// Rate limiting : max 10 tentatives par IP par fenêtre de 60s
-const rateLimitMap = new Map<string, { count: number; resetAt: number }>()
-const RATE_LIMIT_MAX = 10
-const RATE_LIMIT_WINDOW_MS = 60_000
-
-function checkRateLimit(ip: string): boolean {
-  const now = Date.now()
-  const entry = rateLimitMap.get(ip)
-  if (!entry || now > entry.resetAt) {
-    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS })
-    return true
-  }
-  if (entry.count >= RATE_LIMIT_MAX) return false
-  entry.count++
-  return true
-}
 
 function getBearerToken(request: NextRequest) {
   const auth = request.headers.get('authorization') || ''
@@ -31,13 +15,8 @@ function getBearerToken(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
-  const ip = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
-  if (!checkRateLimit(ip)) {
-    return NextResponse.json(
-      { error: 'Trop de tentatives. Veuillez réessayer dans une minute.' },
-      { status: 429 }
-    )
-  }
+  const rateLimitResponse = await checkRateLimit(request, 'admin')
+  if (rateLimitResponse) return rateLimitResponse
 
   try {
     // 1. Vérifier l'authentification de l'appelant

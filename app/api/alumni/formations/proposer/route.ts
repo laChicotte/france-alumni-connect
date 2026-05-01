@@ -3,6 +3,8 @@ import { createClient } from '@supabase/supabase-js'
 import { createSupabaseAdmin } from '@/lib/supabase-admin'
 import { sendEmailSafe } from '@/lib/email/resend'
 import { proposalStaffNotificationEmail } from '@/lib/email/templates'
+import { sanitizeUrl } from '@/lib/utils'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 function getBearerToken(request: NextRequest) {
   const auth = request.headers.get('authorization') || ''
@@ -15,6 +17,9 @@ function generateSlug(titre: string) {
 }
 
 export async function POST(request: NextRequest) {
+  const rateLimitResponse = await checkRateLimit(request, 'alumni')
+  if (rateLimitResponse) return rateLimitResponse
+
   try {
     const token = getBearerToken(request)
     if (!token) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })
@@ -63,7 +68,7 @@ export async function POST(request: NextRequest) {
         heure_debut,
         heure_fin: heure_fin || null,
         lieu: lieu.trim(),
-        lien_visio: lien_visio?.trim() || null,
+        lien_visio: sanitizeUrl(lien_visio),
         type_formation_id: type_formation_id || null,
         description: description.trim(),
         programme: programme?.trim() || null,

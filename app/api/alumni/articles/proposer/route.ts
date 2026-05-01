@@ -3,6 +3,7 @@ import { createClient } from '@supabase/supabase-js'
 import { createSupabaseAdmin } from '@/lib/supabase-admin'
 import { sendEmailSafe } from '@/lib/email/resend'
 import { proposalStaffNotificationEmail } from '@/lib/email/templates'
+import { checkRateLimit } from '@/lib/rate-limit'
 
 function getBearerToken(request: NextRequest) {
   const auth = request.headers.get('authorization') || ''
@@ -15,6 +16,9 @@ function generateSlug(titre: string) {
 }
 
 export async function POST(request: NextRequest) {
+  const rateLimitResponse = await checkRateLimit(request, 'alumni')
+  if (rateLimitResponse) return rateLimitResponse
+
   try {
     const token = getBearerToken(request)
     if (!token) return NextResponse.json({ error: 'Non authentifié' }, { status: 401 })

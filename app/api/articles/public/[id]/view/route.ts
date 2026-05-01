@@ -1,10 +1,14 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createSupabaseAdmin } from "@/lib/supabase-admin"
+import { checkRateLimit } from "@/lib/rate-limit"
 
 export async function POST(
-  _request: NextRequest,
+  request: NextRequest,
   context: { params: Promise<{ id: string }> }
 ) {
+  const rateLimitResponse = await checkRateLimit(request, 'alumni')
+  if (rateLimitResponse) return rateLimitResponse
+
   try {
     const { id } = await context.params
     const supabase = createSupabaseAdmin()
